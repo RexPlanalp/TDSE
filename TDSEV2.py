@@ -4,12 +4,15 @@ import time
 import matplotlib.pyplot as plt
 import h5py
 import os
+from scipy.interpolate import BSpline
+
+
+
 from petsc4py import PETSc
 from slepc4py import SLEPc
 from mpi4py import MPI
-from scipy.interpolate import BSpline
-from scipy.sparse import lil_matrix
-from scipy.sparse.linalg import eigsh
+
+
 
 class Grid:
     def __init__(self,grid_size,grid_spacing,time_size,time_spacing):
@@ -21,16 +24,17 @@ class Grid:
 
         self.tmax = time_size
         self.dt = time_spacing
-    def Print(self):
-        print(
-            """
-            Simulation Box:
+    def Print(self,bool):
+        if bool:
+            print(
+                """
+                Simulation Box:
             
-            x = [{},{}], {}
-            t = [0,{}], {}
+                x = [{},{}], {}
+                t = [0,{}], {}
             
-            """.format(0,self.rmax,self.dr,self.tmax,self.dt)
-        )
+                """.format(0,self.rmax,self.dr,self.tmax,self.dt)
+            )
         return None
     
 class Basis:
@@ -55,17 +59,17 @@ class Basis:
 
         return None
     
-    def PlotFuncs(self,r):
-
-        basis_array = np.empty((len(r),self.n_basis))
-        basis_derivative_array = np.empty((len(r),self.n_basis))
-        for i in range(self.n_basis):
-             basis_array[:,i] = self.bfuncs[i](r)
-             basis_derivative_array[:,i] = self.bfuncs[i](r,2)
+    def PlotFuncs(self,r,bool):
+        if bool:
+            basis_array = np.empty((len(r),self.n_basis))
+            basis_derivative_array = np.empty((len(r),self.n_basis))
+            for i in range(self.n_basis):
+                basis_array[:,i] = self.bfuncs[i](r)
+                basis_derivative_array[:,i] = self.bfuncs[i](r,2)
         
-        for i in range(self.n_basis):
-            plt.plot(r,basis_array[:,i])
-        plt.savefig("b_splines.png")
+            for i in range(self.n_basis):
+                plt.plot(r,basis_array[:,i])
+            plt.savefig("b_splines.png")
         return None
 
     def CreateGauss(self,rmax):
@@ -89,18 +93,18 @@ class Basis:
         self.barrays_der_gauss = basis_derivative_array_gauss
         self.barrays_gauss = basis_array_gauss
 
-class FF_Hamiltonian:
+class TISE:
     def __init__(self):
-        self.H_list = []
+        self.FFH_R_list = []
     def CreateH_l(self,n_basis,barrays,barrays_der,nodes,weights,l):
         rank = PETSc.COMM_WORLD.getRank()
         if rank == 0:
             start = time.time()
-        H_test = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
-        S_test = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
+        FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
+        S_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
 
-        rowstart,rowend = H_test.getOwnershipRange()
-        columnstart,columnend = H_test.getOwnershipRangeColumn()
+        rowstart,rowend = FFH_R.getOwnershipRange()
+        columnstart,columnend = FFH_R.getOwnershipRangeColumn()
         for i in range(rowstart,rowend):
             for j in range(columnstart,columnend):
                 if i >= j:
@@ -114,41 +118,25 @@ class FF_Hamiltonian:
                     H_element = H_element_1 + H_element_2 + H_element_3
 
                     
-                    H_test.setValue(i,j,H_element)
-                    S_test.setValue(i,j,S_element)
+                    FFH_R.setValue(i,j,H_element)
+                    S_R.setValue(i,j,S_element)
 
                     if i != j:
                         
-                        H_test.setValue(j,i,H_element)
-                        S_test.setValue(j,i,S_element)
+                        FFH_R.setValue(j,i,H_element)
+                        S_R.setValue(j,i,S_element)
                         
-        H_test.assemblyBegin()
-        H_test.assemblyEnd()
+        FFH_R.assemblyBegin()
+        FFH_R.assemblyEnd()
+        S_R.assemblyBegin()
+        S_R.assemblyEnd()
 
-        S_test.assemblyBegin()
-        S_test.assemblyEnd()
-
-
-        E = SLEPc.EPS().create()
-        E.setOperators(H_test, S_test)
-        E.setProblemType(SLEPc.EPS.ProblemType.GHEP)
-        E.setDimensions(nev=3)
-        E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
-        E.solve()
-
-        nconv = E.getConverged()
-        eigenvalues = [E.getEigenvalue(i) for i in range(nconv)]
+        self.FFH_R_list.append(FFH_R)
+        self.S_R = S_R
         
-        if rank == 0:
-            end = time.time()
-            print(eigenvalues)
-            print(end-start)
-        
-        
-        
-        
-
         return None
+    
+
     def EvalEigen(self,S):
         with h5py.File('Hydrogen.h5', 'w') as hf:
             eigvec_group = hf.require_group("eigvecs")
@@ -162,30 +150,74 @@ class FF_Hamiltonian:
                     if not f"eigvals/{i+1+l}" in hf:
                         eigval_group.create_dataset(f"{i+1+l}",data = eigvals[i])
         return eigvals,eigvecs
+    def EvalEigen(self):
+        
+        ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
+            
+            
+            
+        for l,H in enumerate(self.FFH_R_list):
+            E = SLEPc.EPS().create()
+            E.setOperators(H, self.S_R)
+            E.setProblemType(SLEPc.EPS.ProblemType.GHEP)
+            E.setDimensions(nev=3)
+            E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
+            E.solve()
+
+            nconv = E.getConverged()
+            
+            for i in range(nconv):
+                eigenvalue = E.getEigenvalue(i)  # This retrieves the eigenvalue
+
+                # Creating separate vectors for the real part of the eigenvector
+                eigen_vector = H.getVecLeft()  # Assuming H is the correct operator for the matrix H
+                E.getEigenvector(i, eigen_vector)  # This retrieves the eigenvector
+                        
+                    
+                eigen_vector.setName(f"Psi_{i+1+l}_{l}")
+                ViewHDF5.view(eigen_vector)
+                    
+                # You could save the real part and the imaginary part if they are non-zero,
+                # but for SMALLEST_REAL we typically only consider the real part.
+                        
+                energy = PETSc.Vec().createMPI(1, comm=PETSc.COMM_WORLD)
+                energy.setValue(0,np.real(eigenvalue))
+                energy.setName(f"E_{i+1+l}_{l}")
+                energy.assemblyBegin()
+                energy.assemblyEnd()
+                ViewHDF5.view(energy)
+        ViewHDF5.destroy()    
+        return None
+
 
 if __name__ == "__main__":
-    
+    if PETSc.COMM_WORLD.rank ==0:
+        start = time.time()
     with open('input.json', 'r') as file:
             input_par = json.load(file)
     box_par = tuple(input_par["box"].values())
     box = Grid(*box_par)
-    #box.Print()
+    box.Print(False)
 
 
     splines_par = tuple(input_par["splines"].values())
     splines = Basis(*splines_par)
     splines.CreateFuncs(box.rmax,box.dr)
-    #splines.PlotFuncs(box.r)
+
+    splines.PlotFuncs(box.r,False)
     splines.CreateGauss(box.rmax)
     splines.EvalGauss()
-    #splines.CreateOverlap()
+    
 
-    start = time.time()
-    FieldFreeH = FF_Hamiltonian()
-    for l in range(1):
+    
+    FieldFreeH = TISE()
+    for l in range(2):
         FieldFreeH.CreateH_l(splines.n_basis,splines.barrays_gauss,splines.barrays_der_gauss,splines.nodes,splines.weights,l)
-    #FieldFreeH.EvalEigen(splines.S)
-    end = time.time()
-    #print(f"Total Time:{end-start}")
+    FieldFreeH.EvalEigen()
+
+    if PETSc.COMM_WORLD.rank ==0:
+        end = time.time()
+   
+        print(f"Total Time:{end-start}")
 
         
