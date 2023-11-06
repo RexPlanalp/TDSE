@@ -7,7 +7,7 @@ import os
 from scipy.interpolate import BSpline
 
 
-
+import slepc4py
 from petsc4py import PETSc
 from slepc4py import SLEPc
 from mpi4py import MPI
@@ -114,8 +114,9 @@ class TISE:
                     H_element_3 = np.sum(weights * barrays[:,i] * barrays[:,j] * (-1/np.sqrt(nodes**2 + 1E-25)))
 
                     S_element = np.sum(weights * barrays[:,i] * barrays[:,j])
-
+                    
                     H_element = H_element_1 + H_element_2 + H_element_3
+                    
 
                     
                     FFH_R.setValue(i,j,H_element)
@@ -135,21 +136,6 @@ class TISE:
         self.S_R = S_R
         
         return None
-    
-
-    def EvalEigen(self,S):
-        with h5py.File('Hydrogen.h5', 'w') as hf:
-            eigvec_group = hf.require_group("eigvecs")
-            eigval_group = hf.require_group("eigvals")
-            for l,H in enumerate(self.H_list):
-                eigvals, eigvecs = eigsh(H, M=S,which = "SM",k = 10)
-                print(eigvals[:3])
-                for i in range(10):
-                    if not f"eigvecs/Psi_{i+1+l}_{l}" in hf:
-                        eigvec_group.create_dataset(f"Psi_{i+1+l}_{l}",data = eigvecs[:,i])
-                    if not f"eigvals/{i+1+l}" in hf:
-                        eigval_group.create_dataset(f"{i+1+l}",data = eigvals[i])
-        return eigvals,eigvecs
     def EvalEigen(self):
         
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
@@ -159,16 +145,24 @@ class TISE:
         for l,H in enumerate(self.FFH_R_list):
             E = SLEPc.EPS().create()
             E.setOperators(H, self.S_R)
-            E.setProblemType(SLEPc.EPS.ProblemType.GHEP)
-            E.setDimensions(nev=3)
+            
+            
+            E.setDimensions(nev=6)
+            
+            
+            
+
+            E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
             E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
+            E.setType(slepc4py.SLEPc.EPS.Type.KRYLOVSCHUR)
+            
             E.solve()
 
             nconv = E.getConverged()
             
             for i in range(nconv):
                 eigenvalue = E.getEigenvalue(i)  # This retrieves the eigenvalue
-
+                
                 # Creating separate vectors for the real part of the eigenvector
                 eigen_vector = H.getVecLeft()  # Assuming H is the correct operator for the matrix H
                 E.getEigenvector(i, eigen_vector)  # This retrieves the eigenvector
@@ -189,35 +183,171 @@ class TISE:
         ViewHDF5.destroy()    
         return None
 
+class Hamiltonian:
+    def __init__(self):
+        with open('input.json', 'r') as file:
+            input_par = json.load(file)
+        self.lmax = input_par["lm"]["lmax"]
+        self.m = input_par["state"][2]
+    def kron_product(self,A, B):
+            """
+            Compute the Kronecker product of two PETSc matrices.
+            """
+            m, n = A.getSize()
+            p, q = B.getSize()
+            r, s = m * p, n * q  # Size of the resulting matrix
+           
+            # Create the resulting matrix
+            C = PETSc.Mat().createAIJ([r, s], comm=PETSc.COMM_WORLD)
+            C.setFromOptions()
+            C.setUp()
+
+            # Compute the Kronecker product in parallel
+            A_ownership_range = A.getOwnershipRange()
+            B_ownership_range = B.getOwnershipRange()
+    
+            for i in range(A_ownership_range[0], A_ownership_range[1]):
+                for j in range(n):
+                    # Only proceed if the current process owns this row
+                    
+            
+                    # Get the value from matrix A
+                    v_A = A.getValue(i, j)
+            
+                    if v_A != 0:  # Skip if zero to avoid unnecessary computations
+                        for k in range(B_ownership_range[0], B_ownership_range[1]):
+                            for l in range(q):
+                                # Only proceed if the current process owns this row
+                                
+                        
+                        # Get the value from matrix B
+                                v_B = B.getValue(k, l)
+                        
+                        # Compute the new indices for the result matrix
+                                new_i = i * p + k
+                                new_j = j * q + l
+                        
+                                # Set the value in the result matrix
+                                C[new_i, new_j] = v_A * v_B
+
+            # Assemble the matrix
+            C.assemblyBegin()
+            C.assemblyEnd()
+    
+            return C
+    def H_MIX(self,n_basis,weights,nodes,basis_funcs):
+        H_mix_lm = PETSc.Mat().createAIJ([self.lmax,self.lmax],comm = PETSc.COMM_WORLD)
+        istart,iend = H_mix_lm.getOwnershipRange()
+        for i in range(istart,iend-1):
+
+            clm = ((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3))
+            H_mix_lm.setValue(i,i+1,clm)
+            H_mix_lm.setValue(i+1,i,clm)
+        H_mix_lm.assemblyBegin()
+        H_mix_lm.assemblyEnd()
+
+        H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
+        rowstart,rowend = H_mix_R.getOwnershipRange()
+        columnstart,columnend = H_mix_R.getOwnershipRangeColumn()
+        for i in range(rowstart,rowend):
+            for j in range(columnstart,columnend):
+                H_element = np.sum(weights * basis_funcs[j](nodes) *  basis_funcs[j](nodes,1))
+                H_mix_R.setValue(i,j,H_element)
+        H_mix_R.assemblyBegin()
+        H_mix_R.assemblyEnd()
+
+        output = self.kron_product(H_mix_lm,H_mix_R)
+        output.scale(-1j)
+
+        self.H_mix = output
+
+        return None
+    def H_ANG(self,n_basis,weights,nodes,basis_funcs):
+        H_ang_lm = PETSc.Mat().createAIJ([self.lmax,self.lmax],comm = PETSc.COMM_WORLD)
+        istart,iend = H_ang_lm.getOwnershipRange()
+        for i in range(istart,iend-1):
+
+            clm = ((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3))
+            H_ang_lm.setValue(i,i+1,(i+i)*clm)
+            H_ang_lm.setValue(i+1,i,-(i+1)*clm)
+        H_ang_lm.assemblyBegin()
+        H_ang_lm.assemblyEnd()
+
+        H_ang_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
+        rowstart,rowend = H_ang_R.getOwnershipRange()
+        columnstart,columnend = H_ang_R.getOwnershipRangeColumn()
+        for i in range(rowstart,rowend):
+            for j in range(columnstart,columnend):
+                H_element = np.sum(weights * basis_funcs[j](nodes) *  basis_funcs[j](nodes) / (nodes))
+                H_ang_R.setValue(i,j,H_element)
+        H_ang_R.assemblyBegin()
+        H_ang_R.assemblyEnd()
+
+        output = self.kron_product(H_ang_lm,H_ang_R)
+        output.scale(-1j)
+
+
+        self.H_ang = output
+
+        return None
+    def H_ATOM(self,H_list):
+        H_atom_lm = PETSc.Mat().createAIJ([self.lmax,self.lmax],comm = PETSc.COMM_WORLD)
+        H_atom_lm.setValue(0,0,1)
+        H_atom_lm.assemblyBegin()
+        H_atom_lm.assemblyEnd()
+
+        H_atom = self.kron_product(H_atom_lm,H_list[0])
+        for l in range(1,self.lmax):
+            intermediate = self.kron_product(H_atom_lm,H_list[l])
+            H_atom.axpy(1.0, intermediate)
+        self.H_atom = H_atom
+
+
+
+        return None
+    def H_TOTAL(self):
+
+        intermediate = self.H_mix
+        intermediate.axpy(1,self.H_ang)
+        intermediate.axpy(1,self.H_atom)
+    
+        self.H_total = intermediate
+        return None
+
+
+
 
 if __name__ == "__main__":
     if PETSc.COMM_WORLD.rank ==0:
         start = time.time()
     with open('input.json', 'r') as file:
             input_par = json.load(file)
+    
     box_par = tuple(input_par["box"].values())
     box = Grid(*box_par)
     box.Print(False)
 
-
     splines_par = tuple(input_par["splines"].values())
     splines = Basis(*splines_par)
     splines.CreateFuncs(box.rmax,box.dr)
-
     splines.PlotFuncs(box.r,False)
     splines.CreateGauss(box.rmax)
     splines.EvalGauss()
     
-
-    
     FieldFreeH = TISE()
-    for l in range(2):
+    for l in range(input_par["lm"]["lmax"]):
         FieldFreeH.CreateH_l(splines.n_basis,splines.barrays_gauss,splines.barrays_der_gauss,splines.nodes,splines.weights,l)
     FieldFreeH.EvalEigen()
 
+    
+    Int = Hamiltonian()
+    Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
+    Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
+    Int.H_ATOM(FieldFreeH.FFH_R_list)
+    Int.H_TOTAL()
+
     if PETSc.COMM_WORLD.rank ==0:
         end = time.time()
-   
         print(f"Total Time:{end-start}")
 
         

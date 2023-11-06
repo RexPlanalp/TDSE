@@ -5,26 +5,14 @@
         "tmax": 10,
         "dt": 0.01
     },
-    "psi_type": "state",
-    "psi_param":{
-        "gaussian": [1,0,0],
-        "state": [[0,1],[0.7071067812,0.7071067812]]
-    },
-    "v_type": "harmonic",
-    "v_param":{
-        "harmonic": 1,
-        "soft_coul": 1e-20
-    },
-    "laser_param":{
-        "I": 0,
-        "w_0":6.283185307,
-        "envelope": "Sin2",
-        "center": 10000
-    },
     "splines":{
         "N_knots": 150,
         "order": 12,
         "N_gauss": 300
-    }
+    },
+    "lm":{
+        "lmax": 3
+    },
+    "state":[1,0,0]
 }
                     
