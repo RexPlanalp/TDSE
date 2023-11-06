@@ -183,6 +183,7 @@ class TISE:
         ViewHDF5.destroy()    
         return None
 
+
 class Hamiltonian:
     def __init__(self):
         with open('input.json', 'r') as file:
