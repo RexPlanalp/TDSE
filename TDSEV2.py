@@ -46,11 +46,19 @@ class Basis:
     def CreateFuncs(self,rmax,dr):
         
         knots_start_end = np.repeat([0, rmax],self.order)  # Repeats -end and end, order times
+
+        
+
+
         knots_middle = np.linspace(0, rmax - 1, self.N_knots - 2 * self.order)  # Creates evenly spaced knots between the start and end
         knots = np.concatenate([knots_start_end[:self.order], knots_middle, knots_start_end[self.order:]])  # Concatenates the start, middle, and end knots
+        
+        
+
+
         basis_funcs = [BSpline(knots, (i == np.arange(len(knots) - self.order - 1 )).astype(float), self.order) for i in range(len(knots) - self.order - 1 )[1:-(self.order+1)]]
 
-    
+
         n_basis = len(basis_funcs)
 
     
@@ -350,5 +358,6 @@ if __name__ == "__main__":
     if PETSc.COMM_WORLD.rank ==0:
         end = time.time()
         print(f"Total Time:{end-start}")
+
     
         

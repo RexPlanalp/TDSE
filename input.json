@@ -1,12 +1,12 @@
 {
     "box":{
-        "xmax": 600,
+        "xmax": 1000,
         "dx": 0.01,
         "tmax": 10,
         "dt": 0.01
     },
     "splines":{
-        "N_knots": 150,
+        "N_knots": 155,
         "order": 12,
         "N_gauss": 200
     },
