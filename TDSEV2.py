@@ -196,21 +196,30 @@ class TISE:
         return None
 
 class Laser:
-    def __init__(self,N,w,tmax):
-        self.freq = 0.057 * 800/w
-        #self.tau = 2*pi *N /self.freq
+    def __init__(self,w,I):
+        self.I = I/3.51E16
+        self.freq = w
         
         return None
     
-    def SinSqEnv(self,time,center):
+    def CreateEnv(self,time,tmax):
+        if input_par["laser"]["envelope"] == "sinsq":
+            self.env = np.power(np.sin(pi*(time-tmax/2) / tmax), 2.0)
+        
+    def CreatePulse(self,time):
+        amplitude = pow(self.I, 0.5) / self.freq
 
-        self.env =  np.power(np.sin(pi*time / self.tau), 2.0)
+        weighted_env = amplitude * self.env
+
+        pulse = weighted_env * np.sin(self.freq * (time))
+        self.pulse = pulse
+        if PETSc.COMM_WORLD.rank == 0:
+            plt.plot(time,self.pulse)
+            plt.savefig("pulse.png")
+
 
     
-    def Pulse(self,I,dt):
-        mu = 4*pow(np.arcsin(np.exp(-1/4)),2.0)
-        intensity /= 3.51e16
-        amplitude = pow(intensity, 0.5) / self.freq
+   
         
 class Hamiltonian:
     def __init__(self):
@@ -368,8 +377,10 @@ if __name__ == "__main__":
         FieldFreeH.CreateH_l(splines.n_basis,splines.barrays_gauss,splines.barrays_der_gauss,splines.nodes,splines.weights,l)
     FieldFreeH.EvalEigen()
 
-    #Field = Laser(input_par["laser"]["N"],input_par["laser"]["w"])
-    #Field.SinSqEnv(box.t,input_par["laser"]["center"])
+    Field = Laser(input_par["laser"]["w"],input_par["laser"]["I"])
+    Field.CreateEnv(box.t,box.tmax)
+    Field.CreatePulse(box.t)
+
 
 
 
