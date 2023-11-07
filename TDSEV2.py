@@ -12,17 +12,21 @@ from petsc4py import PETSc
 from slepc4py import SLEPc
 from mpi4py import MPI
 
+from numpy import pi
 
 
 class Grid:
-    def __init__(self,grid_size,grid_spacing,time_size,time_spacing):
+    def __init__(self,grid_size,grid_spacing,N,time_spacing,freq):
         self.r = np.linspace(0,grid_size,int(grid_size/grid_spacing)) #Chagned back to grid spacing
-        self.t = np.arange(-time_size/2,time_size/2 + time_spacing,time_spacing)
+
+        self.tau = 2*pi/freq
+        self.tmax = N*self.tau
+        self.t = np.arange(-self.tmax/2,self.tmax/2 + time_spacing,time_spacing)
 
         self.rmax = np.max(self.r)
         self.dr = grid_spacing
 
-        self.tmax = time_size
+       
         self.dt = time_spacing
     def Print(self,bool):
         if bool:
@@ -191,7 +195,23 @@ class TISE:
         ViewHDF5.destroy()    
         return None
 
+class Laser:
+    def __init__(self,N,w,tmax):
+        self.freq = 0.057 * 800/w
+        #self.tau = 2*pi *N /self.freq
+        
+        return None
+    
+    def SinSqEnv(self,time,center):
 
+        self.env =  np.power(np.sin(pi*time / self.tau), 2.0)
+
+    
+    def Pulse(self,I,dt):
+        mu = 4*pow(np.arcsin(np.exp(-1/4)),2.0)
+        intensity /= 3.51e16
+        amplitude = pow(intensity, 0.5) / self.freq
+        
 class Hamiltonian:
     def __init__(self):
         with open('input.json', 'r') as file:
@@ -332,8 +352,8 @@ if __name__ == "__main__":
     with open('input.json', 'r') as file:
             input_par = json.load(file)
     
-    box_par = tuple(input_par["box"].values())
-    box = Grid(*box_par)
+    
+    box = Grid(input_par["box"]["xmax"],input_par["box"]["dx"],input_par["box"]["N"],input_par["box"]["dt"],input_par["laser"]["w"])
     box.Print(False)
 
     splines_par = tuple(input_par["splines"].values())
@@ -348,6 +368,12 @@ if __name__ == "__main__":
         FieldFreeH.CreateH_l(splines.n_basis,splines.barrays_gauss,splines.barrays_der_gauss,splines.nodes,splines.weights,l)
     FieldFreeH.EvalEigen()
 
+    #Field = Laser(input_par["laser"]["N"],input_par["laser"]["w"])
+    #Field.SinSqEnv(box.t,input_par["laser"]["center"])
+
+
+
+
     
     Int = Hamiltonian()
     Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
@@ -358,6 +384,7 @@ if __name__ == "__main__":
     if PETSc.COMM_WORLD.rank ==0:
         end = time.time()
         print(f"Total Time:{end-start}")
+    
 
     
         
