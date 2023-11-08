@@ -251,12 +251,65 @@ class Hamiltonian:
             input_par = json.load(file)
         self.lmax = input_par["lm"]["lmax"]
         self.m = input_par["state"][2]
+    def kron(self,A,B,tol = 1E-10):
+        ra,ca = A.getSize()
+        rb,cb = B.getSize()
+
+        C = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD)
+        ownershipC = C.getOwnershipRange()
+        C_range = range(ownershipC[0],ownershipC[1])
+
+        from scipy.sparse import lil_matrix
+
+        ownershipA = A.getOwnershipRange()
+        A_range = range(ownershipA[0],ownershipA[1])
+        A_lil = lil_matrix((A.getSize()),dtype = "complex")
+        for i in A_range:
+            for j in range(ca):
+                A_lil[i,j] = A.getValue(i,j)
+          
+
+        ownershipB = B.getOwnershipRange()
+        B_range = range(ownershipB[0],ownershipB[1])
+        B_lil = lil_matrix((B.getSize()),dtype = "complex")
+        for i in B_range:
+            for j in range(cb):
+                B_lil[i,j] = B.getValue(i,j)
+    
+    
+        A_array = A_lil.toarray()
+        B_array = B_lil.toarray()
+
+
+
+        global_A = np.zeros_like(A_array)
+        global_B = np.zeros_like(B_array)
+        MPI.COMM_WORLD.Allreduce(A_array, global_A, op=MPI.SUM)
+        MPI.COMM_WORLD.Allreduce(B_array, global_B, op=MPI.SUM)
+
+   
+
+
+    
+
+        for i in C_range:
+            for j in range(C.getSize()[1]):
+                if (np.abs(global_A[i//rb,j//cb])<=tol) or (np.abs(global_B[i%rb,j%cb])<=tol):
+                    continue
+                else:
+            
+                    value = global_A[i//rb,j//cb] * global_B[i%rb,j%cb]
+                    C.setValue(i,j,value)
+
+        C.assemblyBegin()
+        C.assemblyEnd()
+        return C
     def H_MIX(self,n_basis,weights,nodes,basis_funcs):
         H_mix_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
         istart,iend = H_mix_lm.getOwnershipRange()
         for i in range(istart,iend-1):
 
-            clm = ((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3))
+            clm = np.sqrt(((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3)))
             H_mix_lm.setValue(i,i+1,clm)
             H_mix_lm.setValue(i+1,i,clm)
         H_mix_lm.assemblyBegin()
@@ -264,15 +317,15 @@ class Hamiltonian:
 
         H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
         rowstart,rowend = H_mix_R.getOwnershipRange()
-        columnstart,columnend = H_mix_R.getOwnershipRangeColumn()
+        rows,cols = H_mix_R.getSize()
         for i in range(rowstart,rowend):
-            for j in range(columnstart,columnend):
+            for j in range(cols):
                 H_element = np.sum(weights * basis_funcs[j](nodes) *  basis_funcs[j](nodes,1))
                 H_mix_R.setValue(i,j,H_element)
         H_mix_R.assemblyBegin()
         H_mix_R.assemblyEnd()
 
-        output = self.kron_product(H_mix_lm,H_mix_R)
+        output = self.kron(H_mix_lm,H_mix_R)
         output.scale(-1j)
 
         self.H_mix = output
@@ -283,7 +336,7 @@ class Hamiltonian:
         istart,iend = H_ang_lm.getOwnershipRange()
         for i in range(istart,iend-1):
 
-            clm = ((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3))
+            clm = np.sqrt(((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3)))
             H_ang_lm.setValue(i,i+1,(i+i)*clm)
             H_ang_lm.setValue(i+1,i,-(i+1)*clm)
         H_ang_lm.assemblyBegin()
@@ -291,9 +344,9 @@ class Hamiltonian:
 
         H_ang_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
         rowstart,rowend = H_ang_R.getOwnershipRange()
-        columnstart,columnend = H_ang_R.getOwnershipRangeColumn()
+        rows,cols = H_ang_R.getSize()
         for i in range(rowstart,rowend):
-            for j in range(columnstart,columnend):
+            for j in range(cols):
                 H_element = np.sum(weights * basis_funcs[j](nodes) *  basis_funcs[j](nodes) / (nodes))
                 H_ang_R.setValue(i,j,H_element)
         H_ang_R.assemblyBegin()
