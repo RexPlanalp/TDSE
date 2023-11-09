@@ -16,7 +16,7 @@ from mpi4py import MPI
 from numpy import pi
 
 
-A = PETSc.Mat().createAIJ([2,2],comm = PETSc.COMM_WORLD)
+A = PETSc.Mat().createAIJ([50,50],comm = PETSc.COMM_WORLD)
 rowstart,rowend = A.getOwnershipRange()
 rows,cols = A.getSize()
 for i in range(rowstart,rowend):
@@ -25,29 +25,27 @@ for i in range(rowstart,rowend):
 A.assemblyBegin()
 A.assemblyEnd()
 
-B = PETSc.Mat().createAIJ([2, 2], comm=PETSc.COMM_WORLD)
-
-
+#B = PETSc.Mat().createAIJ([2, 2], comm=PETSc.COMM_WORLD)
 # Set the values for the part of the matrix that this processor owns
-if PETSc.COMM_WORLD.rank == 0:
-    B.setValue(0, 0, 6)
-    B.setValue(0, 1, 2)
-elif PETSc.COMM_WORLD.rank == 1:
-    B.setValue(1, 0, 1)
-    B.setValue(1, 1, 4)
+#if PETSc.COMM_WORLD.rank == 0:
+    #B.setValue(0, 0, 6)
+    #B.setValue(0, 1, 2)
+#elif PETSc.COMM_WORLD.rank == 1:
+    #B.setValue(1, 0, 1)
+    #B.setValue(1, 1, 4)
 
 # Assemble the matrix
-B.assemblyBegin()
-B.assemblyEnd()
-
-#B = PETSc.Mat().createAIJ([128,128],comm = PETSc.COMM_WORLD)
-#rowstart,rowend = B.getOwnershipRange()
-#rows,cols = B.getSize()
-#for i in range(rowstart,rowend):
-    #for j in range(cols):
-        #B.setValue(i,j,2)
 #B.assemblyBegin()
 #B.assemblyEnd()
+
+B = PETSc.Mat().createAIJ([50,50],comm = PETSc.COMM_WORLD)
+rowstart,rowend = B.getOwnershipRange()
+rows,cols = B.getSize()
+for i in range(rowstart,rowend):
+    for j in range(cols):
+        B.setValue(i,j,2)
+B.assemblyBegin()
+B.assemblyEnd()
 
 
 
@@ -57,7 +55,7 @@ import time
 
 if PETSc.COMM_WORLD.rank == 0:
     start = time.time()
-def kron(A,B,tol = 1E-10):
+def kron(A,B):
     ra,ca = A.getSize()
     rb,cb = B.getSize()
 
@@ -109,14 +107,18 @@ def kron(A,B,tol = 1E-10):
     C.assemblyBegin()
     C.assemblyEnd()
 
-    for i in C_range:
-        index,val = C.getRow(i)
-        print("Row",i,val)
+    #for i in C_range:
+        #index,val = C.getRow(i)
+        #print("Row",i,val)
     return C
     
+def kron(A,B):
+    C = PETSc.Mat().create()
+    C.kron(A,B)
+    return C
 
-
-
+#idx = [0]  # The indices you want in your index set
+#iset = PETSc.IS().createGeneral(idx, comm=PETSc.COMM_WORLD)
 
 
 

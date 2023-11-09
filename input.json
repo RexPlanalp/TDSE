@@ -11,7 +11,7 @@
         "N_gauss": 200
     },
     "lm":{
-        "lmax": 10
+        "lmax": 50
     },
     "state":[1,0,0],
     "laser": {
