@@ -63,7 +63,8 @@ def kronV3(A,B):
 
     C.assemblyBegin()
     C.assemblyEnd()
-   
+    seq_A.destroy()
+    seq_B.destroy()
     return C
 def kronV2(A,B):
     ra,ca = A.getSize()

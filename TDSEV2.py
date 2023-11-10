@@ -505,16 +505,23 @@ if __name__ == "__main__":
     
     Int = Hamiltonian()
 
-
+    if PETSc.COMM_WORLD.rank ==0:
+        start = time.time()
    
 
-    #Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
-    #Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
+    Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
+    Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
     Int.H_ATOM(FieldFreeH.FFH_R_list,splines.n_basis)
     #Int.H_TOTAL(1)
     Int.S_TOTAL(FieldFreeH.S_R,splines.n_basis)
 
-    
+
+    ############
+    for l in range(input_par["lm"]["lmax"]+1):
+        FieldFreeH.FFH_R_list[l].destroy()
+    ##########
+
+
     test = True
     if test:
         L = Int.H_atom.getVecRight()
