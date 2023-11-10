@@ -2,7 +2,7 @@
     "box":{
         "xmax": 1000,
         "dx": 0.01,
-        "N": 1,
+        "N": 10,
         "dt": 0.01
     },
     "splines":{
@@ -11,12 +11,13 @@
         "N_gauss": 200
     },
     "lm":{
-        "lmax": 50
+        "lmax": 5,
+        "nmax":15
     },
     "state":[1,0,0],
     "laser": {
         "center":0,
-        "w": 0.057,
+        "w": 0.08,
         "I": 1E13,
         "envelope": "sinsq"
 

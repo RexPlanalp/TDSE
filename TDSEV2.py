@@ -152,9 +152,23 @@ class TISE:
         
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
             
+        if (input_par["lm"]["nmax"] >= input_par["lm"]["lmax"]):
+            nmax = input_par["lm"]["lmax"] +1
+        else:
+            input_par["lm"]["nmax"] 
+
             
+        #for l,H in enumerate(self.FFH_R_list):
+        for i,l in enumerate(range(nmax)):
+
+
             
-        for l,H in enumerate(self.FFH_R_list):
+
+
+            H = self.FFH_R_list[i]
+
+
+
             E = SLEPc.EPS().create()
             E.setOperators(H, self.S_R)
             
@@ -194,6 +208,8 @@ class TISE:
                 ViewHDF5.view(energy)
         ViewHDF5.destroy()    
         return None
+#WARNING EDITED BOUND STATE RANGE
+
 
 class Laser:
     def __init__(self,w,I):
@@ -202,9 +218,10 @@ class Laser:
         
         return None
     
-    def CreateEnv(self,time,tmax):
+    def CreateEnv(self,time,tmax,N):
         if input_par["laser"]["envelope"] == "sinsq":
             self.env = np.power(np.sin(pi*(time-tmax/2) / tmax), 2.0)
+            
         
     def CreatePulse(self,time):
         amplitude = pow(self.I, 0.5) / self.freq
@@ -235,7 +252,7 @@ class Psi:
       
 
         psi_array = np.pad(total,(l*n_basis,(lmax-l)*n_basis),constant_values= (0,0))
-        
+       
         istart,iend = psi_initial.getOwnershipRange()
         for i in range(istart,iend):
             psi_initial.setValue(i,psi_array[i])
@@ -378,10 +395,11 @@ class Hamiltonian:
 
         output = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
         output.kron(I,S_R)
-
+        output.assemblyBegin()
+        output.assemblyEnd()
         I.destroy()
 
-        self.S_TOTAL = output
+        self.S_total = output
 
 
 
@@ -408,11 +426,11 @@ if __name__ == "__main__":
         FieldFreeH.CreateH_l(splines.n_basis,splines.barrays_gauss,splines.barrays_der_gauss,splines.nodes,splines.weights,l)
     FieldFreeH.EvalEigen()
 
-    #Field = Laser(input_par["laser"]["w"],input_par["laser"]["I"])
-    #Field.CreateEnv(box.t,box.tmax)
-    #Field.CreatePulse(box.t)
+    Field = Laser(input_par["laser"]["w"],input_par["laser"]["I"])
+    Field.CreateEnv(box.t,box.tmax,input_par["box"]["N"])
+    Field.CreatePulse(box.t)
 
-    #psi = Psi(splines.n_basis,input_par["lm"]["lmax"])
+    psi = Psi(splines.n_basis,input_par["lm"]["lmax"])
 
     
     Int = Hamiltonian()
@@ -422,7 +440,9 @@ if __name__ == "__main__":
     #Int.H_TOTAL(1)
     Int.S_TOTAL(FieldFreeH.S_R,splines.n_basis)
 
-    
+
+
+
 
 
     
