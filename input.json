@@ -8,11 +8,11 @@
     "splines":{
         "N_knots": 155,
         "order": 12,
-        "N_gauss": 200
+        "N_gauss": 400
     },
     "lm":{
-        "lmax": 5,
-        "nmax":15
+        "lmax": 50,
+        "nmax": 2
     },
     "state":[1,0,0],
     "laser": {

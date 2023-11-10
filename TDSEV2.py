@@ -6,7 +6,8 @@ import json
 import time
 import h5py
 import os
-
+import gc
+import kron
 from scipy.interpolate import BSpline
 
 import slepc4py
@@ -155,9 +156,9 @@ class TISE:
         if (input_par["lm"]["nmax"] >= input_par["lm"]["lmax"]):
             nmax = input_par["lm"]["lmax"] +1
         else:
-            input_par["lm"]["nmax"] 
+            nmax = input_par["lm"]["nmax"] 
 
-            
+        #nmax = 15
         #for l,H in enumerate(self.FFH_R_list):
         for i,l in enumerate(range(nmax)):
 
@@ -289,10 +290,13 @@ class Hamiltonian:
         H_mix_R.assemblyEnd()
 
 
-        output = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
-        output.kron(H_mix_lm,H_mix_R)
-        output.assemblyBegin()
-        output.assemblyEnd()
+        #output = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
+        #output.kron(H_mix_lm,H_mix_R)
+        #output.assemblyBegin()
+        #output.assemblyEnd()
+        #output.scale(-1j)
+
+        output = kron.kronV2(H_mix_lm,H_mix_R)
         output.scale(-1j)
 
 
@@ -323,10 +327,13 @@ class Hamiltonian:
         H_ang_R.assemblyBegin()
         H_ang_R.assemblyEnd()
 
-        output = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
-        output.kron(H_ang_lm,H_ang_R)
-        output.assemblyBegin()
-        output.assemblyEnd()
+        #output = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
+        #output.kron(H_ang_lm,H_ang_R)
+        #output.assemblyBegin()
+        #output.assemblyEnd()
+        #output.scale(-1j)
+
+        output = kron.kronV2(H_ang_lm,H_ang_R)
         output.scale(-1j)
 
 
@@ -336,27 +343,31 @@ class Hamiltonian:
         self.H_ang = output
 
         return None
-    def H_ATOM(self,H_list,n_basis):
+    def H_ATOMOLD(self,H_list,n_basis):
         H_atom_0 = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
 
         H_atom_0.setValue(0,0,1)
         H_atom_0.assemblyBegin()
         H_atom_0.assemblyEnd()
 
-        C_0 = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
-        C_0.kron(H_atom_0,H_list[0])
+        #C_0 = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
+        #C_0.kron(H_atom_0,H_list[0])
+
+        C_0 = kron.kronV2(H_atom_0,H_list[0])
 
         C_0.assemblyBegin()
         C_0.assemblyEnd()
         
         for l in range(1,self.lmax+1):
-            C_l = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
+            
             H_atom_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
 
             H_atom_lm.setValue(l,l,1)
             H_atom_lm.assemblyBegin()
             H_atom_lm.assemblyEnd()
 
+           # C_l = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
+            C_l = kron.kronV2(H_atom_lm,H_list[l])
             C_l.kron(H_atom_lm,H_list[l])
             C_l.assemblyBegin()
             C_l.assemblyEnd()
@@ -393,13 +404,73 @@ class Hamiltonian:
         I.assemblyBegin()
         I.assemblyEnd()
 
-        output = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
-        output.kron(I,S_R)
-        output.assemblyBegin()
-        output.assemblyEnd()
+        output = kron.kronV2(I,S_R)
+       
         I.destroy()
 
         self.S_total = output
+
+    def H_ATOM(self,H_list,n_basis):
+        def gather_csr(local_csr_part):
+  
+            gathered = PETSc.COMM_WORLD.tompi4py().allgather(local_csr_part)
+        
+            return np.concatenate(gathered)
+        def gather_indpr(local_indptr):
+            gathered = PETSc.COMM_WORLD.tompi4py().allgather(local_indptr)
+            global_indptr = list(gathered[0])
+            offset = global_indptr[-1]  # Start with the last element of the first indptr
+            for proc_indptr in gathered[1:]:
+                # Offset the local indptr (excluding the first element) and extend the global indptr
+                global_indptr.extend(proc_indptr[1:] + offset)
+                # Update the offset for the next iteration
+                offset += proc_indptr[-1] - proc_indptr[0]  # Adjust for the overlapping indices
+            return global_indptr
+        def getLocal(M):
+            local_csr = M.getValuesCSR()
+            local_indptr, local_indices, local_data = local_csr
+            global_indices = gather_csr(local_indices).astype(np.int32)
+            global_data = gather_csr(local_data)
+            global_indptr = gather_indpr(local_indptr)
+            seq_M = PETSc.Mat().createAIJWithArrays([M.getSize()[0],M.getSize()[1]],(global_indptr,global_indices,global_data),comm = PETSc.COMM_SELF)
+            return seq_M
+        
+        
+        
+        
+        H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD)
+        rowstart,rowend = H_atom.getOwnershipRange()
+        
+        local_H = []
+        for l in range(self.lmax+1):
+            local_H.append(getLocal(H_list[l]))
+        
+        
+        for i in range(rowstart,rowend):
+            
+            l = i // n_basis
+            row_index = i % n_basis            
+            
+            
+            index,vals = local_H[l].getRow(row_index)
+            
+
+            full_row = np.zeros(n_basis,dtype = "complex")
+            full_row[index] = vals
+            row_array = np.pad(full_row,(l*n_basis,(self.lmax-l)*n_basis),constant_values= (0,0))
+
+            
+            H_atom.setValues(i,list(range((self.lmax +1)*n_basis)),row_array)
+            
+            
+
+
+        
+        
+        H_atom.assemblyBegin()
+        H_atom.assemblyEnd()
+        self.H_atom = H_atom
+
 
 
 
@@ -434,11 +505,67 @@ if __name__ == "__main__":
 
     
     Int = Hamiltonian()
+
+
+    if PETSc.COMM_WORLD.rank == 0:
+        print("Constructing Mix Interaction")
+        start = time.time()
+
     Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
+
+    if PETSc.COMM_WORLD.rank == 0:
+        print("Finished in",time.time()-start,"seconds")
+        
+
+    if PETSc.COMM_WORLD.rank == 0:
+        print("Constructing Ang Interaction")
+        start = time.time()
+
+
+
     Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
+
+
+    if PETSc.COMM_WORLD.rank == 0:
+        print("Finished in",time.time()-start,"seconds")
+
+
+
+    if PETSc.COMM_WORLD.rank == 0:
+        print("Constructing Atomic Interaction")
+        start = time.time()
     Int.H_ATOM(FieldFreeH.FFH_R_list,splines.n_basis)
+
+
+    if PETSc.COMM_WORLD.rank == 0:
+        print("Finished in",time.time()-start,"seconds")
+
+
+    if PETSc.COMM_WORLD.rank == 0:
+        print("Constructing Overlap")
+        start = time.time()
+
     #Int.H_TOTAL(1)
+
+    
     Int.S_TOTAL(FieldFreeH.S_R,splines.n_basis)
+
+    if PETSc.COMM_WORLD.rank == 0:
+        print("Finished in",time.time()-start,"seconds")
+
+
+
+    test = False
+    if test:
+        L = Int.H_atom.getVecRight()
+        Int.H_atom.mult(psi.psi_initial,L)
+
+        R = Int.S_total.getVecRight()
+        Int.S_total.mult(psi.psi_initial,R)
+
+        if PETSc.COMM_WORLD.rank == 0:
+            print(L.getValue(0))
+            print(R.getValue(0))
 
 
 
