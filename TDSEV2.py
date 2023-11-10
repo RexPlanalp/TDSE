@@ -158,8 +158,7 @@ class TISE:
         else:
             nmax = input_par["lm"]["nmax"] 
 
-        #nmax = 15
-        #for l,H in enumerate(self.FFH_R_list):
+        
         for i,l in enumerate(range(nmax)):
 
 
@@ -296,7 +295,7 @@ class Hamiltonian:
         #output.assemblyEnd()
         #output.scale(-1j)
 
-        output = kron.kronV2(H_mix_lm,H_mix_R)
+        output = kron.kronV3(H_mix_lm,H_mix_R)
         output.scale(-1j)
 
 
@@ -333,7 +332,7 @@ class Hamiltonian:
         #output.assemblyEnd()
         #output.scale(-1j)
 
-        output = kron.kronV2(H_ang_lm,H_ang_R)
+        output = kron.kronV3(H_ang_lm,H_ang_R)
         output.scale(-1j)
 
 
@@ -404,7 +403,7 @@ class Hamiltonian:
         I.assemblyBegin()
         I.assemblyEnd()
 
-        output = kron.kronV2(I,S_R)
+        output = kron.kronV3(I,S_R)
        
         I.destroy()
 
@@ -507,55 +506,16 @@ if __name__ == "__main__":
     Int = Hamiltonian()
 
 
-    if PETSc.COMM_WORLD.rank == 0:
-        print("Constructing Mix Interaction")
-        start = time.time()
+   
 
-    Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
-
-    if PETSc.COMM_WORLD.rank == 0:
-        print("Finished in",time.time()-start,"seconds")
-        
-
-    if PETSc.COMM_WORLD.rank == 0:
-        print("Constructing Ang Interaction")
-        start = time.time()
-
-
-
-    Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
-
-
-    if PETSc.COMM_WORLD.rank == 0:
-        print("Finished in",time.time()-start,"seconds")
-
-
-
-    if PETSc.COMM_WORLD.rank == 0:
-        print("Constructing Atomic Interaction")
-        start = time.time()
+    #Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
+    #Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
     Int.H_ATOM(FieldFreeH.FFH_R_list,splines.n_basis)
-
-
-    if PETSc.COMM_WORLD.rank == 0:
-        print("Finished in",time.time()-start,"seconds")
-
-
-    if PETSc.COMM_WORLD.rank == 0:
-        print("Constructing Overlap")
-        start = time.time()
-
     #Int.H_TOTAL(1)
-
-    
     Int.S_TOTAL(FieldFreeH.S_R,splines.n_basis)
 
-    if PETSc.COMM_WORLD.rank == 0:
-        print("Finished in",time.time()-start,"seconds")
-
-
-
-    test = False
+    
+    test = True
     if test:
         L = Int.H_atom.getVecRight()
         Int.H_atom.mult(psi.psi_initial,L)
@@ -565,7 +525,7 @@ if __name__ == "__main__":
 
         if PETSc.COMM_WORLD.rank == 0:
             print(L.getValue(0))
-            print(R.getValue(0))
+            print(R.getValue(0)*-0.5)
 
 
 

@@ -42,12 +42,20 @@ def kronV3(A,B):
     seq_B = getLocal(B)
     
     for i in C_range:
+
         A_ind = i//rb
-        index,A_row = seq_A.getRow(A_ind)
+        indexA,A_row = seq_A.getRow(A_ind)
+        A_temp = np.zeros(ca,dtype = "complex")
+        A_temp[indexA] = A_row
 
         B_ind = i%rb
-        index,B_row = seq_B.getRow(B_ind)
-        C_row = [a * b for a in A_row for b in B_row]
+        indexB,B_row = seq_B.getRow(B_ind)
+        B_temp = np.zeros(cb,dtype = "complex")
+        B_temp[indexB] = B_row
+
+
+
+        C_row = [a * b for a in A_temp for b in B_temp]
         C_indices = list(range(C.getSize()[1]))
         C.setValues(i,C_indices,C_row)
 
