@@ -2,16 +2,16 @@
     "box":{
         "xmax": 1000,
         "dx": 0.01,
-        "N": 10,
-        "dt": 0.01
+        "N": 3,
+        "dt": 0.05
     },
     "splines":{
-        "N_knots": 225,
+        "N_knots": 175,
         "order": 12,
         "N_gauss": 400
     },
     "lm":{
-        "lmax": 40,
+        "lmax": 50,
         "nmax": 2
     },
     "state":[1,0,0],

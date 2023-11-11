@@ -14,6 +14,30 @@ import slepc4py
 from petsc4py import PETSc
 from slepc4py import SLEPc
 from mpi4py import MPI
+def gather_csr(local_csr_part):
+  
+        gathered = PETSc.COMM_WORLD.tompi4py().allgather(local_csr_part)
+        
+        return np.concatenate(gathered)
+def gather_indpr(local_indptr):
+    gathered = PETSc.COMM_WORLD.tompi4py().allgather(local_indptr)
+    global_indptr = list(gathered[0])
+    offset = global_indptr[-1]  # Start with the last element of the first indptr
+    for proc_indptr in gathered[1:]:
+        # Offset the local indptr (excluding the first element) and extend the global indptr
+        global_indptr.extend(proc_indptr[1:] + offset)
+        # Update the offset for the next iteration
+        offset += proc_indptr[-1] - proc_indptr[0]  # Adjust for the overlapping indices
+    return global_indptr
+def getLocal(M):
+    local_csr = M.getValuesCSR()
+    local_indptr, local_indices, local_data = local_csr
+    global_indices = gather_csr(local_indices).astype(np.int32)
+    global_data = gather_csr(local_data)
+    global_indptr = gather_indpr(local_indptr)
+    seq_M = PETSc.Mat().createAIJWithArrays([M.getSize()[0],M.getSize()[1]],(global_indptr,global_indices,global_data),comm = PETSc.COMM_SELF)
+    return seq_M
+
 
 
 class Grid:
@@ -268,7 +292,7 @@ class Hamiltonian:
         self.lmax = input_par["lm"]["lmax"]
         self.m = input_par["state"][2]
     def H_MIX(self,n_basis,weights,nodes,basis_funcs):
-        H_mix_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
+        H_mix_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD,nnz = 2)
         istart,iend = H_mix_lm.getOwnershipRange()
         for i in range(istart,iend-1):
 
@@ -294,11 +318,12 @@ class Hamiltonian:
         #output.assemblyBegin()
         #output.assemblyEnd()
         #output.scale(-1j)
-
+        
         output = kron.kronV3(H_mix_lm,H_mix_R)
+        
         output.scale(-1j)
 
-
+        
 
         H_mix_lm.destroy()
         H_mix_R.destroy()
@@ -342,43 +367,7 @@ class Hamiltonian:
         self.H_ang = output
 
         return None
-    def H_ATOMOLD(self,H_list,n_basis):
-        H_atom_0 = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
-
-        H_atom_0.setValue(0,0,1)
-        H_atom_0.assemblyBegin()
-        H_atom_0.assemblyEnd()
-
-        #C_0 = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
-        #C_0.kron(H_atom_0,H_list[0])
-
-        C_0 = kron.kronV2(H_atom_0,H_list[0])
-
-        C_0.assemblyBegin()
-        C_0.assemblyEnd()
-        
-        for l in range(1,self.lmax+1):
-            
-            H_atom_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
-
-            H_atom_lm.setValue(l,l,1)
-            H_atom_lm.assemblyBegin()
-            H_atom_lm.assemblyEnd()
-
-           # C_l = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
-            C_l = kron.kronV2(H_atom_lm,H_list[l])
-            C_l.kron(H_atom_lm,H_list[l])
-            C_l.assemblyBegin()
-            C_l.assemblyEnd()
-
-            C_0.axpy(1,C_l)
-
-
-            
-        H_atom_0.destroy()
-        C_l.destroy()
-        self.H_atom = C_0
-        return None
+    
     def H_TOTAL(self,field_val):
 
         intermediate_mix = self.H_mix
@@ -473,7 +462,6 @@ class Hamiltonian:
 
 
 
-
 if __name__ == "__main__":
     if PETSc.COMM_WORLD.rank ==0:
         start = time.time()
@@ -504,25 +492,18 @@ if __name__ == "__main__":
 
     
     Int = Hamiltonian()
-
-    if PETSc.COMM_WORLD.rank ==0:
-        start = time.time()
-   
-
     Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
     Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
     Int.H_ATOM(FieldFreeH.FFH_R_list,splines.n_basis)
-    #Int.H_TOTAL(1)
     Int.S_TOTAL(FieldFreeH.S_R,splines.n_basis)
-
 
     ############
     for l in range(input_par["lm"]["lmax"]+1):
         FieldFreeH.FFH_R_list[l].destroy()
     ##########
+    gc.collect()
 
-
-    test = True
+    test = False
     if test:
         L = Int.H_atom.getVecRight()
         Int.H_atom.mult(psi.psi_initial,L)
@@ -534,61 +515,73 @@ if __name__ == "__main__":
             print(L.getValue(0))
             print(R.getValue(0)*-0.5)
 
-
-
-
-
-
-    
- 
-
-
-
-    
-    
-    
-   
-    
-
-    
-    
+    test2 = False
+    if test2:
+        dt = box.dt
+        L = len(box.t)
+        structure = structure=PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN
+        def makeLeft(S,MIX,ANG,ATOM,i):
             
 
+            S.axpy(-Field.pulse[i],MIX,structure)
+            S.axpy(-Field.pulse[i],ANG,structure)
+            S.axpy(-1,ATOM,structure)
+            return S
+        def makeRight(S,MIX,ANG,ATOM,i):
+            
+            
+            
+            S.axpy(Field.pulse[i],MIX,structure)
+            S.axpy(Field.pulse[i],ANG,structure)
+            S.axpy(1,ATOM,structure)
+            
+            return S
 
+        H_mix = Int.H_mix
+        H_mix.scale(1j * dt /2)
+  
+        H_ang = Int.H_ang
+        H_ang.scale(1j * dt /2)
+
+        H_atom = Int.H_atom
+        H_atom.scale(1j * dt /2)
+
+        S = Int.S_total
+
+        psi_initial = psi.psi_initial.copy()
+        ksp = PETSc.KSP().create(PETSc.COMM_WORLD)
 
    
+        for i,t in enumerate(box.t):
+            print(i,L)
 
-   
+            
+
+            O_L = makeLeft(S,H_mix,H_ang,H_atom,i)
+            O_R = makeRight(S,H_mix,H_ang,H_atom,i)
+
+            
+
+            if i == 0:
+                known = O_R.getVecRight()
+                sol = O_L.getVecRight()
         
+            O_R.mult(psi_initial,known)
+
+            ksp.setOperators(O_L)
+        
+            
+            ksp.solve(known,sol)
+
+            
+            
     
+            psi_initial.copy(sol)
 
-    
-
-
-
-    
-
-  
-    
-  
-    
-
-  
-
-
-
-
-
-    
-   
+        
 
    
-    
-
    
-    if PETSc.COMM_WORLD.rank ==0:
-        end = time.time()
-        print(f"Total Time:{end-start}")
     
 
     
