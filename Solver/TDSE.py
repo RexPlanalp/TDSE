@@ -372,8 +372,8 @@ class Hamiltonian:
             for j in range(cols):
 
                 row_element = row_array[j] 
-                if np.abs(row_element)<= 1E-10:
-                    continue
+                #if np.abs(row_element)<= 1E-10:
+                    #continue
                 H_atom.setValue(i,j,row_element)
         H_atom.assemble()
         self.H_atom = H_atom
