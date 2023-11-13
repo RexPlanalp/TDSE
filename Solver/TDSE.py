@@ -210,6 +210,9 @@ class TISE:
             for i in range(nconv):
                 eigenvalue = E.getEigenvalue(i)  # This retrieves the eigenvalue
                 
+                if np.real(eigenvalue) > 0:
+                    continue
+
                 # Creating separate vectors for the real part of the eigenvector
                 eigen_vector = H.getVecLeft()  # Assuming H is the correct operator for the matrix H
                 E.getEigenvector(i, eigen_vector)  # This retrieves the eigenvector
@@ -419,7 +422,7 @@ if __name__ == "__main__":
     splines_par = tuple(input_par["splines"].values())
     splines = Basis(*splines_par)
     splines.CreateFuncs(box.rmax,box.dr)
-    splines.PlotFuncs(box.r,plot = False)
+    splines.PlotFuncs(box.r,plot = True)
     splines.CreateGauss(box.rmax)
     splines.EvalGauss()
     
@@ -428,25 +431,25 @@ if __name__ == "__main__":
         FieldFreeH.CreateH_l(splines.n_basis,splines,splines.nodes,splines.weights,l)
     FieldFreeH.EvalEigen()
 
-    #Field = Laser(input_par["laser"]["w"],input_par["laser"]["I"])
-    #Field.CreateEnv(box.t,box.tmax,input_par["box"]["N"])
-    #Field.CreatePulse(box.t)
-    #Field.PlotPulse(box.t,False)
+    Field = Laser(input_par["laser"]["w"],input_par["laser"]["I"])
+    Field.CreateEnv(box.t,box.tmax,input_par["box"]["N"])
+    Field.CreatePulse(box.t)
+    Field.PlotPulse(box.t,False)
 
     psi = Psi(splines.n_basis,input_par["lm"]["lmax"])
 
     
     Int = Hamiltonian()
-    #Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs,box.dt)
-    #Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs,box.dt)
+    Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines,box.dt)
+    Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines,box.dt)
     Int.H_ATOM(FieldFreeH.FFH_R_list,splines.n_basis,box.dt)
     Int.S(FieldFreeH.S_R,splines.n_basis)
-    #Int.PartialAtomic(box.dt)
-    #Int.PartialAngular()
+    Int.PartialAtomic(box.dt)
+    Int.PartialAngular()
 
     
-    #for l in range(input_par["lm"]["lmax"]+1):
-        #FieldFreeH.FFH_R_list[l].destroy()
+    for l in range(input_par["lm"]["lmax"]+1):
+        FieldFreeH.FFH_R_list[l].destroy()
     
 
 
@@ -459,7 +462,7 @@ if __name__ == "__main__":
     
     gc.collect()
 
-    test = True
+    test = False
     if test:
         L = Int.H_atom.getVecRight()
         Int.H_atom.mult(psi.psi_initial,L)

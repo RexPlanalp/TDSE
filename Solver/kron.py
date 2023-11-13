@@ -28,12 +28,15 @@ def getLocal(M):
         seq_M = PETSc.Mat().createAIJWithArrays([M.getSize()[0],M.getSize()[1]],(global_indptr,global_indices,global_data),comm = PETSc.COMM_SELF)
         return seq_M
 
-
+# Even faster, but breaks sparcity
+# If I can use the sparse vals/indices of A,B to set
+# the rows of C, this might be the best, but currently broken
 def kronV3(A,B):
     ra,ca = A.getSize()
     rb,cb = B.getSize()
 
     C = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD)
+    C.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
     C.setUp()
     ownershipC = C.getOwnershipRange()
     C_range = range(ownershipC[0],ownershipC[1])
@@ -66,6 +69,8 @@ def kronV3(A,B):
     seq_A.destroy()
     seq_B.destroy()
     return C
+
+# Faster, doesn't break sparcity
 def kronV2(A,B):
     ra,ca = A.getSize()
     rb,cb = B.getSize()
@@ -91,11 +96,15 @@ def kronV2(A,B):
     C.assemblyEnd()
    
     return C
+
+
+# Slow, not sure if breaks sparcity
 def kronV1(A,B):
     ra,ca = A.getSize()
     rb,cb = B.getSize()
 
     C = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD)
+    C.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
     ownershipC = C.getOwnershipRange()
     C_range = range(ownershipC[0],ownershipC[1])
 

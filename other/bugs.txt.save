@@ -1,0 +1,17 @@
+
+
+Test laser
+Test psi
+TesT eigenstate
+
+
+Check to see if tolerance in kronV2 and H_atom/S needs to be zero or just small
+or checkif KRONV3 is working, and set IGNORE ZERO on all matrices and test
+
+adust input to differential betwee
+differentiate between lm of bound states and lm expansion
+only save positive energies
+
+Test psi, working on computing inner products
+double check laser paramters and result
+start working on energy spectrum
