@@ -313,7 +313,7 @@ class Hamiltonian:
                 H_mix_R.setValue(i,j,H_element)
         H_mix_R.assemble()
 
-        total = kron.kronV2(H_mix_lm,H_mix_R)
+        total = kron.kronV3(H_mix_lm,H_mix_R)
         total.scale(-1j)
 
         H_mix_lm.destroy()
@@ -342,7 +342,7 @@ class Hamiltonian:
                 H_ang_R.setValue(i,j,H_element)
         H_ang_R.assemble()
 
-        total = kron.kronV2(H_ang_lm,H_ang_R)
+        total = kron.kronV3(H_ang_lm,H_ang_R)
         total.scale(-1j)
 
         H_ang_lm.destroy()
@@ -352,7 +352,7 @@ class Hamiltonian:
         return None  
     def H_ATOM(self,H_list,n_basis,dt):
         H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD)
-
+        H_atom.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
         local_H = []
         for l in range(self.lmax+1):
             local_H.append(getLocal(H_list[l]))
@@ -385,7 +385,7 @@ class Hamiltonian:
             I.setValue(i,i,1)
         I.assemble()
 
-        total = kron.kronV2(I,S_R)
+        total = kron.kronV3(I,S_R)
 
         I.destroy()
         self.S = total
@@ -422,7 +422,7 @@ if __name__ == "__main__":
     splines_par = tuple(input_par["splines"].values())
     splines = Basis(*splines_par)
     splines.CreateFuncs(box.rmax,box.dr)
-    splines.PlotFuncs(box.r,plot = True)
+    splines.PlotFuncs(box.r,plot = False)
     splines.CreateGauss(box.rmax)
     splines.EvalGauss()
     
@@ -452,13 +452,17 @@ if __name__ == "__main__":
         FieldFreeH.FFH_R_list[l].destroy()
     
 
+    
+
+    ONE = Int.H_mix
+    TWO = Int.H_ang
 
 
-
-
-
-    #PETSc.Log.begin()
-    #PETSc.Log.view()
+    PETSc.Log.begin()
+    
+    ONE.axpy(1,TWO)
+    
+    PETSc.Log.view()
     
     gc.collect()
 
@@ -526,7 +530,6 @@ if __name__ == "__main__":
         psi_r = np.zeros(len(box.r),dtype = "complex")
         for i,coeff in enumerate(total):
             psi_r += coeff*splines.bfuncs[i](box.r)
-
 
         if PETSc.COMM_WORLD.rank == 0:
             print(trapz(np.abs(psi_r)**2,box.r))
