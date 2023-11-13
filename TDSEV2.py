@@ -14,6 +14,12 @@ import slepc4py
 from petsc4py import PETSc
 from slepc4py import SLEPc
 from mpi4py import MPI
+import sys
+
+import petsc4py
+petsc4py.init(sys.argv)
+petsc4py.init(comm=PETSc.COMM_WORLD)
+
 def gather_csr(local_csr_part):
   
         gathered = PETSc.COMM_WORLD.tompi4py().allgather(local_csr_part)
@@ -312,18 +318,9 @@ class Hamiltonian:
         H_mix_R.assemblyBegin()
         H_mix_R.assemblyEnd()
 
-
-        #output = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
-        #output.kron(H_mix_lm,H_mix_R)
-        #output.assemblyBegin()
-        #output.assemblyEnd()
-        #output.scale(-1j)
-        
-        output = kron.kronV3(H_mix_lm,H_mix_R)
+        output = kron.kronV2(H_mix_lm,H_mix_R)
         
         output.scale(-1j)
-
-        
 
         H_mix_lm.destroy()
         H_mix_R.destroy()
@@ -336,7 +333,7 @@ class Hamiltonian:
         for i in range(istart,iend-1):
 
             clm = np.sqrt(((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3)))
-            H_ang_lm.setValue(i,i+1,(i+i)*clm)
+            H_ang_lm.setValue(i,i+1,(i+1)*clm)
             H_ang_lm.setValue(i+1,i,-(i+1)*clm)
         H_ang_lm.assemblyBegin()
         H_ang_lm.assemblyEnd()
@@ -351,13 +348,7 @@ class Hamiltonian:
         H_ang_R.assemblyBegin()
         H_ang_R.assemblyEnd()
 
-        #output = PETSc.Mat().createAIJ([(self.lmax+1)*n_basis,(self.lmax+1)*n_basis],comm = PETSc.COMM_WORLD)
-        #output.kron(H_ang_lm,H_ang_R)
-        #output.assemblyBegin()
-        #output.assemblyEnd()
-        #output.scale(-1j)
-
-        output = kron.kronV3(H_ang_lm,H_ang_R)
+        output = kron.kronV2(H_ang_lm,H_ang_R)
         output.scale(-1j)
 
 
@@ -367,24 +358,7 @@ class Hamiltonian:
         self.H_ang = output
 
         return None
-    
-    def H_TOTAL(self,field_val):
-
-        intermediate_mix = self.H_mix
-        intermediate_mix.scale(field_val)
-
-        intermediate_ang = self.H_ang
-        intermediate_ang.scale(field_val)
-
-        intermediate_mix.axpy(1,intermediate_ang)
-        intermediate_mix.axpy(1,self.H_atom)
-
-        
-    
-    
-        self.H_total = intermediate_mix
-        return None
-    def S_TOTAL(self,S_R,n_basis):
+    def S(self,S_R,n_basis):
         I = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
         start,end = I.getOwnershipRange()
         for i in range(start,end):
@@ -396,36 +370,8 @@ class Hamiltonian:
        
         I.destroy()
 
-        self.S_total = output
-
+        self.S = output
     def H_ATOM(self,H_list,n_basis):
-        def gather_csr(local_csr_part):
-  
-            gathered = PETSc.COMM_WORLD.tompi4py().allgather(local_csr_part)
-        
-            return np.concatenate(gathered)
-        def gather_indpr(local_indptr):
-            gathered = PETSc.COMM_WORLD.tompi4py().allgather(local_indptr)
-            global_indptr = list(gathered[0])
-            offset = global_indptr[-1]  # Start with the last element of the first indptr
-            for proc_indptr in gathered[1:]:
-                # Offset the local indptr (excluding the first element) and extend the global indptr
-                global_indptr.extend(proc_indptr[1:] + offset)
-                # Update the offset for the next iteration
-                offset += proc_indptr[-1] - proc_indptr[0]  # Adjust for the overlapping indices
-            return global_indptr
-        def getLocal(M):
-            local_csr = M.getValuesCSR()
-            local_indptr, local_indices, local_data = local_csr
-            global_indices = gather_csr(local_indices).astype(np.int32)
-            global_data = gather_csr(local_data)
-            global_indptr = gather_indpr(local_indptr)
-            seq_M = PETSc.Mat().createAIJWithArrays([M.getSize()[0],M.getSize()[1]],(global_indptr,global_indices,global_data),comm = PETSc.COMM_SELF)
-            return seq_M
-        
-        
-        
-        
         H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD)
         rowstart,rowend = H_atom.getOwnershipRange()
         
@@ -458,11 +404,137 @@ class Hamiltonian:
         H_atom.assemblyBegin()
         H_atom.assemblyEnd()
         self.H_atom = H_atom
+    #################################################################################################################################
 
 
+
+
+
+
+
+    def H_MIX(self,n_basis,weights,nodes,basis_funcs,dt):
+        H_mix_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD,nnz = 2)
+        H_mix_lm.setUp()
+
+        istart,iend = H_mix_lm.getOwnershipRange()
+        rows,cols = H_mix_lm.getSize()
+        for i in range(istart,iend):
+            for j in range(cols):
+                clm = np.sqrt(((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3))) * 1j * dt /2
+                if i == j+1:
+                    H_mix_lm.setValue(i,j,clm)
+                elif j == i+1:
+                    H_mix_lm.setValue(i,j,clm)
+        H_mix_lm.assemble()
+
+        H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
+        istart,iend = H_mix_R.getOwnershipRange()
+        rows,cols = H_mix_R.getSize()
+        for i in range(istart,iend):
+            for j in range(cols):
+                H_element = np.sum(weights * basis_funcs[j](nodes) *  basis_funcs[j](nodes,1))
+                H_mix_R.setValue(i,j,H_element)
+        H_mix_R.assemble()
+
+        total = kron.kronV2(H_mix_lm,H_mix_R)
+        total.scale(-1j)
+
+        H_mix_lm.destroy()
+        H_mix_R.destroy()
+        self.H_mix = total
+        return None
+    def H_ANG(self,n_basis,weights,nodes,basis_funcs,dt):
+        H_ang_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD,nnz = 2)
+        istart,iend = H_ang_lm.getOwnershipRange()
+        rows,cols = H_ang_lm.getSize()
+        for i in range(istart,iend):
+            for j in range(cols):
+                clm = np.sqrt(((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3)))* 1j * dt /2
+                if j == i+1:
+                    H_ang_lm.setValue(i,j,(i+1)*clm)
+                elif i == j+1:
+                    H_ang_lm.setValue(i,j,-(i+1)*clm)
+        H_ang_lm.assemble()
+
+        H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
+        istart,iend = H_ang_R.getOwnershipRange()
+        rows,cols = H_ang_R.getSize()
+        for i in range(istart,iend):
+            for j in range(cols):
+                H_element = np.sum(weights * basis_funcs[j](nodes) *  basis_funcs[j](nodes) / (nodes))
+                H_ang_R.setValue(i,j,H_element)
+        H_ang_R.assemble()
+
+        total = kron.kronV2(H_ang_lm,H_ang_R)
+        total.scale(-1j)
+
+        H_ang_lm.destroy()
+        H_ang_R.destroy()
+
+        self.H_ang = total
+        return None  
+    def H_ATOM(self,H_list,n_basis,dt):
+        H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD)
+
+        local_H = []
+        for l in range(self.lmax+1):
+            local_H.append(getLocal(H_list[l]))
+
+        istart,iend = H_atom.getOwnershipRange()
+        rows,cols = H_atom.getSize()
+        for i in range(istart,iend):
+            l = i // n_basis
+            l_row = i % n_basis
+
+            index,vals = local_H[l].getRow(l_row)
+
+            full_row = np.zeros(n_basis,dtype = "complex")
+            full_row[index] = vals
+            row_array = np.pad(full_row,(l*n_basis,(self.lmax-l)*n_basis),constant_values= (0,0))
+
+            for j in range(cols):
+
+                row_element = row_array[j] * 1j * dt /2
+                if np.abs(row_element)<= 1E-10:
+                    continue
+                H_atom.setValue(i,j,row_element)
+        H_atom.assemble()
+        self.H_atom = H_atom
+        return None
+    def S(self,S_R,n_basis):
+        I = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
+        istart,iend = I.getOwnershipRange()
+        for i in range(istart,iend):
+            I.setValue(i,i,1)
+        I.assemble()
+
+        total = kron.kronV2(I,S_R)
+
+        I.destroy()
+        self.S = total
+        return None
+    def PartialAtomic(self):
+
+        S_copy_L = self.S.copy()
+        S_copy_R = self.S.copy()
+        
+        S_copy_L.axpy(-1,self.H_atom)
+        S_copy_R.axpy(1,self.H_atom)
+
+
+        self.partial_L = S_copy_L
+        self.partial_R = S_copy_R
+    def PartialAngular(self):
+        H_mix_copy = self.H_mix.copy()
+        H_mix_copy.axpy(1,self.H_ang)
+
+        self.partial_angular = H_mix_copy
+        return None
 
 
 if __name__ == "__main__":
+
+    
     if PETSc.COMM_WORLD.rank ==0:
         start = time.time()
     with open('input.json', 'r') as file:
@@ -475,7 +547,7 @@ if __name__ == "__main__":
     splines_par = tuple(input_par["splines"].values())
     splines = Basis(*splines_par)
     splines.CreateFuncs(box.rmax,box.dr)
-    splines.PlotFuncs(box.r,False)
+    splines.PlotFuncs(box.r,True)
     splines.CreateGauss(box.rmax)
     splines.EvalGauss()
     
@@ -492,15 +564,23 @@ if __name__ == "__main__":
 
     
     Int = Hamiltonian()
-    Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
-    Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs)
-    Int.H_ATOM(FieldFreeH.FFH_R_list,splines.n_basis)
-    Int.S_TOTAL(FieldFreeH.S_R,splines.n_basis)
+    Int.H_MIX(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs,box.dt)
+    Int.H_ANG(splines.n_basis,splines.weights,splines.nodes,splines.bfuncs,box.dt)
+    Int.H_ATOM(FieldFreeH.FFH_R_list,splines.n_basis,box.dt)
+    Int.S(FieldFreeH.S_R,splines.n_basis)
+    Int.PartialAtomic()
+    Int.PartialAngular()
 
     ############
     for l in range(input_par["lm"]["lmax"]+1):
         FieldFreeH.FFH_R_list[l].destroy()
     ##########
+
+    #PETSc.Log.begin()
+  
+  
+    #PETSc.Log.view()
+    
     gc.collect()
 
     test = False
@@ -508,75 +588,59 @@ if __name__ == "__main__":
         L = Int.H_atom.getVecRight()
         Int.H_atom.mult(psi.psi_initial,L)
 
-        R = Int.S_total.getVecRight()
-        Int.S_total.mult(psi.psi_initial,R)
+        R = Int.S.getVecRight()
+        Int.S.mult(psi.psi_initial,R)
 
         if PETSc.COMM_WORLD.rank == 0:
             print(L.getValue(0))
             print(R.getValue(0)*-0.5)
 
-    test2 = False
+    test2 = True
     if test2:
-        dt = box.dt
+        
         L = len(box.t)
-        structure = structure=PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN
-        def makeLeft(S,MIX,ANG,ATOM,i):
-            
-
-            S.axpy(-Field.pulse[i],MIX,structure)
-            S.axpy(-Field.pulse[i],ANG,structure)
-            S.axpy(-1,ATOM,structure)
-            return S
-        def makeRight(S,MIX,ANG,ATOM,i):
-            
-            
-            
-            S.axpy(Field.pulse[i],MIX,structure)
-            S.axpy(Field.pulse[i],ANG,structure)
-            S.axpy(1,ATOM,structure)
-            
-            return S
-
-        H_mix = Int.H_mix
-        H_mix.scale(1j * dt /2)
-  
-        H_ang = Int.H_ang
-        H_ang.scale(1j * dt /2)
-
-        H_atom = Int.H_atom
-        H_atom.scale(1j * dt /2)
-
-        S = Int.S_total
+       
 
         psi_initial = psi.psi_initial.copy()
         ksp = PETSc.KSP().create(PETSc.COMM_WORLD)
+        pulse = Field.pulse
 
-   
+        PETSc.Log.begin()
+        #for i,t in enumerate([0]):
         for i,t in enumerate(box.t):
-            print(i,L)
+            if PETSc.COMM_WORLD.rank == 0:
+
+                print(i,L)
+            partial_L_copy = Int.partial_L.copy()
+            partial_R_copy = Int.partial_R.copy()
+
+            partial_L_copy.axpy(-pulse[i],Int.partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_R_copy.axpy(pulse[i],Int.partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+
 
             
+            known = partial_R_copy.getVecRight()
+            solution = partial_L_copy.getVecRight()
 
-            O_L = makeLeft(S,H_mix,H_ang,H_atom,i)
-            O_R = makeRight(S,H_mix,H_ang,H_atom,i)
+            partial_R_copy.mult(psi_initial,known)
+
+            ksp.setOperators(partial_L_copy)
+
+            ksp.solve(known,solution)
+
+            psi_initial.copy(solution)
+
+            partial_L_copy.destroy()
+            partial_R_copy.destroy()
+            known.destroy()
+            solution.destroy()
+    PETSc.Log.view()
+
+    if PETSc.COMM_WORLD.rank ==0:
+        end = time.time()
+        print(f"Total Time:{end-start}")
 
             
-
-            if i == 0:
-                known = O_R.getVecRight()
-                sol = O_L.getVecRight()
-        
-            O_R.mult(psi_initial,known)
-
-            ksp.setOperators(O_L)
-        
-            
-            ksp.solve(known,sol)
-
-            
-            
-    
-            psi_initial.copy(sol)
 
         
 
