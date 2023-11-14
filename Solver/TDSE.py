@@ -167,10 +167,10 @@ class TISE:
         FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
 
         rowstart,rowend = FFH_R.getOwnershipRange()
-        #columnstart,columnend = FFH_R.getOwnershipRangeColumn()
+        
         rows,cols = FFH_R.getSize()
         for i in range(rowstart,rowend):
-            #for j in range(columnstart,columnend):
+            
             for j in range(cols):
                 if i >= j:
 
@@ -203,7 +203,7 @@ class TISE:
 
         return None
     
-    def EvalEigen(self):
+    def EvalEigen(self,n_basis,S_R):
         
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
             
@@ -230,6 +230,8 @@ class TISE:
 
             nconv = E.getConverged()
             
+
+            seq_S = getLocal(S_R)
             for i in range(nconv):
                 eigenvalue = E.getEigenvalue(i)  # This retrieves the eigenvalue
                 
@@ -240,12 +242,15 @@ class TISE:
                 eigen_vector = H.getVecLeft()  # Assuming H is the correct operator for the matrix H
                 E.getEigenvector(i, eigen_vector)  # This retrieves the eigenvector
                         
-                    
+                
+                for i in range(n_basis):
+                    for j in range(n_basis):
+                        Norm = eigen_vector.getValue(i) * np.conjugate(eigen_vector.getValue(j)) * seq_S.getValue(i,j)
+                eigen_vector.scale(1/np.sqrt(Norm))
                 eigen_vector.setName(f"Psi_{i+1+l}_{l}")
                 ViewHDF5.view(eigen_vector)
                     
-                # You could save the real part and the imaginary part if they are non-zero,
-                # but for SMALLEST_REAL we typically only consider the real part.
+                
                         
                 energy = PETSc.Vec().createMPI(1, comm=PETSc.COMM_WORLD)
                 energy.setValue(0,np.real(eigenvalue))
@@ -452,7 +457,7 @@ if __name__ == "__main__":
     FieldFreeH = TISE()
     for l in range(input_par["lm"]["lmax"]+1):
         FieldFreeH.CreateH_l(splines.n_basis,splines,splines.nodes,splines.weights,l)
-    FieldFreeH.EvalEigen()
+    FieldFreeH.EvalEigen(splines.n_basis,FieldFreeH.S_R)
 
     Field = Laser(input_par["laser"]["w"],input_par["laser"]["I"])
     Field.CreateEnv(box.t,box.tmax,input_par["box"]["N"])
