@@ -2,7 +2,7 @@
 #SBATCH --job-name TDSE
 #SBATCH -p photons
 #SBATCH --nodes 1
-#SBATCH --ntasks 8
+#SBATCH --ntasks 16
 #SBATCH --mem=32G 
 #SBATCH -o run.log 
 #SBATCH -t 0-01:00:00

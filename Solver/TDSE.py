@@ -167,9 +167,11 @@ class TISE:
         FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
 
         rowstart,rowend = FFH_R.getOwnershipRange()
-        columnstart,columnend = FFH_R.getOwnershipRangeColumn()
+        #columnstart,columnend = FFH_R.getOwnershipRangeColumn()
+        rows,cols = FFH_R.getSize()
         for i in range(rowstart,rowend):
-            for j in range(columnstart,columnend):
+            #for j in range(columnstart,columnend):
+            for j in range(cols):
                 if i >= j:
 
                     H_element_1 = np.sum(weights * basis_object.barray[:,i] * (-0.5)* basis_object.second_barray[:,j])
@@ -198,7 +200,9 @@ class TISE:
         self.FFH_R_list.append(FFH_R)
         self.S_R = S_R
         
+
         return None
+    
     def EvalEigen(self):
         
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
@@ -209,7 +213,7 @@ class TISE:
             nmax = input_par["lm"]["nmax"] 
 
         for i,l in enumerate(range(nmax)):
-            print(nmax)
+            
             H = self.FFH_R_list[i]
 
             E = SLEPc.EPS().create()
@@ -507,7 +511,7 @@ if __name__ == "__main__":
         pulse = Field.pulse
 
         PETSc.Log.begin()
-        #for i,t in enumerate([0]):
+        
         for i,t in enumerate(box.t):
             if PETSc.COMM_WORLD.rank == 0:
 
@@ -535,6 +539,10 @@ if __name__ == "__main__":
             partial_R_copy.destroy()
             known.destroy()
             solution.destroy()
+        ViewHDF5 = PETSc.Viewer().createHDF5("TDSE.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
+        psi_initial.setName("psi_final")
+        ViewHDF5.view(psi_initial)
+        ViewHDF5.destroy()
     
     test3 = False
     if test3:
@@ -559,6 +567,9 @@ if __name__ == "__main__":
                 inner_prod += np.conjugate(ci)*cj * seq_S.getValue(i,j)
         if PETSc.COMM_WORLD.rank == 0:
             print(inner_prod)
+
+
+
 
     if PETSc.COMM_WORLD.rank ==0:
         end = time.time()

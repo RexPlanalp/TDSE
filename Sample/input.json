@@ -2,23 +2,23 @@
     "box":{
         "xmax": 1000,
         "dx": 0.01,
-        "N": 20,
+        "N": 10,
         "dt": 0.05
     },
     "splines":{
         "N_knots": 150,
         "order": 14,
-        "N_gauss": 500
+        "N_gauss": 400
     },
     "lm":{
-        "lmax":50,
+        "lmax":25,
         "nmax": 4
     },
     "state":[1,0,0],
     "laser": {
         "center":0,
-        "w": 0.03811875,
-        "I": 2E13,
+        "w": 0.625,
+        "I": 1E13,
         "envelope": "sinsq"
 
     }
