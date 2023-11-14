@@ -77,18 +77,37 @@ class Basis:
 
     def CreateFuncs(self,rmax,dr):
         
-        knots_start_end = np.repeat([0, rmax],self.order)  # Repeats -end and end, order times
-        knots_middle = np.linspace(0, rmax - 1, self.N_knots - 2 * self.order)  # Creates evenly spaced knots between the start and end
-        knots = np.concatenate([knots_start_end[:self.order], knots_middle, knots_start_end[self.order:]])  # Concatenates the start, middle, and end knots
+
+        def Linear():
+            knots_start_end = np.repeat([0, rmax],self.order)  # Repeats -end and end, order times
+            knots_middle = np.linspace(0, rmax - 1, self.N_knots - 2 * self.order)  # Creates evenly spaced knots between the start and end
+            knots = np.concatenate([knots_start_end[:self.order], knots_middle, knots_start_end[self.order:]])  # Concatenates the start, middle, and end knots
+            basis_funcs = [BSpline(knots, (i == np.arange(len(knots) - self.order - 1 )).astype(float), self.order) for i in range(len(knots) - self.order - 1 )[1:-(self.order+1)]]
+
+
+            n_basis = len(basis_funcs)
+
+            return basis_funcs,n_basis
         
-        
 
+        def Quadratic():
+            linear = np.linspace(0,rmax/3,int(self.N_knots/2))
+            a = 10
+            x = np.linspace(np.sqrt((linear[-1])*a),np.sqrt(rmax*a),int(self.N_knots/2))
+            quadratic = x**2 /a
+            knots = np.append(linear,quadratic)
+            for _ in range(self.order+1):
+                knots = np.insert(knots,0,0)
+                knots = np.append(knots,rmax)
+            n_basis = len(knots) - self.order - 1
 
-        basis_funcs = [BSpline(knots, (i == np.arange(len(knots) - self.order - 1 )).astype(float), self.order) for i in range(len(knots) - self.order - 1 )[1:-(self.order+1)]]
+            basis_funcs = [BSpline(knots, (i == np.arange(n_basis)), self.order) for i in range(n_basis)[int(self.order/5):-int(self.order/5)-1]]
+    
+            n_basis = len(basis_funcs)
 
+            return basis_funcs,n_basis
 
-        n_basis = len(basis_funcs)
-
+        basis_funcs,n_basis = Quadratic()
     
         self.n_basis = len(basis_funcs)
         self.bfuncs = basis_funcs
@@ -184,13 +203,13 @@ class TISE:
         
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
             
-        if (input_par["lm"]["nmax"] >= input_par["lm"]["lmax"]):
+        if (input_par["lm"]["lmax"] >= input_par["lm"]["nmax"]):
             nmax = input_par["lm"]["lmax"] +1
         else:
             nmax = input_par["lm"]["nmax"] 
 
         for i,l in enumerate(range(nmax)):
-
+            print(nmax)
             H = self.FFH_R_list[i]
 
             E = SLEPc.EPS().create()
@@ -454,15 +473,14 @@ if __name__ == "__main__":
 
     
 
-    ONE = Int.H_mix
-    TWO = Int.H_ang
+    
 
 
-    PETSc.Log.begin()
+    #PETSc.Log.begin()
     
-    ONE.axpy(1,TWO)
     
-    PETSc.Log.view()
+    
+    #PETSc.Log.view()
     
     gc.collect()
 

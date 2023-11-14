@@ -5,10 +5,12 @@ Test psi
 TesT eigenstate
 
 
-Check to see if tolerance in kronV2 and H_atom/S needs to be zero or just small
+look to see if there is a better b-spline distribution
+look to see if there is a better integration method 
 differentiate between lm of bound states and lm expansion
 
 
-Test psi, working on computing inner products
-double check laser paramters and result
-start working on energy spectrum
+Double check laser parametres
+
+write population function
+write energy spectrum 
