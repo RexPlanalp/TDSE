@@ -167,10 +167,8 @@ class TISE:
         FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
 
         rowstart,rowend = FFH_R.getOwnershipRange()
-        #columnstart,columnend = FFH_R.getOwnershipRangeColumn()
         rows,cols = FFH_R.getSize()
         for i in range(rowstart,rowend):
-            #for j in range(columnstart,columnend):
             for j in range(cols):
                 if i >= j:
 
@@ -196,6 +194,7 @@ class TISE:
         FFH_R.assemblyEnd()
         S_R.assemblyBegin()
         S_R.assemblyEnd()
+
 
         self.FFH_R_list.append(FFH_R)
         self.S_R = S_R
