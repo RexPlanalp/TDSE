@@ -200,6 +200,9 @@ class TISE:
         self.FFH_R_list.append(FFH_R)
         self.S_R = S_R
         
+        ViewBinary = PETSc.Viewer().createBinary("overlap.bin","w")
+        S_R.view(ViewBinary)
+        ViewBinary.destroy()
 
         return None
     
@@ -231,7 +234,7 @@ class TISE:
             nconv = E.getConverged()
             
 
-            seq_S = getLocal(S_R)
+            
             for i in range(nconv):
                 eigenvalue = E.getEigenvalue(i)  # This retrieves the eigenvalue
                 
@@ -243,10 +246,15 @@ class TISE:
                 E.getEigenvector(i, eigen_vector)  # This retrieves the eigenvector
                         
                 
-                for i in range(n_basis):
-                    for j in range(n_basis):
-                        Norm = eigen_vector.getValue(i) * np.conjugate(eigen_vector.getValue(j)) * seq_S.getValue(i,j)
-                eigen_vector.scale(1/np.sqrt(Norm))
+                
+                Sv = S_R.createVecRight()
+                S_R.mult(eigen_vector, Sv)
+
+                eigen_vector.conjugate()
+                norm = eigen_vector.dot(Sv)
+
+                
+                eigen_vector.scale(1/np.sqrt(norm))
                 eigen_vector.setName(f"Psi_{i+1+l}_{l}")
                 ViewHDF5.view(eigen_vector)
                     
@@ -493,7 +501,7 @@ if __name__ == "__main__":
     
     gc.collect()
 
-    test = False
+    test = True
     if test:
         L = Int.H_atom.getVecRight()
         Int.H_atom.mult(psi.psi_initial,L)
@@ -549,11 +557,11 @@ if __name__ == "__main__":
         ViewHDF5.view(psi_initial)
         ViewHDF5.destroy()
     
-    test3 = False
+    test3 = True
     if test3:
         from scipy.integrate import trapz
         with h5py.File('Hydrogen.h5', 'r') as f:
-            data = f[f"/Psi_{2}_{0}"][:]
+            data = f[f"/Psi_{1}_{0}"][:]
 
             real_part = data[:,0]
             imaginary_part = data[:,1]
