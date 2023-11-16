@@ -583,7 +583,26 @@ if __name__ == "__main__":
             print(inner_prod)
 
 
+    test4 = True
+    if test4:
 
+        vec1 = splines.bfuncs[0](box.r)[:10000]
+        vec2 = splines.bfuncs[1](box.r)[:10000]
+        from scipy.integrate import trapz
+        
+
+        
+
+        if PETSc.COMM_WORLD.rank == 0:
+            start = time.time()
+        I1 = trapz(vec1*vec2,box.r[:10000])
+
+        if PETSc.COMM_WORLD.rank == 0:
+            end = time.time()
+            print("TRAPZ TIME",end-start)
+
+
+    
 
     if PETSc.COMM_WORLD.rank ==0:
         end = time.time()

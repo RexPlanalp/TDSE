@@ -8,7 +8,7 @@
     "splines":{
         "N_knots": 150,
         "order": 14,
-        "N_gauss": 400
+        "N_gauss": 600
     },
     "lm":{
         "lmax":25,
