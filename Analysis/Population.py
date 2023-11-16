@@ -18,7 +18,6 @@ with h5py.File('TDSE.h5', 'r') as f:
     imaginary_part = data[:,1]
     total = real_part + 1j*imaginary_part
 
-with h5py.File('Overlap.h5', 'r') as f:
-    matrix = f["overlap_matrix"][...]
+
     
 
