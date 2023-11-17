@@ -180,7 +180,7 @@ if __name__ == "__main__":
         if comm.rank == 0:
             print(inner_prod)
 
-    TESTTHREE = False # Testing norm of embedded final state
+    TESTTHREE = True # Testing norm of embedded final state
     if TESTTHREE:
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)

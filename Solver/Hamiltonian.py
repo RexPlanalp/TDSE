@@ -31,12 +31,15 @@ class hamiltonian:
         
         for i in range(istart,iend):
             for j in range(self.lmax+1):
+                
+                def clm(index):
+                    return np.sqrt(((index+1)**2 - self.m**2)/((2*index+1)*(2*index+3))) * 1j * dt /2
 
-                clm = np.sqrt(((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3))) * 1j * dt /2
+                
                 if i == j+1:
-                    H_mix_lm.setValue(i,j,clm)
+                    H_mix_lm.setValue(i,j,clm(i))
                 elif j == i+1:
-                    H_mix_lm.setValue(i,j,clm)
+                    H_mix_lm.setValue(i,j,clm(j))
         H_mix_lm.assemble()
 
         H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
@@ -77,11 +80,13 @@ class hamiltonian:
         
         for i in range(istart,iend):
             for j in range(self.lmax+1):
-                clm = np.sqrt(((i+1)**2 - self.m**2)/((2*i+1)*(2*i+3)))* 1j * dt /2
+
+                def clm(index):
+                    return np.sqrt(((index+1)**2 - self.m**2)/((2*index+1)*(2*index+3))) * 1j * dt /2
                 if j == i+1:
-                    H_ang_lm.setValue(i,j,(i+1)*clm)
+                    H_ang_lm.setValue(i,j,(i+1)*clm(j))
                 elif i == j+1:
-                    H_ang_lm.setValue(i,j,-(i+1)*clm)
+                    H_ang_lm.setValue(i,j,-(j+1)*clm(i))
         H_ang_lm.assemble()
 
         H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
@@ -181,6 +186,8 @@ class hamiltonian:
         self.partial_R = S_copy_R
 
         return None
+    
+
     def PartialAngular(self):
         H_mix_copy = self.H_mix.copy()
         H_mix_copy.axpy(1,self.H_ang)

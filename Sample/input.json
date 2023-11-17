@@ -19,7 +19,7 @@
     "laser": {
         "center":0,
         "w": 0.625,
-        "I": 0,
+        "I": 1E14,
         "envelope": "sinsq"
 
     }
