@@ -502,7 +502,7 @@ if __name__ == "__main__":
     
     gc.collect()
 
-    test = True
+    test = False
     if test:
         L = Int.H_atom.getVecRight()
         Int.H_atom.mult(psi.psi_initial,L)
@@ -513,23 +513,26 @@ if __name__ == "__main__":
         if PETSc.COMM_WORLD.rank == 0:
             print(L.getValue(0))
             print(R.getValue(0)*-0.5)
-
-    test2 = False
+    PETSc.Log.begin()
+    test2 = True
     if test2:
         
         L = len(box.t)
        
-
+        psi_ground = psi.psi_initial.copy()
         psi_initial = psi.psi_initial.copy()
         ksp = PETSc.KSP().create(PETSc.COMM_WORLD)
         pulse = Field.pulse
 
+        if PETSc.COMM_WORLD.rank == 0:
+            print(psi_initial.getValue(0))
+
         PETSc.Log.begin()
         
         for i,t in enumerate(box.t):
-            if PETSc.COMM_WORLD.rank == 0:
+            #if PETSc.COMM_WORLD.rank == 0:
 
-                print(i,L)
+                #print(i,L)
             partial_L_copy = Int.partial_L.copy()
             partial_R_copy = Int.partial_R.copy()
 
@@ -547,18 +550,23 @@ if __name__ == "__main__":
 
             ksp.solve(known,solution)
 
-            psi_initial.copy(solution)
+            #psi_initial.copy(solution)
+
+            
 
             partial_L_copy.destroy()
             partial_R_copy.destroy()
             known.destroy()
             solution.destroy()
+        PETSc.Log.view()
+        if PETSc.COMM_WORLD.rank == 0:
+            print(psi_initial.getValue(0))
         ViewHDF5 = PETSc.Viewer().createHDF5("TDSE.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
         psi_initial.setName("psi_final")
         ViewHDF5.view(psi_initial)
         ViewHDF5.destroy()
     
-    test3 = True
+    test3 = False
     if test3:
         from scipy.integrate import trapz
         with h5py.File('Hydrogen.h5', 'r') as f:
@@ -583,24 +591,17 @@ if __name__ == "__main__":
             print(inner_prod)
 
 
-    test4 = True
+    test4 = False
     if test4:
-
-        vec1 = splines.bfuncs[0](box.r)[:10000]
-        vec2 = splines.bfuncs[1](box.r)[:10000]
-        from scipy.integrate import trapz
+        Sv = Int.S.getVecRight()
+        Int.S.mult(psi_initial,Sv)
+        psi_initial.conjugate()
+        pop = psi_ground.dot(Sv)
+        if PETSc.COMM_WORLD.rank == 0:
+            print(pop)
         
 
-        
-
-        if PETSc.COMM_WORLD.rank == 0:
-            start = time.time()
-        I1 = trapz(vec1*vec2,box.r[:10000])
-
-        if PETSc.COMM_WORLD.rank == 0:
-            end = time.time()
-            print("TRAPZ TIME",end-start)
-
+       
 
     
 
