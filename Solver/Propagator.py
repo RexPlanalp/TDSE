@@ -30,8 +30,8 @@ class propagator:
 
 
             
-            known = partial_R_copy.getVecRight()
-            solution = partial_L_copy.getVecRight()
+            known = partial_R_copy.createVecRight() 
+            solution = partial_L_copy.createVecRight()
 
             partial_R_copy.mult(psi_initial,known)
 

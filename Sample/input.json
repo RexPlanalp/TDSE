@@ -6,14 +6,14 @@
         "dt": 0.01
     },
     "splines":{
-        "N_knots": 175,
+        "N_knots": 250,
         "order": 14,
         "N_gauss": 800,
         "knot_spacing":"linear"
     },
     "lm":{
         "lmax":50,
-        "nmax": 4
+        "nmax": 1
     },
     "state":[1,0,0],
     "laser": {

@@ -4,7 +4,7 @@ import numpy as np
 from slepc4py import SLEPc
 import slepc4py
 import json
-
+from scipy.integrate import trapz
 comm = PETSc.COMM_WORLD
 
 class tise:
@@ -33,10 +33,10 @@ class tise:
                     H_element_1 = np.sum(weights * basisInstance.barray[:,i] * (-0.5)* basisInstance.second_barray[:,j])
                     H_element_2 = np.sum(weights * basisInstance.barray[:,i] * basisInstance.barray[:,j] * l*(l+1)/(2*np.sqrt(nodes**4 + 1E-25 )))
                     H_element_3 = np.sum(weights * basisInstance.barray[:,i] * basisInstance.barray[:,j] * (-1/np.sqrt(nodes**2 + 1E-25)))
-
-                    
-                    
                     H_element = H_element_1 + H_element_2 + H_element_3
+
+                  
+                    
                     
 
                     
@@ -107,6 +107,7 @@ class tise:
             E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
             E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
             E.setType(slepc4py.SLEPc.EPS.Type.KRYLOVSCHUR)
+
             
             E.solve()
 
@@ -138,7 +139,21 @@ class tise:
                 eigen_vector.setName(f"Psi_{i+1+l}_{l}")
                 ViewHDF5.view(eigen_vector)
                     
-                
+                ##############
+
+                #Sv = H.createVecRight()
+                #H.mult(eigen_vector,Sv)
+
+                #Su = self.S_R.createVecRight()
+                #self.S_R.mult(eigen_vector,Su)
+
+                #if comm.rank == 0:
+                    #print(eigen_vector.getValue(0))
+                    #print(Sv.getValue(3))
+                    #print(Su.getValue(3)*eigenvalue)
+
+                ##############
+
                         
                 energy = PETSc.Vec().createMPI(1, comm=PETSc.COMM_WORLD)
                 energy.setValue(0,np.real(eigenvalue))
