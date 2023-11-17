@@ -129,7 +129,8 @@ class tise:
                 Sv = self.S_R.createVecRight()
                 self.S_R.mult(eigen_vector, Sv)
 
-                eigen_vector.conjugate()
+
+
                 norm = eigen_vector.dot(Sv)
 
                 

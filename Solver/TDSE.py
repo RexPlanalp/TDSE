@@ -5,6 +5,7 @@ from Laser import laser
 from Hamiltonian import hamiltonian
 from Psi import psi
 from Propagator import propagator
+from Module import *
 
 import numpy as np
 from numpy import pi
@@ -141,3 +142,50 @@ if __name__ == "__main__":
     if comm.rank == 0:
         end = time.time()
         print("Total Simulation Time:",end-start)
+
+    
+    TESTONE = False # Testing norm of unembedded initial state vs embedded
+    if TESTONE:
+
+        # First we retrieve the unembedded state from the TISE output
+        with h5py.File('Hydrogen.h5', 'r') as f:
+            data = f[f"/Psi_{1}_{0}"][:]
+            real_part = data[:,0]
+            imaginary_part = data[:,1]
+            total = real_part + 1j*imaginary_part
+
+
+        inner_prod = 0
+        seq_S = getLocal(tiseInstance.S_R)
+        for i,ci in enumerate(total):
+            for j,cj in enumerate(total):
+                inner_prod += np.conjugate(cj)*ci * seq_S.getValue(i,j)
+        if PETSc.COMM_WORLD.rank == 0:
+            print(inner_prod)
+
+        psi_initial = PETSc.Vec().createWithArray(comm = PETSc.COMM_WORLD,size = len(total),array = total)
+
+        Sv = tiseInstance.S_R.getVecRight()
+        tiseInstance.S_R.mult(psi_initial,Sv)
+        inner_prod2 = psi_initial.dot(Sv)
+        if comm.rank == 0:
+            print(inner_prod2)
+
+    TESTTWO = False # Testing norm of embedded initial state
+    if TESTTWO:
+        Sv = hamiltonianInstance.S.getVecRight()
+        hamiltonianInstance.S.mult(psiInstance.psi_initial,Sv)
+        
+        inner_prod = psiInstance.psi_initial.dot(Sv)
+        if comm.rank == 0:
+            print(inner_prod)
+
+    TESTTHREE = False # Testing norm of embedded final state
+    if TESTTHREE:
+        Sv = hamiltonianInstance.S.getVecRight()
+        hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
+
+        inner_prod = psiInstance.psi_final.dot(Sv)
+
+        if comm.rank == 0:
+            print(inner_prod)
