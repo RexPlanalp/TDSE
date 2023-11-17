@@ -96,7 +96,8 @@ if __name__ == "__main__":
 
         if comm.rank == 0:
             psistart = time.time()
-        psiInstance = psi(basisInstance)
+        psiInstance = psi()
+        psiInstance.createInitial(basisInstance)
         if comm.rank == 0:
             psiend = time.time()
             print("Total Time to Create Initial Psi:",psiend-psistart)

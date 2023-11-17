@@ -5,7 +5,10 @@ import json
 
 
 class psi:
-    def __init__(self,basisInstance):
+    def __init__(self):
+        pass
+    def createInitial(self,basisInstance): 
+        
 
         n_basis = basisInstance.n_basis
         with open('input.json', 'r') as file:
@@ -29,6 +32,8 @@ class psi:
             psi_initial.setValue(i,psi_array[i])
         psi_initial.assemble()
         
-        self.psi = psi_initial
+        self.psi_initial = psi_initial
 
         return None
+    
+    

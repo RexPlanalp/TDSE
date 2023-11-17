@@ -9,7 +9,7 @@ class propagator:
     def propagateCN(self,gridInstance,psiInstance,laserInstance,hamiltonianInstance):
         t = gridInstance.t
         L = len(t)
-        psi_initial = psiInstance.psi.copy()
+        psi_initial = psiInstance.psi_initial.copy()
 
         ksp = PETSc.KSP().create(comm = comm)
 
