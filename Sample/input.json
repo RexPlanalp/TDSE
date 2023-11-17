@@ -2,13 +2,13 @@
     "box":{
         "xmax": 1000,
         "dx": 0.01,
-        "N": 3,
+        "N": 20,
         "dt": 0.01
     },
     "splines":{
-        "N_knots": 150,
+        "N_knots": 175,
         "order": 14,
-        "N_gauss": 400,
+        "N_gauss": 800,
         "knot_spacing":"linear"
     },
     "lm":{
@@ -19,7 +19,7 @@
     "laser": {
         "center":0,
         "w": 0.625,
-        "I": 8E14,
+        "I": 0,
         "envelope": "sinsq"
 
     }

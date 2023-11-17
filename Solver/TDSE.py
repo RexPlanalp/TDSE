@@ -141,41 +141,37 @@ if __name__ == "__main__":
         print("Total Simulation Time:",end-start)
 
     
-    TESTONE = False # Testing norm of unembedded initial state vs embedded
+    TESTONE = False # Testing norm of state
     if TESTONE:
-
-        # First we retrieve the unembedded state from the TISE output
-        with h5py.File('Hydrogen.h5', 'r') as f:
-            data = f[f"/Psi_{1}_{0}"][:]
-            real_part = data[:,0]
-            imaginary_part = data[:,1]
-            total = real_part + 1j*imaginary_part
-
-
-        inner_prod = 0
-        seq_S = getLocal(tiseInstance.S_R)
-        for i,ci in enumerate(total):
-            for j,cj in enumerate(total):
-                inner_prod += np.conjugate(cj)*ci * seq_S.getValue(i,j)
-        if PETSc.COMM_WORLD.rank == 0:
-            print(inner_prod)
-
-        psi_initial = PETSc.Vec().createWithArray(comm = PETSc.COMM_WORLD,size = len(total),array = total)
-
-        Sv = tiseInstance.S_R.getVecRight()
-        tiseInstance.S_R.mult(psi_initial,Sv)
-        inner_prod2 = psi_initial.dot(Sv)
-        if comm.rank == 0:
-            print(inner_prod2)
-
-    TESTTWO = False # Testing norm of embedded initial state
-    if TESTTWO:
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_initial,Sv)
+        inner_prod1 = psiInstance.psi_final.dot(Sv)
+
+        Sv = hamiltonianInstance.S.getVecRight()
+        hamiltonianInstance.S.mult(psiInstance.psi_initial,Sv)
+        inner_prod2 = psiInstance.psi_initial.dot(Sv)
         
-        inner_prod = psiInstance.psi_initial.dot(Sv)
         if comm.rank == 0:
-            print(inner_prod)
+            print(np.abs(inner_prod2)**2)
+            print(np.abs(inner_prod1)**2)
+
+            print(psiInstance.psi_final.getValue(0))
+            print(psiInstance.psi_initial.getValue(0))
+
+    
+    TESTTWO = True
+    if TESTTWO:
+        R = hamiltonianInstance.H_atom.getVecRight()
+        hamiltonianInstance.H_atom.mult(psiInstance.psi_initial,R)
+
+        L = hamiltonianInstance.S.getVecRight()
+        hamiltonianInstance.S.mult(psiInstance.psi_initial,L)
+
+        if comm.rank == 0:
+            print(R.getValue(0))
+            print(L.getValue(0)*-0.5)
+
+        
 
     TESTTHREE = False # Testing norm of embedded final state
     if TESTTHREE:
@@ -188,7 +184,7 @@ if __name__ == "__main__":
             print(np.abs(inner_prod)**2)
 
 
-    TESTFOUR = True
+    TESTFOUR = False
     if TESTFOUR:
         mat = PETSc.Mat()
         viewer = PETSc.Viewer().createBinary('overlap.bin', 'r')
