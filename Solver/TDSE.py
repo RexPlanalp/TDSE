@@ -122,9 +122,6 @@ if __name__ == "__main__":
             print("Total Time to Create Interaction:",hamend-hamstart)
 
 
-
-    #PETSc.Log.begin()
-
     if PROPAGATE:
 
         if comm.rank == 0:
@@ -137,7 +134,7 @@ if __name__ == "__main__":
             propend = time.time()
             print("Total Time to Propagate:",propend-propstart)
     
-    #PETSc.Log.view()
+    
 
     if comm.rank == 0:
         end = time.time()
@@ -180,12 +177,20 @@ if __name__ == "__main__":
         if comm.rank == 0:
             print(inner_prod)
 
-    TESTTHREE = True # Testing norm of embedded final state
+    TESTTHREE = False # Testing norm of embedded final state
     if TESTTHREE:
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
 
-        inner_prod = psiInstance.psi_final.dot(Sv)
+        inner_prod = psiInstance.psi_initial.dot(Sv)
 
         if comm.rank == 0:
-            print(inner_prod)
+            print(np.abs(inner_prod)**2)
+
+
+    TESTFOUR = True
+    if TESTFOUR:
+        mat = PETSc.Mat()
+        viewer = PETSc.Viewer().createBinary('overlap.bin', 'r')
+        mat.load(viewer)
+        viewer.destroy()

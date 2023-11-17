@@ -169,6 +169,12 @@ class hamiltonian:
 
         I.destroy()
         self.S = total
+
+        viewer = PETSc.Viewer().createBinary("overlap.bin","w")
+        
+        total.view(viewer)
+        viewer.destroy()
+
         return None
     
 
