@@ -36,4 +36,6 @@ class psi:
 
         return None
     
-    
+    def createFinal(self,vec):
+        self.psi_final = vec
+        return None

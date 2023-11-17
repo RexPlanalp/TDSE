@@ -48,7 +48,7 @@ class propagator:
             partial_R_copy.destroy()
             known.destroy()
             solution.destroy()
-
+        psiInstance.createFinal(psi_initial)
         ViewHDF5 = PETSc.Viewer().createHDF5("TDSE.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
         psi_initial.setName("psi_final")
         ViewHDF5.view(psi_initial)
