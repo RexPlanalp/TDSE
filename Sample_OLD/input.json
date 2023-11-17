@@ -2,17 +2,16 @@
     "box":{
         "xmax": 1000,
         "dx": 0.01,
-        "N": 3,
+        "N": 1,
         "dt": 0.05
     },
     "splines":{
         "N_knots": 150,
         "order": 14,
-        "N_gauss": 400,
-        "knot_spacing":"linear"
+        "N_gauss": 400      
     },
     "lm":{
-        "lmax":50,
+        "lmax":5,
         "nmax": 4
     },
     "state":[1,0,0],
