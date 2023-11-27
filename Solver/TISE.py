@@ -137,16 +137,16 @@ class tise:
                     
                 ##############
 
-                #Sv = H.createVecRight()
-                #H.mult(eigen_vector,Sv)
+                Sv = H.createVecRight()
+                H.mult(eigen_vector,Sv)
 
-                #Su = self.S_R.createVecRight()
-                #self.S_R.mult(eigen_vector,Su)
+                Su = self.S_R.createVecRight()
+                self.S_R.mult(eigen_vector,Su)
 
-                #if comm.rank == 0:
-                    #print(eigen_vector.getValue(0))
-                    #print(Sv.getValue(0))
-                    #print(Su.getValue(0))
+                if comm.rank == 0:
+                    print(eigen_vector.getValue(0))
+                    print(Sv.getValue(0))
+                    print(Su.getValue(0)*eigenvalue)
 
                 ##############
 

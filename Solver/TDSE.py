@@ -141,7 +141,7 @@ if __name__ == "__main__":
         print("Total Simulation Time:",end-start)
 
     
-    TESTONE = True # Testing norm of state
+    TESTONE = False # Testing norm of state
     if TESTONE:
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
@@ -161,10 +161,7 @@ if __name__ == "__main__":
             print("Final State Norm",np.abs(inner_prod2)**2)
             print("Ground State Population",np.abs(inner_prod3)**2)
 
-           
-
-    
-    TESTTWO = False
+    TESTTWO = True
     if TESTTWO:
         R = hamiltonianInstance.H_atom.getVecRight()
         hamiltonianInstance.H_atom.mult(psiInstance.psi_initial,R)
@@ -173,18 +170,17 @@ if __name__ == "__main__":
         hamiltonianInstance.S.mult(psiInstance.psi_initial,L)
 
         if comm.rank == 0:
+            
             print("Eigenvalue Eq for first element")
             print(R.getValue(0))
-            print(L.getValue(0))
-
-        
+            print(L.getValue(0)*-0.5)
 
     TESTTHREE = False # Testing norm of embedded final state
     if TESTTHREE:
 
         if comm.rank == 0:
-            print(psiInstance.psi_initial.getValue(0))
-
+            print("Element of Initial",psiInstance.psi_initial.getValue(0))
+            print("Element of Final",psiInstance.psi_final.getValue(0))
 
     TESTFOUR = False
     if TESTFOUR:

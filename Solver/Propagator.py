@@ -15,6 +15,12 @@ class propagator:
 
         pulse = laserInstance.pulse
 
+        ####################
+
+        ksp.setTolerances(rtol = 1e-8)
+
+        ####################
+
 
         
         for i,t in enumerate(t):
