@@ -20,13 +20,13 @@ class propagator:
         for i,t in enumerate(t):
             if PETSc.COMM_WORLD.rank == 0:
 
-                print(i,L)
+                print(i,L-1)
 
             partial_L_copy = hamiltonianInstance.partial_L.copy()
             partial_R_copy = hamiltonianInstance.partial_R.copy()
             partial_angular = hamiltonianInstance.partial_angular
-            partial_L_copy.axpy(-pulse[i],partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
-            partial_R_copy.axpy(pulse[i],partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_L_copy.axpy(pulse[i],partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_R_copy.axpy(-pulse[i],partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
 
 
             

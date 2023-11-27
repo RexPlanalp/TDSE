@@ -116,9 +116,6 @@ class hamiltonian:
     def H_ATOM(self,tiseInstance,basisInstance,gridInstance):
         H_list = tiseInstance.FFH_R_list
         n_basis = basisInstance.n_basis
-        dt = gridInstance.dt
-
-
 
         H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = comm)
         H_atom.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
@@ -139,21 +136,18 @@ class hamiltonian:
             full_row[index] = vals
             row_array = np.pad(full_row,(l*n_basis,(self.lmax-l)*n_basis),constant_values= (0,0))
 
-            for j in range((self.lmax +1)*n_basis):
-                
 
-                #TESTING
+            
+            for j in range((self.lmax +1)*n_basis):
                 row_element = row_array[j] 
-                #if i >= j:
-                    
                 H_atom.setValue(i,j,row_element)
 
-                    #if i != j:
-                        #H_atom.setValue(j,i,np.conjugate(row_element))
         H_atom.assemble()
         self.H_atom = H_atom
         return None
     
+
+
 
     def S(self,tiseInstance,basisInstance):
         n_basis = basisInstance.n_basis
@@ -184,8 +178,8 @@ class hamiltonian:
         S_copy_L = self.S.copy()
         S_copy_R = self.S.copy()
         
-        S_copy_L.axpy(-1j*dt/2,self.H_atom)
-        S_copy_R.axpy(1j*dt/2,self.H_atom)
+        S_copy_L.axpy(1j*dt/2,self.H_atom) 
+        S_copy_R.axpy(-1j*dt/2,self.H_atom) 
 
 
         self.partial_L = S_copy_L

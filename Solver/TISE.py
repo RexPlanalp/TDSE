@@ -14,6 +14,7 @@ class tise:
         self.FFH_R_list = []
         self.nmax = input_par["lm"]["nmax"]
         self.lmax = input_par["lm"]["lmax"]
+
     def createH_l(self,basisInstance,l):
         
         n_basis = basisInstance.n_basis
@@ -54,10 +55,12 @@ class tise:
         self.FFH_R_list.append(FFH_R)
         
         return None
+    
     def createAllH(self,basisInstance):
         for l in range(self.lmax+1):
             self.createH_l(basisInstance,l)
         return None
+    
     def createS_R(self,basisInstance):
         n_basis = basisInstance.n_basis
         nodes = basisInstance.nodes
@@ -77,13 +80,6 @@ class tise:
         S_R.assemble()
         self.S_R = S_R
         return None
-
-
-
-
-
-        
-
 
     def solveEigensystem(self):
         
@@ -149,8 +145,8 @@ class tise:
 
                 #if comm.rank == 0:
                     #print(eigen_vector.getValue(0))
-                    #print(Sv.getValue(3))
-                    #print(Su.getValue(3)*eigenvalue)
+                    #print(Sv.getValue(0))
+                    #print(Su.getValue(0))
 
                 ##############
 

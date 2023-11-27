@@ -145,20 +145,26 @@ if __name__ == "__main__":
     if TESTONE:
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
-        inner_prod1 = psiInstance.psi_final.dot(Sv)
+        inner_prod2 = psiInstance.psi_final.dot(Sv)
 
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_initial,Sv)
-        inner_prod2 = psiInstance.psi_initial.dot(Sv)
+        inner_prod1 = psiInstance.psi_initial.dot(Sv)
+
+        Sv = hamiltonianInstance.S.getVecRight()
+        hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
+        inner_prod3 = psiInstance.psi_initial.dot(Sv)
         
         if comm.rank == 0:
             print("Norms:")
-            print(np.abs(inner_prod2)**2)
-            print(np.abs(inner_prod1)**2)
+            print("Initial State Norm",np.abs(inner_prod1)**2)
+            print("Final State Norm",np.abs(inner_prod2)**2)
+            print("Ground State Population",np.abs(inner_prod3)**2)
+
            
 
     
-    TESTTWO = True
+    TESTTWO = False
     if TESTTWO:
         R = hamiltonianInstance.H_atom.getVecRight()
         hamiltonianInstance.H_atom.mult(psiInstance.psi_initial,R)
@@ -169,7 +175,7 @@ if __name__ == "__main__":
         if comm.rank == 0:
             print("Eigenvalue Eq for first element")
             print(R.getValue(0))
-            print(L.getValue(0)*-0.5)
+            print(L.getValue(0))
 
         
 
