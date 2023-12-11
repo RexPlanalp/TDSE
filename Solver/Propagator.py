@@ -17,7 +17,7 @@ class propagator:
 
         ####################
 
-        ksp.setTolerances(rtol = 1e-8)
+        ksp.setTolerances(rtol = 1e-7)
 
         ####################
 
@@ -27,6 +27,7 @@ class propagator:
             if PETSc.COMM_WORLD.rank == 0:
 
                 print(i,L-1)
+            
 
             partial_L_copy = hamiltonianInstance.partial_L.copy()
             partial_R_copy = hamiltonianInstance.partial_R.copy()
@@ -43,9 +44,9 @@ class propagator:
 
             ksp.setOperators(partial_L_copy)
 
-            ksp.solve(known,solution)
 
-            
+
+            ksp.solve(known,solution)
             solution.copy(psi_initial)
 
             

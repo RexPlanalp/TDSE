@@ -136,7 +136,7 @@ class tise:
                 ViewHDF5.view(eigen_vector)
                     
                 ##############
-
+                '''
                 Sv = H.createVecRight()
                 H.mult(eigen_vector,Sv)
 
@@ -147,7 +147,8 @@ class tise:
                     print(eigen_vector.getValue(0))
                     print(Sv.getValue(0))
                     print(Su.getValue(0)*eigenvalue)
-
+                    print(eigenvalue)
+                '''
                 ##############
 
                         
