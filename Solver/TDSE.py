@@ -44,7 +44,7 @@ if __name__ == "__main__":
             gridstart = time.time()
 
         gridInstance = grid()
-        gridInstance.print(False)
+        gridInstance.print(True)
 
         if comm.rank == 0:
             gridend = time.time()
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
         basisInstance = basis()
         basisInstance.createFuncs(gridInstance)
-        basisInstance.plotFuncs(gridInstance,False)
+        basisInstance.plotFuncs(gridInstance,True)
         basisInstance.createGauss(gridInstance)
         basisInstance.evalGauss()
 
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         print("Total Simulation Time:",end-start)
 
     
-    TESTONE = True # Testing norm of state
+    TESTONE = False # Testing norm of state
     if TESTONE:
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
@@ -189,3 +189,15 @@ if __name__ == "__main__":
         viewer = PETSc.Viewer().createBinary('overlap.bin', 'r')
         mat.load(viewer)
         viewer.destroy()
+
+
+    TESTFIVE = False
+    if TESTFIVE:
+        test = 2*gridInstance.tmax
+        test = test/2
+        test = test/(2*np.pi)
+        test = test % 1
+        print(test*2*np.pi)
+        
+
+        

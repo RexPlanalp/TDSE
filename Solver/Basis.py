@@ -66,6 +66,7 @@ class basis:
                 plt.plot(r,basis_array[:,i])
             plt.savefig("b_splines.png")
             plt.clf()
+        np.save("basis.npy",basis_array)
         return None
 
     def createGauss(self,gridInstance):

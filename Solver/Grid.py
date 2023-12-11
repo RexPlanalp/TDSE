@@ -15,9 +15,19 @@ class grid:
 
         self.r = np.linspace(0,grid_size,int(grid_size/grid_spacing)) 
 
+        ###########
+        self.r = np.linspace(0,grid_size,int(grid_size/grid_spacing)+1) 
+        ###########
+
         self.tau = 2*pi/freq
         self.tmax = N*self.tau
         self.t = np.arange(-self.tmax/2,self.tmax/2 + time_spacing,time_spacing)
+
+        ##############
+        N = int(np.rint(self.tmax / time_spacing)) + 1
+        self.t = np.linspace(-self.tmax/2,self.tmax/2,N)
+        ##############
+
 
         self.rmax = grid_size
         self.dr = grid_spacing

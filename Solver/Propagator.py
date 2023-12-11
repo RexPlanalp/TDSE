@@ -17,7 +17,7 @@ class propagator:
 
         ####################
 
-        ksp.setTolerances(rtol = 1e-7)
+        ksp.setTolerances(rtol = 1e-18)
 
         ####################
 
