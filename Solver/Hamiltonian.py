@@ -37,9 +37,9 @@ class hamiltonian:
 
                 
                 if i == j+1:
-                    H_mix_lm.setValue(i,j,clm(i))
+                    H_mix_lm.setValue(i,j,clm(i-1))
                 elif j == i+1:
-                    H_mix_lm.setValue(i,j,clm(j))
+                    H_mix_lm.setValue(i,j,clm(j-1))
         H_mix_lm.assemble()
 
         H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
@@ -78,9 +78,9 @@ class hamiltonian:
                 def clm(index):
                     return np.sqrt(((index+1)**2 - self.m**2)/((2*index+1)*(2*index+3))) * 1j * dt /2
                 if j == i+1:
-                    H_ang_lm.setValue(i,j,(i+1)*clm(j))
+                    H_ang_lm.setValue(i,j,(i)*clm(j-1))
                 elif i == j+1:
-                    H_ang_lm.setValue(i,j,-(j+1)*clm(i))
+                    H_ang_lm.setValue(i,j,-(j)*clm(i-1))
         H_ang_lm.assemble()
 
         H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
