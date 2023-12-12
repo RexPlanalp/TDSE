@@ -44,7 +44,7 @@ if __name__ == "__main__":
             gridstart = time.time()
 
         gridInstance = grid()
-        gridInstance.print(True)
+        gridInstance.print(False)
 
         if comm.rank == 0:
             gridend = time.time()

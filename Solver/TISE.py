@@ -5,6 +5,7 @@ from slepc4py import SLEPc
 import slepc4py
 import json
 from scipy.integrate import trapz
+import os
 comm = PETSc.COMM_WORLD
 
 class tise:
@@ -82,6 +83,8 @@ class tise:
         return None
 
     def solveEigensystem(self):
+        if os.path.exists("Hydrogen.h5"):
+            return
         
         n_basis,_ = self.S_R.getSize()
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
