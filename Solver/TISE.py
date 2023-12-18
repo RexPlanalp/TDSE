@@ -30,7 +30,7 @@ class tise:
         for i in range(rowstart,rowend):
             
             for j in range(n_basis):
-                if i >= j:
+                #if i >= j:
 
                     H_element_1 = np.sum(weights * basisInstance.barray[:,i] * (-0.5)* basisInstance.second_barray[:,j])
                     H_element_2 = np.sum(weights * basisInstance.barray[:,i] * basisInstance.barray[:,j] * l*(l+1)/(2*np.sqrt(nodes**4 + 1E-25 )))
@@ -45,9 +45,9 @@ class tise:
                     FFH_R.setValue(i,j,H_element)
                     
 
-                    if i != j:
+                    #if i != j:
                         
-                        FFH_R.setValue(j,i,np.conjugate(H_element))
+                        #FFH_R.setValue(j,i,np.conjugate(H_element))
                         
                         
         FFH_R.assemble()
@@ -72,12 +72,12 @@ class tise:
         for i in range(rowstart,rowend):
             for j in range(n_basis):
                 
-                if i >= j:
+                #if i >= j:
                     S_element = np.sum(weights * basisInstance.barray[:,i] * basisInstance.barray[:,j])
                     S_R.setValue(i,j,S_element)
                     
-                    if i != j:
-                        S_R.setValue(j,i,np.conjugate(S_element))
+                    #if i != j:
+                        #S_R.setValue(j,i,np.conjugate(S_element))
         S_R.assemble()
         self.S_R = S_R
         return None

@@ -82,10 +82,31 @@ def probDistribution():
         print(f"The Norm of the l = {l} block is {N}")
         total+= N
     print(f"Total Norm of State:{total}")
+def plotWavefunction():
+    basis_array = np.load("basis.npy")
+    grid_size = 1000
+    grid_spacing = 0.01
 
+    r = np.linspace(0,grid_size,int(grid_size/grid_spacing)+1)
+    with h5py.File("Hydrogen.h5","r") as f:
+        data = f["Psi_1_0"][:]
+    #with h5py.File('TDSE.h5', 'r') as f:
+        #data = f["psi_final"][:]
+        real_part = data[:,0]
+        imaginary_part = data[:,1]
+        wavefunction = real_part + 1j*imaginary_part
+
+    pos_space_wavefunction = 0
+    for i in range(51):
+        
+        pos_space_wavefunction+= basis_array[:,i]*wavefunction[i]
+
+    plt.plot(r,np.abs(pos_space_wavefunction)**2)
+    plt.xlim([0,10])
+    plt.savefig("test.png")
 #computePopulation()
 probDistribution()
-
+plotWavefunction()
 
 
     

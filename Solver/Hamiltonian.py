@@ -51,7 +51,7 @@ class hamiltonian:
                         H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.first_barray[:,j])
                         H_mix_R.setValue(i,j,H_element)
                         #if i!=j:
-                            #H_mix_R.setValue(j,i,np.conjugate(H_element))
+                            #H_mix_R.setValue(j,i,H_element)
 
         H_mix_R.assemble()
 
@@ -97,7 +97,7 @@ class hamiltonian:
                     H_ang_R.setValue(i,j,H_element)
 
                     #if i != j:
-                        #H_ang_R.setValue(j,i,np.conjugate(H_element))
+                        #H_ang_R.setValue(j,i,H_element)
         H_ang_R.assemble()
 
         total = kronV3(H_ang_lm,H_ang_R)
