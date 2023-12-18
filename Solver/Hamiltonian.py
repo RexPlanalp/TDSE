@@ -47,8 +47,11 @@ class hamiltonian:
         
         for i in range(istart,iend):
             for j in range(n_basis):
-                    H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.first_barray[:,j])
-                    H_mix_R.setValue(i,j,H_element)
+                    #if i>=j:
+                        H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.first_barray[:,j])
+                        H_mix_R.setValue(i,j,H_element)
+                        #if i!=j:
+                            #H_mix_R.setValue(j,i,np.conjugate(H_element))
 
         H_mix_R.assemble()
 

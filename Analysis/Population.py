@@ -7,7 +7,7 @@ import h5py
 import numpy as np
 from numpy import pi
 import matplotlib.pyplot as plt
-
+from scipy.integrate import trapz
 
 
 
@@ -59,7 +59,32 @@ def computePopulation():
             total_pop += np.abs(amp)**2
     print(total_pop)
     return None
-computePopulation()
+def probDistribution():
+    basis_array = np.load("basis.npy")
+    grid_size = 1000
+    grid_spacing = 0.01
+
+    r = np.linspace(0,grid_size,int(grid_size/grid_spacing)+1)
+    total = 0
+    with h5py.File('TDSE.h5', 'r') as f:
+        data = f["psi_final"][:]
+        real_part = data[:,0]
+        imaginary_part = data[:,1]
+        wavefunction = real_part + 1j*imaginary_part
+    
+    for l in range(51):
+        partial_wavefunction = wavefunction[l*231:(l+1)*231]
+        
+        pos_space = 0
+        for i in range(231):
+            pos_space += partial_wavefunction[i]*basis_array[:,i]
+        N = trapz(np.abs(pos_space)**2,r)
+        print(f"The Norm of the l = {l} block is {N}")
+        total+= N
+    print(f"Total Norm of State:{total}")
+
+#computePopulation()
+probDistribution()
 
 
 
