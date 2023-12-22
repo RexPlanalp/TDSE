@@ -16,11 +16,9 @@ class hamiltonian:
         return None
     
 
-    def clm(self,l,m):
-        return np.sqrt(((l+1)**2 - self.m**2)/((2*l+1)*(2*l+3)))
-
-
     def H_MIX(self,basisInstance,gridInstance):
+
+
         n_basis = basisInstance.n_basis
         weights = basisInstance.weights
         nodes = basisInstance.nodes
@@ -28,21 +26,33 @@ class hamiltonian:
 
         H_mix_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = comm,nnz = 2)
         H_mix_lm.setUp()
+
         istart,iend = H_mix_lm.getOwnershipRange()
+        
         for i in range(istart,iend):
             for j in range(self.lmax+1):
+                
+                def clm(index):
+                    return np.sqrt(((index+1)**2 - self.m**2)/((2*index+1)*(2*index+3))) * 1j * dt /2
+
+                
                 if i == j+1:
-                    H_mix_lm.setValue(i,j,self.clm(i-1,self.m))
+                    H_mix_lm.setValue(i,j,clm(i-1))
                 elif j == i+1:
-                    H_mix_lm.setValue(i,j,self.clm(j-1,self.m))
+                    H_mix_lm.setValue(i,j,clm(j-1))
         H_mix_lm.assemble()
 
         H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
         istart,iend = H_mix_R.getOwnershipRange()
+        
         for i in range(istart,iend):
             for j in range(n_basis):
+                    #if i>=j:
                         H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.first_barray[:,j])
                         H_mix_R.setValue(i,j,H_element)
+                        #if i!=j:
+                            #H_mix_R.setValue(j,i,H_element)
+
         H_mix_R.assemble()
 
         total = kronV3(H_mix_lm,H_mix_R)
@@ -52,30 +62,42 @@ class hamiltonian:
         H_mix_R.destroy()
         self.H_mix = total
         return None
-
+    
 
     def H_ANG(self,basisInstance,gridInstance):
+
         n_basis = basisInstance.n_basis
         weights = basisInstance.weights
         nodes = basisInstance.nodes
         dt = gridInstance.dt
 
+
         H_ang_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = comm,nnz = 2)
         istart,iend = H_ang_lm.getOwnershipRange()
+        
         for i in range(istart,iend):
             for j in range(self.lmax+1):
-                if i == j+1:
-                    H_ang_lm.setValue(i,j,-(i)*self.clm(i-1,self.m))
-                elif j == i+1:
-                    H_ang_lm.setValue(i,j,(j)*self.clm(j-1,self.m))
+
+                def clm(index):
+                    return np.sqrt(((index+1)**2 - self.m**2)/((2*index+1)*(2*index+3))) * 1j * dt /2
+                if j == i+1:
+                    H_ang_lm.setValue(i,j,(i)*clm(j-1))
+                elif i == j+1:
+                    H_ang_lm.setValue(i,j,-(j)*clm(i-1))
         H_ang_lm.assemble()
 
         H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
         istart,iend = H_ang_R.getOwnershipRange()
+        
         for i in range(istart,iend):
             for j in range(n_basis):
+
+                #if i >= j:
                     H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.barray[:,j] / (nodes))
                     H_ang_R.setValue(i,j,H_element)
+
+                    #if i != j:
+                        #H_ang_R.setValue(j,i,H_element)
         H_ang_R.assemble()
 
         total = kronV3(H_ang_lm,H_ang_R)
@@ -83,6 +105,7 @@ class hamiltonian:
 
         H_ang_lm.destroy()
         H_ang_R.destroy()
+
         self.H_ang = total
         return None  
     
@@ -120,6 +143,8 @@ class hamiltonian:
         self.H_atom = H_atom
         return None
     
+
+
 
     def S(self,tiseInstance,basisInstance):
         n_basis = basisInstance.n_basis
@@ -160,11 +185,9 @@ class hamiltonian:
         return None
     
 
-    def PartialAngular(self,gridInstance):
-        dt = gridInstance.dt
+    def PartialAngular(self):
         H_mix_copy = self.H_mix.copy()
         H_mix_copy.axpy(1,self.H_ang)
-        H_mix_copy.scale(1j*dt/2)
 
         self.partial_angular = H_mix_copy
         return None

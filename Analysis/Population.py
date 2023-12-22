@@ -23,47 +23,34 @@ def computePopulation():
         real_part = data[:,0]
         imaginary_part = data[:,1]
         psi_final = real_part + 1j*imaginary_part
-    N = len(psi_final)
-    psi_final = PETSc.Vec().createWithArray(comm = PETSc.COMM_WORLD,size = N,array = psi_final)
-    
-
-
     lmax = 50
-    nmax = 15
-    n_basis = int(N/(lmax+1))
-    
-    
-    
-    total_pop = 0
-
-    for n in range(nmax-1):
-         for l in range(n):
-            print(n,l)
+    for n in range(lmax+1):
+        for l in range(n):
+            u1 = psi_final[l*206:(l+1)*206]
             with h5py.File('Hydrogen.h5', 'r') as f:
-            
-                data = f[f"/Psi_{n}_{l}"][:]
+                data = f[f"Psi_{n}_{l}"][:]
 
                 real_part = data[:,0]
                 imaginary_part = data[:,1]
-                total = real_part + 1j*imaginary_part
-        
-            psi_array = np.pad(total,(l*n_basis,(lmax-l)*n_basis),constant_values= (0,0))
-
-
-            psi_bound = PETSc.Vec().createWithArray(comm = PETSc.COMM_WORLD,size = len(psi_array),array = psi_array)
-
-
-            Sv = S.getVecRight()
-            S.mult(psi_final,Sv)
-            amp = psi_bound.dot(Sv)
-            total_pop += np.abs(amp)**2
-    print(total_pop)
+                u2 = real_part + 1j*imaginary_part
+            inner_prod = 0
+            for i in range(len(u1)):
+                for j in range(len(u2)):
+                    inner_prod += np.conjugate(u2[i])*S.getValue(i,j)*u1[j]
+            pop = np.abs(inner_prod)**2 * (2*l+1)
+            print(f"The population of the {n}_{l} state is {pop}")
+            
+    
+    
+    
+    
+    
     return None
 def probDistribution():
     basis_array = np.load("basis.npy")
     grid_size = 1000
     grid_spacing = 0.01
-
+    
     r = np.linspace(0,grid_size,int(grid_size/grid_spacing)+1)
     total = 0
     with h5py.File('TDSE.h5', 'r') as f:
@@ -71,17 +58,21 @@ def probDistribution():
         real_part = data[:,0]
         imaginary_part = data[:,1]
         wavefunction = real_part + 1j*imaginary_part
-    
+    prob_list = []
     for l in range(51):
-        partial_wavefunction = wavefunction[l*231:(l+1)*231]
+        partial_wavefunction = wavefunction[l*206:(l+1)*206]
         
         pos_space = 0
-        for i in range(231):
+        for i in range(206):
             pos_space += partial_wavefunction[i]*basis_array[:,i]
         N = trapz(np.abs(pos_space)**2,r)
         print(f"The Norm of the l = {l} block is {N}")
         total+= N
+        prob_list.append(N)
     print(f"Total Norm of State:{total}")
+
+    plt.bar(range(51),prob_list)
+    plt.savefig("prob_dist.png")
 def plotWavefunction():
     basis_array = np.load("basis.npy")
     grid_size = 1000
@@ -104,9 +95,28 @@ def plotWavefunction():
     plt.plot(r,np.abs(pos_space_wavefunction)**2)
     plt.xlim([0,10])
     plt.savefig("test.png")
+def checkPhase():
+    with h5py.File('TDSE.h5', 'r') as f:
+        data = f["psi_final"][:]
+        real_part = data[:,0]
+        imaginary_part = data[:,1]
+        wavefunction = real_part + 1j*imaginary_part
+    with h5py.File('Hydrogen.h5', 'r') as f:
+        data = f["Psi_1_0"][:]
+        real_part = data[:,0]
+        imaginary_part = data[:,1]
+        groundstate = real_part + 1j*imaginary_part
+    
+    val1 = wavefunction[0]
+    val2 = groundstate[0]
+    print(np.angle(val1/val2))
+    print(np.abs(val1/val2))
+
+
 #computePopulation()
 probDistribution()
-plotWavefunction()
+#checkPhase()
+#plotWavefunction()
 
 
     

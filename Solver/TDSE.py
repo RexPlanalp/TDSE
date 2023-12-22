@@ -115,7 +115,7 @@ if __name__ == "__main__":
         hamiltonianInstance.H_ATOM(tiseInstance,basisInstance,gridInstance)
         hamiltonianInstance.S(tiseInstance,basisInstance)
         hamiltonianInstance.PartialAtomic(gridInstance)
-        hamiltonianInstance.PartialAngular()
+        hamiltonianInstance.PartialAngular(gridInstance)
         
         if comm.rank == 0:
             hamend = time.time()
@@ -127,7 +127,7 @@ if __name__ == "__main__":
         if comm.rank == 0:
             propstart = time.time()
 
-        propagatorInstance = propagator()
+        propagatorInstance = propagator(tol = 1E-5)
         propagatorInstance.propagateCN(gridInstance,psiInstance,laserInstance,hamiltonianInstance)
 
         if comm.rank == 0:
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         print("Total Simulation Time:",end-start)
 
     
-    TESTONE = False # Testing norm of state
+    TESTONE = True # Testing norm of state
     if TESTONE:
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
@@ -194,10 +194,13 @@ if __name__ == "__main__":
     TESTFIVE = False
     if TESTFIVE:
         test = 2*gridInstance.tmax
-        test = test/2
+        test = test*0.499998
         test = test/(2*np.pi)
         test = test % 1
-        print(test*2*np.pi)
+        print(test)
+
+
+        
         
 
         

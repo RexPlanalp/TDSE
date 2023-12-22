@@ -4,8 +4,9 @@ import petsc4py
 comm = PETSc.COMM_WORLD
 
 class propagator:
-    def __init__(self):
-        pass
+    def __init__(self,tol):
+        self.tol = tol
+        
     def propagateCN(self,gridInstance,psiInstance,laserInstance,hamiltonianInstance):
         t = gridInstance.t
         L = len(t)
@@ -17,8 +18,8 @@ class propagator:
 
         ####################
 
-        ksp.setTolerances(rtol = 1e-18)
-
+        ksp.setTolerances(rtol = self.tol)
+        
         ####################
 
 
