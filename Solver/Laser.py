@@ -26,8 +26,27 @@ class laser:
         amplitude = pow(self.I, 0.5) / self.w
         weighted_env = amplitude * self.env
         pulse = weighted_env*np.sin(self.w*t)
+
+        
+
         self.pulse = pulse
+
         return None
+    def createPulse(self,gridInstance):
+        t = gridInstance.t
+        tmax = gridInstance.tmax
+        if self.envelope == "sinsq":
+            def pulseFunc(t_i):
+                env = np.power(np.sin(pi*(t_i-tmax/2) / tmax), 2.0)
+                amplitude = pow(self.I, 0.5) / self.w
+                weighted_env = amplitude * env
+                pulse = weighted_env*np.sin(self.w*t_i)
+                return pulse
+            self.pulse_func = pulseFunc
+        self.pulse = self.pulse_func(t)
+        
+        return 
+
 
     def plotPulse(self,bool):
         if bool:

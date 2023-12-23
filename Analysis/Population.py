@@ -48,11 +48,14 @@ def computePopulation():
     return None
 def probDistribution():
     basis_array = np.load("basis.npy")
+    print(np.shape(basis_array))
     grid_size = 1000
     grid_spacing = 0.01
     
     r = np.linspace(0,grid_size,int(grid_size/grid_spacing)+1)
     total = 0
+    #with h5py.File('Hydrogen.h5', 'r') as f:
+        #data = f["Psi_2_1"][:]
     with h5py.File('TDSE.h5', 'r') as f:
         data = f["psi_final"][:]
         real_part = data[:,0]
@@ -60,10 +63,10 @@ def probDistribution():
         wavefunction = real_part + 1j*imaginary_part
     prob_list = []
     for l in range(51):
-        partial_wavefunction = wavefunction[l*206:(l+1)*206]
+        partial_wavefunction = wavefunction[l*227:(l+1)*227]
         
         pos_space = 0
-        for i in range(206):
+        for i in range(227):
             pos_space += partial_wavefunction[i]*basis_array[:,i]
         N = trapz(np.abs(pos_space)**2,r)
         print(f"The Norm of the l = {l} block is {N}")
@@ -74,27 +77,37 @@ def probDistribution():
     plt.bar(range(51),prob_list)
     plt.savefig("prob_dist.png")
 def plotWavefunction():
+    
     basis_array = np.load("basis.npy")
     grid_size = 1000
     grid_spacing = 0.01
 
     r = np.linspace(0,grid_size,int(grid_size/grid_spacing)+1)
-    with h5py.File("Hydrogen.h5","r") as f:
-        data = f["Psi_1_0"][:]
-    #with h5py.File('TDSE.h5', 'r') as f:
-        #data = f["psi_final"][:]
+
+    with h5py.File('TDSE.h5', 'r') as f:
+        data = f["psi_final"][:]
         real_part = data[:,0]
         imaginary_part = data[:,1]
         wavefunction = real_part + 1j*imaginary_part
-
     pos_space_wavefunction = 0
-    for i in range(51):
-        
+    for i in range(227):
         pos_space_wavefunction+= basis_array[:,i]*wavefunction[i]
 
-    plt.plot(r,np.abs(pos_space_wavefunction)**2)
+    pos_space_bound = 0
+    with h5py.File("Hydrogen.h5","r") as f:
+        data = f["Psi_1_0"][:]
+        real_part = data[:,0]
+        imaginary_part = data[:,1]
+        wavefunction = real_part + 1j*imaginary_part
+    for i in range(227):
+        pos_space_bound += basis_array[:,i]*wavefunction[i]
+
+    plt.plot(r,np.abs(pos_space_wavefunction)**2,label = "final")
+    plt.plot(r,np.abs(pos_space_bound)**2,label = "bound")
+    plt.legend()
     plt.xlim([0,10])
     plt.savefig("test.png")
+    plt.clf()
 def checkPhase():
     with h5py.File('TDSE.h5', 'r') as f:
         data = f["psi_final"][:]
@@ -116,7 +129,7 @@ def checkPhase():
 #computePopulation()
 probDistribution()
 #checkPhase()
-#plotWavefunction()
+plotWavefunction()
 
 
     

@@ -3,7 +3,7 @@
 #SBATCH -p photons
 #SBATCH --nodes 1
 #SBATCH --ntasks 24
-#SBATCH --mem=32G 
+#SBATCH --mem=92G 
 #SBATCH -o run.log 
 #SBATCH -t 0-01:00:00
 #SBATCH --exclude=photon13

@@ -25,7 +25,7 @@ class hamiltonian:
         weights = basisInstance.weights
         nodes = basisInstance.nodes
         dt = gridInstance.dt
-
+    
         H_mix_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = comm,nnz = 2)
         H_mix_lm.setUp()
         istart,iend = H_mix_lm.getOwnershipRange()
@@ -74,7 +74,7 @@ class hamiltonian:
         istart,iend = H_ang_R.getOwnershipRange()
         for i in range(istart,iend):
             for j in range(n_basis):
-                    H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.barray[:,j] / (nodes))
+                    H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.barray[:,j] / np.sqrt(nodes**2 + 1E-25))
                     H_ang_R.setValue(i,j,H_element)
         H_ang_R.assemble()
 
@@ -165,6 +165,5 @@ class hamiltonian:
         H_mix_copy = self.H_mix.copy()
         H_mix_copy.axpy(1,self.H_ang)
         H_mix_copy.scale(1j*dt/2)
-
         self.partial_angular = H_mix_copy
         return None
