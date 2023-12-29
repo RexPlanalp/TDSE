@@ -16,42 +16,32 @@ class tise:
         self.nmax = input_par["lm"]["nmax"]
         self.lmax = input_par["lm"]["lmax"]
 
-    def createH_l(self,basisInstance,l):
+    
+
+
+    def _createH_l(self,basisInstance,l):
+        def _H_element_1(x,i,j):
+            return basis_funcs[i](x) * (-1/2) * basis_funcs[j](x,2)
+        def _H_element_2(x,i,j):
+            return basis_funcs[i](x) * basis_funcs[j](x) * l*(l+1)/(2*np.sqrt(x**4 + 1E-25 ))
+        def _H_element_3(x,i,j):
+            return basis_funcs[i](x) * basis_funcs[j](x)* (-1/np.sqrt(x**2 + 1E-25))
         
         n_basis = basisInstance.n_basis
-        nodes = basisInstance.nodes
-        weights = basisInstance.weights
-        
-        FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
+        basis_funcs = basisInstance.basis_funcs
+        degree = basisInstance.degree
 
+        
+        FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD,nnz = 2*degree +1)
         rowstart,rowend = FFH_R.getOwnershipRange()
-        
-        
         for i in range(rowstart,rowend):
-            
             for j in range(n_basis):
-                #if i >= j:
-
-                    H_element_1 = np.sum(weights * basisInstance.barray[:,i] * (-0.5)* basisInstance.second_barray[:,j])
-                    H_element_2 = np.sum(weights * basisInstance.barray[:,i] * basisInstance.barray[:,j] * l*(l+1)/(2*np.sqrt(nodes**4 + 1E-25 )))
-                    H_element_3 = np.sum(weights * basisInstance.barray[:,i] * basisInstance.barray[:,j] * (-1/np.sqrt(nodes**2 + 1E-25)))
-                    H_element = H_element_1 + H_element_2 + H_element_3
-
-                  
-                    
-                    
-
-                    
-                    FFH_R.setValue(i,j,H_element)
-                    
-
-                    #if i != j:
-                        
-                        #FFH_R.setValue(j,i,np.conjugate(H_element))
-                        
-                        
+                    H_1 = basisInstance.integrate(_H_element_1,i,j)
+                    H_2 = basisInstance.integrate(_H_element_2,i,j)
+                    H_3 = basisInstance.integrate(_H_element_3,i,j)
+                    H_element = H_1 + H_2 + H_3
+                    FFH_R.setValue(i,j,H_element)      
         FFH_R.assemble()
-
 
         self.FFH_R_list.append(FFH_R)
         
@@ -59,25 +49,25 @@ class tise:
     
     def createAllH(self,basisInstance):
         for l in range(self.lmax+1):
-            self.createH_l(basisInstance,l)
+            self._createH_l(basisInstance,l)
         return None
     
     def createS_R(self,basisInstance):
         n_basis = basisInstance.n_basis
-        nodes = basisInstance.nodes
-        weights = basisInstance.weights
+        basis_funcs = basisInstance.basis_funcs
+        degree = basisInstance.degree
 
-        S_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
+        def S_element(x,i,j):
+            return basis_funcs[i](x) * basis_funcs[j](x)
+
+        S_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree+1)
         rowstart,rowend = S_R.getOwnershipRange()
         for i in range(rowstart,rowend):
             for j in range(n_basis):
                 
-                #if i >= j:
-                    S_element = np.sum(weights * basisInstance.barray[:,i] * basisInstance.barray[:,j])
-                    S_R.setValue(i,j,S_element)
-                    
-                    #if i != j:
-                        #S_R.setValue(j,i,np.conjugate(S_element))
+                
+                    S_1 = basisInstance.integrate(S_element,i,j)
+                    S_R.setValue(i,j,S_1)    
         S_R.assemble()
         self.S_R = S_R
         return None

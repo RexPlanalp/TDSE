@@ -56,10 +56,9 @@ if __name__ == "__main__":
             basisstart = time.time()
 
         basisInstance = basis()
-        basisInstance.createFuncs(gridInstance)
-        basisInstance.plotFuncs(gridInstance,True)
-        basisInstance.createGauss(gridInstance)
-        basisInstance.evalGauss()
+        basisInstance.createBasis(gridInstance)
+        basisInstance.saveBasis(gridInstance,plot = True)
+        
 
         if comm.rank == 0:
             basisend = time.time()

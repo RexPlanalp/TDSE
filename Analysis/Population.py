@@ -63,10 +63,10 @@ def probDistribution():
         wavefunction = real_part + 1j*imaginary_part
     prob_list = []
     for l in range(51):
-        partial_wavefunction = wavefunction[l*298:(l+1)*298]
+        partial_wavefunction = wavefunction[l*338:(l+1)*338]
         
         pos_space = 0
-        for i in range(298):
+        for i in range(338):
             pos_space += partial_wavefunction[i]*basis_array[:,i]
         N = trapz(np.abs(pos_space)**2,r)
         print(f"The Norm of the l = {l} block is {N}")

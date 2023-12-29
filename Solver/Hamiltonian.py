@@ -22,10 +22,14 @@ class hamiltonian:
 
     def H_MIX(self,basisInstance,gridInstance):
         n_basis = basisInstance.n_basis
-        weights = basisInstance.weights
-        nodes = basisInstance.nodes
+        degree = basisInstance.degree
+        basis_funcs = basisInstance.basis_funcs
+
         dt = gridInstance.dt
-    
+
+        def H_mix_R_element(x,i,j):
+            return basis_funcs[i](x)*basis_funcs[j](x,1)
+
         H_mix_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = comm,nnz = 2)
         H_mix_lm.setUp()
         istart,iend = H_mix_lm.getOwnershipRange()
@@ -37,11 +41,12 @@ class hamiltonian:
                     H_mix_lm.setValue(i,j,self.clm(j-1,self.m))
         H_mix_lm.assemble()
 
-        H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
+        H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree + 1)
+        H_mix_R.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
         istart,iend = H_mix_R.getOwnershipRange()
         for i in range(istart,iend):
             for j in range(n_basis):
-                        H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.first_barray[:,j])
+                        H_element = basisInstance.integrate(H_mix_R_element,i,j)
                         H_mix_R.setValue(i,j,H_element)
         H_mix_R.assemble()
 
@@ -56,9 +61,12 @@ class hamiltonian:
 
     def H_ANG(self,basisInstance,gridInstance):
         n_basis = basisInstance.n_basis
-        weights = basisInstance.weights
-        nodes = basisInstance.nodes
+        degree = basisInstance.degree
+        basis_funcs = basisInstance.basis_funcs
         dt = gridInstance.dt
+
+        def H_ang_R_element(x,i,j):
+            return basis_funcs[i](x)*basis_funcs[j](x)/ np.sqrt(x**2 + 1E-25)
 
         H_ang_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = comm,nnz = 2)
         istart,iend = H_ang_lm.getOwnershipRange()
@@ -70,11 +78,12 @@ class hamiltonian:
                     H_ang_lm.setValue(i,j,(j)*self.clm(j-1,self.m))
         H_ang_lm.assemble()
 
-        H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
+        H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree+1)
+        H_ang_R.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
         istart,iend = H_ang_R.getOwnershipRange()
         for i in range(istart,iend):
             for j in range(n_basis):
-                    H_element = np.sum(weights * basisInstance.barray[:,i] *  basisInstance.barray[:,j] / np.sqrt(nodes**2 + 1E-25))
+                    H_element = basisInstance.integrate(H_ang_R_element,i,j)
                     H_ang_R.setValue(i,j,H_element)
         H_ang_R.assemble()
 
