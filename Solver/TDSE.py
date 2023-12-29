@@ -86,7 +86,7 @@ if __name__ == "__main__":
     
         laserInstance = laser()
         laserInstance.createPulse(gridInstance)
-        laserInstance.plotPulse(False)
+        laserInstance.plotPulse(True)
 
         if comm.rank == 0:
             laserend = time.time()
@@ -127,7 +127,7 @@ if __name__ == "__main__":
         if comm.rank == 0:
             propstart = time.time()
 
-        propagatorInstance = propagator(tol = 1E-5)
+        propagatorInstance = propagator(tol = 1E-12)
         propagatorInstance.propagateCN(gridInstance,psiInstance,laserInstance,hamiltonianInstance)
 
         if comm.rank == 0:

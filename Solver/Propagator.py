@@ -9,13 +9,14 @@ class propagator:
         
     def propagateCN(self,gridInstance,psiInstance,laserInstance,hamiltonianInstance):
         t = gridInstance.t
+        dt = gridInstance.dt
         L = len(t)
         psi_initial = psiInstance.psi_initial.copy()
 
         ksp = PETSc.KSP().create(comm = comm)
 
-        pulse = laserInstance.pulse
-
+        
+        pulseFunc = laserInstance.pulse_func
         ####################
 
         ksp.setTolerances(rtol = self.tol)
@@ -26,15 +27,19 @@ class propagator:
         
         for i,t in enumerate(t):
             if PETSc.COMM_WORLD.rank == 0:
-
                 print(i,L-1)
+                
             
+
+            t_mid = t + dt/2
+            
+            pulse_val = pulseFunc(t_mid)
 
             partial_L_copy = hamiltonianInstance.partial_L.copy()
             partial_R_copy = hamiltonianInstance.partial_R.copy()
             partial_angular = hamiltonianInstance.partial_angular
-            partial_L_copy.axpy(pulse[i],partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
-            partial_R_copy.axpy(-pulse[i],partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_L_copy.axpy(-pulse_val,partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_R_copy.axpy(pulse_val,partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
 
 
             
