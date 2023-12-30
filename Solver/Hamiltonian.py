@@ -146,16 +146,7 @@ class hamiltonian:
         self.S = total
 
 
-
-        viewer = PETSc.Viewer().createHDF5('matrix_files/S.h5', 'w')
-        viewer.pushFormat(viewer.Format.HDF5_MAT)
-        viewer.view(total)
-        viewer.popFormat()
-
-        #viewer = PETSc.Viewer().createBinary("matrix_files/overlap.bin","w")
-        #viewer.setOptionsPrefix("write_")
-        #PETSc.Options().setValue("write_info", "false")
-        
+        viewer = PETSc.Viewer().createBinary("matrix_files/overlap.bin","w")
         total.view(viewer)
         viewer.destroy()
 

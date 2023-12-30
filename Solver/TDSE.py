@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
         basisInstance = basis()
         basisInstance.createBasis(gridInstance)
-        basisInstance.saveBasis(gridInstance,plot = True)
+        basisInstance.saveBasis(gridInstance,plot = False)
         
 
         if comm.rank == 0:
@@ -148,7 +148,7 @@ if __name__ == "__main__":
         print("Total Simulation Time:",end-start)
 
     
-    TESTONE = True # Testing norm of state
+    TESTONE = False # Testing norm of state
     if TESTONE:
         Sv = hamiltonianInstance.S.getVecRight()
         hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
