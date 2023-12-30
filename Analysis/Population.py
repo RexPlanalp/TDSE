@@ -90,9 +90,9 @@ def plotWavefunction():
         imaginary_part = data[:,1]
         wavefunction = real_part + 1j*imaginary_part
     pos_space_wavefunction = 0
-    L =2
-    for i in range(L*298,(L+1)*298):
-        j = i% 298
+    L =0
+    for i in range(L*338,(L+1)*338):
+        j = i% 338
         pos_space_wavefunction+= basis_array[:,j]*wavefunction[i]
 
     pos_space_bound = 0
@@ -101,13 +101,13 @@ def plotWavefunction():
         real_part = data[:,0]
         imaginary_part = data[:,1]
         wavefunction = real_part + 1j*imaginary_part
-    for i in range(298):
+    for i in range(338):
         pos_space_bound += basis_array[:,i]*wavefunction[i]
 
     plt.plot(r,np.abs(pos_space_wavefunction)**2,label = "final")
-    #plt.plot(r,np.abs(pos_space_bound)**2,label = "bound")
+    plt.plot(r,np.abs(pos_space_bound)**2,label = "bound")
     plt.legend()
-    #plt.xlim([0,10])
+    plt.xlim([0,10])
     plt.savefig("test.png")
     plt.clf()
 def checkPhase():

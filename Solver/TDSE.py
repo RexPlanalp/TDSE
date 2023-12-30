@@ -39,6 +39,14 @@ if __name__ == "__main__":
     HAMILTONIAN = True
     PROPAGATE = True
 
+    if comm.rank == 0:
+        if not os.path.exists("matrix_files"):
+            os.mkdir("matrix_files")
+        if not os.path.exists("images"):
+            os.mkdir("images")
+        if not os.path.exists("basis"):
+            os.mkdir("basis")
+
     if GRID:
         if comm.rank == 0:
             gridstart = time.time()
@@ -126,7 +134,7 @@ if __name__ == "__main__":
         if comm.rank == 0:
             propstart = time.time()
 
-        propagatorInstance = propagator(tol = 1E-12)
+        propagatorInstance = propagator(tol = 1E-15)
         propagatorInstance.propagateCN(gridInstance,psiInstance,laserInstance,hamiltonianInstance)
 
         if comm.rank == 0:

@@ -68,9 +68,9 @@ class basis:
             basis_array[:,i] = self.basis_funcs[i](r)
             if plot:
                 plt.plot(r,basis_array[:,i])
-        np.save("basis.npy",basis_array)
+        np.save("basis/basis.npy",basis_array)
         if plot:
-            plt.savefig("basis.png")
+            plt.savefig("images/basis.png")
         return
 
 if __name__ == "__main__":

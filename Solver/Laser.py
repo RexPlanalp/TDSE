@@ -52,5 +52,5 @@ class laser:
         if bool:
             plt.figure()
             plt.plot(self.pulse)
-            plt.savefig("pulse.png")
+            plt.savefig("images/pulse.png")
             plt.clf()
