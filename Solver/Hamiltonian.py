@@ -126,6 +126,9 @@ class hamiltonian:
                 H_atom.setValue(i,j,row_element)
 
         H_atom.assemble()
+        viewer = PETSc.Viewer().createBinary("matrix_files/H_0.bin","w")
+        H_atom.view(viewer)
+        viewer.destroy()
         self.H_atom = H_atom
         return None
     
