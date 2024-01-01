@@ -11,57 +11,6 @@ from scipy.integrate import trapz
 import json
 
 
-# Old
-def plotWavefunction():
-    
-    basis_array = np.load("basis.npy")
-    grid_size = 1000
-    grid_spacing = 0.01
-
-    r = np.linspace(0,grid_size,int(grid_size/grid_spacing)+1)
-
-    with h5py.File('TDSE.h5', 'r') as f:
-        data = f["psi_final"][:]
-        real_part = data[:,0]
-        imaginary_part = data[:,1]
-        wavefunction = real_part + 1j*imaginary_part
-    pos_space_wavefunction = 0
-    L =0
-    for i in range(L*338,(L+1)*338):
-        j = i% 338
-        pos_space_wavefunction+= basis_array[:,j]*wavefunction[i]
-
-    pos_space_bound = 0
-    with h5py.File("Hydrogen.h5","r") as f:
-        data = f["Psi_1_0"][:]
-        real_part = data[:,0]
-        imaginary_part = data[:,1]
-        wavefunction = real_part + 1j*imaginary_part
-    for i in range(338):
-        pos_space_bound += basis_array[:,i]*wavefunction[i]
-
-    plt.plot(r,np.abs(pos_space_wavefunction)**2,label = "final")
-    plt.plot(r,np.abs(pos_space_bound)**2,label = "bound")
-    plt.legend()
-    plt.xlim([0,10])
-    plt.savefig("test.png")
-    plt.clf()
-def checkPhase():
-    with h5py.File('TDSE.h5', 'r') as f:
-        data = f["psi_final"][:]
-        real_part = data[:,0]
-        imaginary_part = data[:,1]
-        wavefunction = real_part + 1j*imaginary_part
-    with h5py.File('Hydrogen.h5', 'r') as f:
-        data = f["Psi_1_0"][:]
-        real_part = data[:,0]
-        imaginary_part = data[:,1]
-        groundstate = real_part + 1j*imaginary_part
-    
-    val1 = wavefunction[0]
-    val2 = groundstate[0]
-    print(np.angle(val1/val2))
-    print(np.abs(val1/val2))
 
 
 
@@ -102,8 +51,8 @@ def checkNorm():
     S.mult(psi_initial,Sv)
     initial_prod = psi_initial.dot(Sv)
 
-    print("Norm of Initial State:",np.real(initial_prod))
-    print("Norm of Final State:",np.real(final_prod))
+    print("Norm of Initial State:",np.sqrt(np.real(initial_prod)))
+    print("Norm of Final State:",np.sqrt(np.real(final_prod)))
     
     
     return
@@ -126,6 +75,7 @@ def probDisribution():
         imaginary_part = data[:,1]
         wavefunction = real_part + 1j*imaginary_part
     prob_list = []
+    norm_list = []
     for l in range(lmax+1):
         partial_wavefunction = wavefunction[l*n_basis:(l+1)*n_basis]
         phi_lm = PETSc.Vec().createWithArray(np.pad(partial_wavefunction,(l*n_basis,(lmax-l)*n_basis),constant_values= (0,0)))
@@ -133,19 +83,18 @@ def probDisribution():
        
         Sv = S.createVecRight()
         S.mult(phi_lm,Sv)
-        final_prod = phi_lm.dot(Sv)
-
-        print(f"Norm of {l} block", np.real(final_prod))
+        final_prod = Sv.dot(phi_lm)
+        
+        # Stipulate that floating error give small imaginary piece, throwaway!!!
+        print(f"Norm of {l} block", np.real(np.sqrt(final_prod)))
 
 
         prob_list.append(final_prod)
-    print(np.real(np.sum(prob_list)))
-
-    plt.bar(range(lmax+1),np.real(prob_list))
+        norm_list.append(np.real(np.sqrt(final_prod)))
+    print(np.real(np.sqrt(np.sum(prob_list))))
+    
+    plt.bar(range(lmax+1),norm_list)
     plt.savefig("images/prob_dist.png")
-
-
-# Not working
 def groundStatePop():
 
 
@@ -178,12 +127,13 @@ def groundStatePop():
     Sv = S.createVecRight()
     S.mult(psi_final,Sv)
     prod = ground_state.dot(Sv)
-    print(np.abs(prod))
+    print(np.abs(prod)**2)
     return
 
-checkNorm()
-#probDisribution()
+#checkNorm()
+probDisribution()
 #groundStatePop()
+
 
 
 

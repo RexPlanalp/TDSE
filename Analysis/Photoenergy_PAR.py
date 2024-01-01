@@ -10,6 +10,9 @@ E_min = -0.6
 E_range = np.arange(E_min,1+2*gamma,2*gamma)
 
 
+
+    
+
 def photoEnergyV1(E_range):
 
     photo_energy = []
@@ -51,6 +54,7 @@ def photoEnergyV1(E_range):
 
         # Set Operator and Solve 
         ksp = PETSc.KSP().create()
+        ksp.setTolerances(rtol = 1E-15)
         ksp.setOperators(H_0_1)
         ksp.solve(a, x)
 
@@ -72,16 +76,26 @@ def photoEnergyV1(E_range):
 
         photo_energy.append(val)
 
-    final = np.array(photo_energy)*gamma**4
+    final = np.array(photo_energy)*gamma**2 * 1.11
+
+    print(np.max(final))
+
     plt.semilogy(E_range,final)
-    plt.axvline([-0.5])
-    plt.axvline([-0.125])
-    plt.axvline([-0.05555555])
-    plt.axvline([0])
+    plt.yticks([10**0, 10**-5, 10**-10, 10**-15])
+    plt.ylim([1e-15, 1e0])
+    #plt.axvline([-0.5])
+    #plt.axvline([-0.125])
+    #plt.axvline([-0.05555555])
+    #plt.axvline([0])
     plt.savefig("images/energy.png")
 
     return
 
+ 
+
+
+
+photoEnergyV1(E_range)
 
 
 
