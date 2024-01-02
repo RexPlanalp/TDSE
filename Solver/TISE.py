@@ -27,6 +27,23 @@ class tise:
         def _H_element_3(x,i,j):
             return basis_funcs[i](x) * basis_funcs[j](x)* (-1/np.sqrt(x**2 + 1E-25))
         
+
+        #### TESTING REMOVE WHEN DONE ####
+        def _polyCAP(x):
+            eta = 100
+            R0 = 950
+            n = 2
+            
+            potential = np.zeros_like(x,dtype = "complex")
+   
+            index = int(R0/np.max(x)*len(x))
+            potential[index:] = -1j * eta *(x[index:]-R0)**n
+    
+            return potential
+        def _H_CAP(x,i,j):
+            return basis_funcs[i](x) * basis_funcs[j](x) * _polyCAP(x)
+        #### TESTING REMOVE WHEN DONE ####
+
         n_basis = basisInstance.n_basis
         basis_funcs = basisInstance.basis_funcs
         degree = basisInstance.degree
@@ -39,7 +56,13 @@ class tise:
                     H_1 = basisInstance.integrate(_H_element_1,i,j)
                     H_2 = basisInstance.integrate(_H_element_2,i,j)
                     H_3 = basisInstance.integrate(_H_element_3,i,j)
-                    H_element = H_1 + H_2 + H_3
+
+
+                    #### TESTING REMOVE WHEN DONE ####
+                    H_CAP = basisInstance.integrate(_H_CAP,i,j)
+                    #### TESTSING REMOVE WHEN DONE ####
+
+                    H_element = H_1 + H_2 + H_3 + H_CAP
                     FFH_R.setValue(i,j,H_element)      
         FFH_R.assemble()
 

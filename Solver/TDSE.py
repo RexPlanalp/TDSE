@@ -134,7 +134,7 @@ if __name__ == "__main__":
         if comm.rank == 0:
             propstart = time.time()
 
-        propagatorInstance = propagator(tol = 1E-15)
+        propagatorInstance = propagator(tol = 1E-10)
         propagatorInstance.propagateCN(gridInstance,psiInstance,laserInstance,hamiltonianInstance)
 
         if comm.rank == 0:
