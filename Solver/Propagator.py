@@ -41,7 +41,7 @@ class propagator:
             partial_L_copy.axpy(-pulse_val,partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
             partial_R_copy.axpy(pulse_val,partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
 
-
+            
             
             known = partial_R_copy.createVecRight() 
             solution = partial_L_copy.createVecRight()
@@ -49,6 +49,7 @@ class propagator:
             partial_R_copy.mult(psi_initial,known)
 
             ksp.setOperators(partial_L_copy)
+            
 
 
 

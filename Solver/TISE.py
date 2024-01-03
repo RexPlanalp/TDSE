@@ -19,6 +19,9 @@ class tise:
     
 
 
+
+
+
     def _createH_l(self,basisInstance,l):
         def _H_element_1(x,i,j):
             return basis_funcs[i](x) * (-1/2) * basis_funcs[j](x,2)
@@ -30,9 +33,9 @@ class tise:
 
         #### TESTING REMOVE WHEN DONE ####
         def _polyCAP(x):
-            eta = 100
-            R0 = 950
-            n = 2
+            eta = 10
+            R0 = 1200
+            n = 3
             
             potential = np.zeros_like(x,dtype = "complex")
    
@@ -46,10 +49,10 @@ class tise:
 
         n_basis = basisInstance.n_basis
         basis_funcs = basisInstance.basis_funcs
-        degree = basisInstance.degree
+        order = basisInstance.order
 
         
-        FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD,nnz = 2*degree +1)
+        FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
         rowstart,rowend = FFH_R.getOwnershipRange()
         for i in range(rowstart,rowend):
             for j in range(n_basis):
@@ -63,11 +66,10 @@ class tise:
                     #### TESTSING REMOVE WHEN DONE ####
 
                     H_element = H_1 + H_2 + H_3 + H_CAP
+                    H_element = H_1 + H_2 + H_3
                     FFH_R.setValue(i,j,H_element)      
         FFH_R.assemble()
-
         self.FFH_R_list.append(FFH_R)
-        
         return None
     
     def createAllH(self,basisInstance):
@@ -78,12 +80,12 @@ class tise:
     def createS_R(self,basisInstance):
         n_basis = basisInstance.n_basis
         basis_funcs = basisInstance.basis_funcs
-        degree = basisInstance.degree
+        order = basisInstance.order
 
         def S_element(x,i,j):
             return basis_funcs[i](x) * basis_funcs[j](x)
 
-        S_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree+1)
+        S_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
         rowstart,rowend = S_R.getOwnershipRange()
         for i in range(rowstart,rowend):
             for j in range(n_basis):
@@ -96,9 +98,6 @@ class tise:
         return None
 
     def solveEigensystem(self):
-        if os.path.exists("Hydrogen.h5"):
-            return
-        
         n_basis,_ = self.S_R.getSize()
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
             
@@ -109,6 +108,7 @@ class tise:
         for i,l in enumerate(range(self.nmax)):
             
             H = self.FFH_R_list[i]
+            
 
             E = SLEPc.EPS().create()
             E.setOperators(H, self.S_R)

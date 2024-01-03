@@ -2,6 +2,7 @@ import json
 from petsc4py import PETSc
 import numpy as np
 from Module import *
+import os
 
 
 comm = PETSc.COMM_WORLD
@@ -22,7 +23,7 @@ class hamiltonian:
 
     def H_MIX(self,basisInstance,gridInstance):
         n_basis = basisInstance.n_basis
-        degree = basisInstance.degree
+        order = basisInstance.order
         basis_funcs = basisInstance.basis_funcs
 
         dt = gridInstance.dt
@@ -41,7 +42,7 @@ class hamiltonian:
                     H_mix_lm.setValue(i,j,self.clm(j-1,self.m))
         H_mix_lm.assemble()
 
-        H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree + 1)
+        H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
         H_mix_R.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
         istart,iend = H_mix_R.getOwnershipRange()
         for i in range(istart,iend):
@@ -61,7 +62,7 @@ class hamiltonian:
 
     def H_ANG(self,basisInstance,gridInstance):
         n_basis = basisInstance.n_basis
-        degree = basisInstance.degree
+        order = basisInstance.order
         basis_funcs = basisInstance.basis_funcs
         dt = gridInstance.dt
 
@@ -78,7 +79,7 @@ class hamiltonian:
                     H_ang_lm.setValue(i,j,(j)*self.clm(j-1,self.m))
         H_ang_lm.assemble()
 
-        H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree+1)
+        H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
         H_ang_R.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
         istart,iend = H_ang_R.getOwnershipRange()
         for i in range(istart,iend):
@@ -97,6 +98,20 @@ class hamiltonian:
     
 
     def H_ATOM(self,tiseInstance,basisInstance,gridInstance):
+        
+        
+        if os.path.exists('matrix_files/H_0.bin'):
+            
+            n_basis = basisInstance.n_basis
+            H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD)
+            viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
+            H_atom.load(viewer)
+            viewer.destroy()
+            self.H_atom = H_atom
+            
+            return
+
+
         H_list = tiseInstance.FFH_R_list
         n_basis = basisInstance.n_basis
 
@@ -134,6 +149,16 @@ class hamiltonian:
     
 
     def S(self,tiseInstance,basisInstance):
+
+        
+        if os.path.exists('matrix_files/overlap.bin'):
+            n_basis = basisInstance.n_basis
+            S = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD)
+            viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
+            S.load(viewer)
+            viewer.destroy()
+            self.S = S
+            return
         n_basis = basisInstance.n_basis
         S_R = tiseInstance.S_R
 
@@ -152,7 +177,6 @@ class hamiltonian:
         viewer = PETSc.Viewer().createBinary("matrix_files/overlap.bin","w")
         total.view(viewer)
         viewer.destroy()
-
         return None
     
 

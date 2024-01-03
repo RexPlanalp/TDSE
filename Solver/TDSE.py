@@ -46,6 +46,7 @@ if __name__ == "__main__":
             os.mkdir("images")
         if not os.path.exists("basis"):
             os.mkdir("basis")
+        
 
     if GRID:
         if comm.rank == 0:
@@ -78,9 +79,13 @@ if __name__ == "__main__":
             tisestart = time.time()
     
         tiseInstance = tise()
-        tiseInstance.createS_R(basisInstance)
-        tiseInstance.createAllH(basisInstance)
-        tiseInstance.solveEigensystem()
+
+
+        # If we dont have the bound states, nor do we have the total matrices then we need to run all of this
+        if not (os.path.exists("Hydrogen.h5") and os.path.exists("matrix_files/H_0.bin") and os.path.exists("matrix_files/overlap.bin")):
+            tiseInstance.createAllH(basisInstance)
+            tiseInstance.createS_R(basisInstance)
+            tiseInstance.solveEigensystem()
 
         if comm.rank == 0:
             tiseend = time.time()

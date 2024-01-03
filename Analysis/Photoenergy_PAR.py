@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 gamma = 0.001
-E_min = -0.6
+E_min = 0
 E_range = np.arange(E_min,1+2*gamma,2*gamma)
 
 

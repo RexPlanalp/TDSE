@@ -28,6 +28,7 @@ def checkNorm():
     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
     S.load(viewer)
     viewer.destroy()
+    
 
     with h5py.File('TDSE.h5', 'r') as f:
         data = f["psi_final"][:]
@@ -109,6 +110,8 @@ def groundStatePop():
     S.load(viewer)
     viewer.destroy()
 
+    
+
     with h5py.File('TDSE.h5', 'r') as f:
         data = f["psi_final"][:]
         real_part = data[:,0]
@@ -130,9 +133,26 @@ def groundStatePop():
     print(np.abs(prod)**2)
     return
 
+
+def checkHermitian():
+    S = PETSc.Mat()
+    viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
+    S.load(viewer)
+    viewer.destroy()
+
+    H_0 = PETSc.Mat()
+
+    viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
+    H_0.load(viewer)
+    viewer.destroy()
+
+    print(H_0.isHermitian(tol = 0.1))
+
+   
 #checkNorm()
-#probDisribution()
-groundStatePop()
+probDisribution()
+#groundStatePop()
+#checkHermitian()
 
 
 
