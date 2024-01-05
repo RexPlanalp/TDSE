@@ -52,7 +52,7 @@ class hamiltonian:
                         H_mix_R.setValue(i,j,H_element)
         H_mix_R.assemble()
 
-        total = kronV2(H_mix_lm,H_mix_R)
+        total = kronV4(H_mix_lm,H_mix_R,2*(2*order+1))
         total.scale(-1j)
 
         H_mix_lm.destroy()
@@ -90,7 +90,7 @@ class hamiltonian:
                     H_ang_R.setValue(i,j,H_element)
         H_ang_R.assemble()
 
-        total = kronV2(H_ang_lm,H_ang_R)
+        total = kronV4(H_ang_lm,H_ang_R,2*(2*order+1))
         total.scale(-1j)
 
         H_ang_lm.destroy()
@@ -172,6 +172,7 @@ class hamiltonian:
             return
         n_basis = basisInstance.n_basis
         S_R = tiseInstance.S_R
+        order = basisInstance.order
 
         I = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = PETSc.COMM_WORLD)
         istart,iend = I.getOwnershipRange()
@@ -179,7 +180,7 @@ class hamiltonian:
             I.setValue(i,i,1)
         I.assemble()
 
-        total = kronV2(I,S_R)
+        total = kronV4(I,S_R,2*(2*order+1))
 
         I.destroy()
         self.S = total

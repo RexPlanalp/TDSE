@@ -42,7 +42,13 @@ class tise:
         
 
         #### TESTING REMOVE WHEN DONE ####
-        def _polyCAP(x,R0,eta,n):
+        def _polyCAP(x):
+
+            R0 = self.R0[1]
+            n = self.n
+            eta = self.eta
+
+
             potential = np.zeros_like(x,dtype = "complex")
    
             index = int(R0/np.max(x)*len(x))
@@ -110,8 +116,10 @@ class tise:
         n_basis,_ = self.S_R.getSize()
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
             
-        if (self.lmax >= self.nmax):
-            self.nmax = self.lmax +1
+        #if (self.lmax >= self.nmax):
+            #self.nmax = self.lmax +1
+        
+
         
 
         for i,l in enumerate(range(self.nmax)):
