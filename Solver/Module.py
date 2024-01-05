@@ -55,9 +55,6 @@ def kronV4(A,B,nonzeros):
         column_indices = np.add.outer(A_indices * cb, B_indices).flatten()
         column_indices = column_indices.astype("int32")
 
-        
-
-
         C.setValues(i,column_indices,values)
     C.assemble()
     return C

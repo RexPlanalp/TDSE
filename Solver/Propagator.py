@@ -51,6 +51,8 @@ class propagator:
             ksp.setOperators(partial_L_copy)
             
 
+            
+
 
 
             ksp.solve(known,solution)
