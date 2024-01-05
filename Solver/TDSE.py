@@ -147,69 +147,9 @@ if __name__ == "__main__":
             print("Total Time to Propagate:",propend-propstart)
     
     
-
     if comm.rank == 0:
         end = time.time()
         print("Total Simulation Time:",end-start)
-
-    
-    TESTONE = False # Testing norm of state
-    if TESTONE:
-        Sv = hamiltonianInstance.S.getVecRight()
-        hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
-        inner_prod2 = psiInstance.psi_final.dot(Sv)
-
-        Sv = hamiltonianInstance.S.getVecRight()
-        hamiltonianInstance.S.mult(psiInstance.psi_initial,Sv)
-        inner_prod1 = psiInstance.psi_initial.dot(Sv)
-
-        Sv = hamiltonianInstance.S.getVecRight()
-        hamiltonianInstance.S.mult(psiInstance.psi_final,Sv)
-        inner_prod3 = psiInstance.psi_initial.dot(Sv)
-        
-        if comm.rank == 0:
-            print("Norms:")
-            print("Initial State Norm",np.abs(inner_prod1)**2)
-            print("Final State Norm",np.abs(inner_prod2)**2)
-            print("Ground State Population",np.abs(inner_prod3)**2)
-
-    TESTTWO = False
-    if TESTTWO:
-        R = hamiltonianInstance.H_atom.getVecRight()
-        hamiltonianInstance.H_atom.mult(psiInstance.psi_initial,R)
-
-        L = hamiltonianInstance.S.getVecRight()
-        hamiltonianInstance.S.mult(psiInstance.psi_initial,L)
-
-        if comm.rank == 0:
-            
-            print("Eigenvalue Eq for first element")
-            print(psiInstance.psi_initial.getValue(0))
-            print(R.getValue(0))
-            print(L.getValue(0)*(-0.005440883203318759+2.8168289533377845e-20j))
-
-    TESTTHREE = False # Testing norm of embedded final state
-    if TESTTHREE:
-
-        if comm.rank == 0:
-            print("Element of Initial",psiInstance.psi_initial.getValue(0))
-            print("Element of Final",psiInstance.psi_final.getValue(0))
-
-    TESTFOUR = False
-    if TESTFOUR:
-        mat = PETSc.Mat()
-        viewer = PETSc.Viewer().createBinary('overlap.bin', 'r')
-        mat.load(viewer)
-        viewer.destroy()
-
-
-    TESTFIVE = False
-    if TESTFIVE:
-        test = 2*gridInstance.tmax
-        test = test*0.499998
-        test = test/(2*np.pi)
-        test = test % 1
-        print(test)
 
 
         

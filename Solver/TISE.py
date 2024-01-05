@@ -16,6 +16,16 @@ class tise:
         self.nmax = input_par["lm"]["nmax"]
         self.lmax = input_par["lm"]["lmax"]
 
+        CAP = input_par["box"]["CAP"]
+        if CAP != 0:
+            self.R0 = True,int(CAP*input_par["box"]["xmax"])
+            self.eta = input_par["box"]["eta"]
+            self.n = input_par["box"]["n"]
+
+        else:
+            self.R0 = False,CAP
+        
+
     
 
 
@@ -32,11 +42,7 @@ class tise:
         
 
         #### TESTING REMOVE WHEN DONE ####
-        def _polyCAP(x):
-            eta = 10
-            R0 = 1200
-            n = 3
-            
+        def _polyCAP(x,R0,eta,n):
             potential = np.zeros_like(x,dtype = "complex")
    
             index = int(R0/np.max(x)*len(x))
@@ -52,7 +58,7 @@ class tise:
         order = basisInstance.order
 
         
-        FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD)
+        FFH_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD,nnz = 2*order +1)
         rowstart,rowend = FFH_R.getOwnershipRange()
         for i in range(rowstart,rowend):
             for j in range(n_basis):
@@ -61,12 +67,13 @@ class tise:
                     H_3 = basisInstance.integrate(_H_element_3,i,j)
 
 
-                    #### TESTING REMOVE WHEN DONE ####
-                    H_CAP = basisInstance.integrate(_H_CAP,i,j)
-                    #### TESTSING REMOVE WHEN DONE ####
-
-                    H_element = H_1 + H_2 + H_3 + H_CAP
-                    H_element = H_1 + H_2 + H_3
+                    if self.R0[0]:
+                        H_CAP = basisInstance.integrate(_H_CAP,i,j)
+                        H_element = H_1 + H_2 + H_3 + H_CAP
+                    else:
+                        H_element = H_1 + H_2 + H_3
+                    if H_element == 0:
+                        continue
                     FFH_R.setValue(i,j,H_element)      
         FFH_R.assemble()
         self.FFH_R_list.append(FFH_R)
@@ -85,13 +92,15 @@ class tise:
         def S_element(x,i,j):
             return basis_funcs[i](x) * basis_funcs[j](x)
 
-        S_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm)
+        S_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*order +1)
         rowstart,rowend = S_R.getOwnershipRange()
         for i in range(rowstart,rowend):
             for j in range(n_basis):
                 
                 
                     S_1 = basisInstance.integrate(S_element,i,j)
+                    if S_1 == 0:
+                        continue
                     S_R.setValue(i,j,S_1)    
         S_R.assemble()
         self.S_R = S_R

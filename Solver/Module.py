@@ -28,6 +28,39 @@ def getLocal(M):
         seq_M = PETSc.Mat().createAIJWithArrays([M.getSize()[0],M.getSize()[1]],(global_indptr,global_indices,global_data),comm = PETSc.COMM_SELF)
         return seq_M
 
+
+def kronV4(A,B,nonzeros):
+    ra,ca = A.getSize()
+    rb,cb = B.getSize()
+
+    C = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD,nnz = nonzeros)
+    ownershipC = C.getOwnershipRange()
+    C_range = range(ownershipC[0],ownershipC[1])
+
+    seq_A = getLocal(A)
+    seq_B = getLocal(B)
+    
+    for i in C_range:
+        A_ind = i//rb
+        A_indices,A_row = seq_A.getRow(A_ind)
+
+        B_ind = i%rb
+        B_indices,B_row = seq_B.getRow(B_ind)
+        
+        column_indices = []
+        values = []
+
+        outer_product = np.outer(A_row, B_row)
+        values = outer_product.flatten()
+        column_indices = np.add.outer(A_indices * cb, np.arange(cb)).flatten()
+        column_indices = column_indices.astype("int32")
+
+        C.setValues(i,column_indices,values)
+    C.assemble()
+    return C
+
+
+
 # Even faster, but breaks sparcity
 # If I can use the sparse vals/indices of A,B to set
 # the rows of C, this might be the best, but currently broken
@@ -75,7 +108,8 @@ def kronV2(A,B):
     ra,ca = A.getSize()
     rb,cb = B.getSize()
 
-    C = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD)
+    C = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD,nnz = 2*(2*7+1))
+    C.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
     ownershipC = C.getOwnershipRange()
     C_range = range(ownershipC[0],ownershipC[1])
 
@@ -85,7 +119,7 @@ def kronV2(A,B):
     for i in C_range:
         for j in range(C.getSize()[1]):
 
-            if (np.abs(seq_A[i//rb,j//cb]) <= 1E-8) or (np.abs(seq_B[i%rb,j%cb]) <= 1E-8):
+            if (np.abs(seq_A[i//rb,j//cb]) == 0) or (np.abs(seq_B[i%rb,j%cb]) == 0):
                 continue
             
             

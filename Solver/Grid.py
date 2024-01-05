@@ -12,6 +12,7 @@ class grid:
         freq = input_par["laser"]["w"]
         N = input_par["box"]["N"]
         time_spacing = input_par["box"]["dt"]
+        
 
         self.r = np.linspace(0,grid_size,int(grid_size/grid_spacing)) 
 
@@ -32,6 +33,9 @@ class grid:
         self.rmax = grid_size
         self.dr = grid_spacing
         self.dt = time_spacing
+
+        
+
     def print(self,bool):
         if bool:
             print(
