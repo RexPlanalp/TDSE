@@ -100,53 +100,53 @@ class hamiltonian:
     
 
     def H_ATOM(self,tiseInstance,basisInstance,gridInstance):
-        
-        
         if os.path.exists('matrix_files/H_0.bin'):
-            
+
             n_basis = basisInstance.n_basis
             order = basisInstance.order
-            degree = basisInstance.degree
-
-
-            H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD,nnz = 2*degree+1)
+            H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD,nnz = 2*order+1)
             viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
             H_atom.load(viewer)
             viewer.destroy()
             self.H_atom = H_atom
-            
             return
-
-
         H_list = tiseInstance.FFH_R_list
-        n_basis = basisInstance.n_basis
-        order = basisInstance.order
-        degree = basisInstance.degree
-
-        H_atom = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = comm,nnz = 2*degree+1)
-        H_atom.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
-
         local_H = []
         for l in range(self.lmax+1):
             local_H.append(getLocal(H_list[l]))
 
-        istart,iend = H_atom.getOwnershipRange()
+        n_basis = basisInstance.n_basis
+        order = basisInstance.order
         
-        for i in range(istart,iend):
-            l = i // n_basis
-            l_row = i % n_basis
+        ra,ca = self.lmax+1,self.lmax+1
+        rb,cb = n_basis,n_basis
 
-            index,vals = local_H[l].getRow(l_row)
+        H_atom = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD,nnz =2*order+1)
+        ownershipH = H_atom.getOwnershipRange()
+        H_range = range(ownershipH[0],ownershipH[1])
 
-            full_row = np.zeros(n_basis,dtype = "complex")
-            full_row[index] = vals
-            row_array = np.pad(full_row,(l*n_basis,(self.lmax-l)*n_basis),constant_values= (0,0))
-
+        
+        for i in H_range:
 
             
-            for j in range((self.lmax +1)*n_basis):
-                row_element = row_array[j] 
-                H_atom.setValue(i,j,row_element)
+            A_ind = i//rb
+            A_indices,A_row = np.array(A_ind),np.array(1)
+
+            B = local_H[A_ind]
+            B_ind = i%rb
+            B_indices,B_row = B.getRow(B_ind)
+        
+            column_indices = []
+            values = []
+
+
+
+            outer_product = np.outer(A_row, B_row)
+            values = outer_product.flatten()
+            column_indices = np.add.outer(A_indices * cb, B_indices).flatten()
+            column_indices = column_indices.astype("int32")
+        
+            H_atom.setValues(i,column_indices,values)
 
         H_atom.assemble()
         viewer = PETSc.Viewer().createBinary("matrix_files/H_0.bin","w")
@@ -154,17 +154,15 @@ class hamiltonian:
         viewer.destroy()
         self.H_atom = H_atom
         return None
-    
+
 
     def S(self,tiseInstance,basisInstance):
-
-        
         if os.path.exists('matrix_files/overlap.bin'):
             n_basis = basisInstance.n_basis
             order = basisInstance.order
-            degree = basisInstance.degree
+            
 
-            S = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD,nnz = 2*degree+1)
+            S = PETSc.Mat().createAIJ([(self.lmax +1)*n_basis,(self.lmax +1)*n_basis],comm = PETSc.COMM_WORLD,nnz = 2*order+1)
             viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
             S.load(viewer)
             viewer.destroy()
