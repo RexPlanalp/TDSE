@@ -49,6 +49,11 @@ class propagator:
             partial_R_copy.mult(psi_initial,known)
 
             ksp.setOperators(partial_L_copy)
+
+
+            ksp.setType(PETSc.KSP.Type.GMRES)
+
+            
             
 
             
