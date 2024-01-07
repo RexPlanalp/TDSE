@@ -6,8 +6,9 @@ import matplotlib.pyplot as plt
 
 
 gamma = 0.001
-E_min = -0.6
-E_range = np.arange(E_min,1+2*gamma,2*gamma)
+E_min = 0
+E_max = 0.005623031939*12
+E_range = np.arange(E_min,E_max+2*gamma,2*gamma)
 
 
 
@@ -68,6 +69,7 @@ def photoEnergyV1(E_range):
         # Create and population RHS vector
         b = S.createVecRight()
         S.mult(x,b)
+        
 
         # Set operator as H_0_1 and solve
         ksp.setOperators(H_0_1)

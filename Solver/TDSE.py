@@ -39,6 +39,8 @@ if __name__ == "__main__":
     HAMILTONIAN = True
     PROPAGATE = True
 
+    LOG_PROP = True
+
     if comm.rank == 0:
         if not os.path.exists("matrix_files"):
             os.mkdir("matrix_files")
@@ -133,7 +135,9 @@ if __name__ == "__main__":
             hamend = time.time()
             print("Total Time to Create Interaction:",hamend-hamstart)
 
-
+    if LOG_PROP:
+        PETSc.Log.begin()
+        
     if PROPAGATE:
 
         if comm.rank == 0:
@@ -146,6 +150,8 @@ if __name__ == "__main__":
             propend = time.time()
             print("Total Time to Propagate:",propend-propstart)
     
+    if LOG_PROP:
+        PETSc.Log.view()
     
     if comm.rank == 0:
         end = time.time()

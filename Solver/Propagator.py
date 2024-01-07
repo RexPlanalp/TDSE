@@ -31,15 +31,15 @@ class propagator:
                 
             
 
-            t_mid = t + dt/2
             
-            pulse_val = pulseFunc(t_mid)
+            
+            pulse_val = pulseFunc(t)
 
             partial_L_copy = hamiltonianInstance.partial_L.copy()
             partial_R_copy = hamiltonianInstance.partial_R.copy()
             partial_angular = hamiltonianInstance.partial_angular
-            partial_L_copy.axpy(-pulse_val,partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
-            partial_R_copy.axpy(pulse_val,partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_L_copy.axpy(pulse_val,partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_R_copy.axpy(-pulse_val,partial_angular,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
 
             
             
@@ -48,11 +48,21 @@ class propagator:
 
             partial_R_copy.mult(psi_initial,known)
 
+
+
+
             ksp.setOperators(partial_L_copy)
 
-
-            ksp.setType(PETSc.KSP.Type.GMRES)
-
+            
+            ksp.setType(PETSc.KSP.Type.BICG)
+            #pc = ksp.getPC()
+            #pc.setType(PETSc.PC.Type.BJACOBI)
+            
+            
+            
+            # Changed sign on pulse
+            # using partial_L_copy as PC in setOperators
+            # got rid of T_mid
             
             
 
