@@ -122,7 +122,12 @@ class tise:
 
         
 
-        for i,l in enumerate(range(self.nmax)):
+        for i,l in enumerate(range(self.lmax+1)):
+
+            if self.nmax - i <= 0:
+                continue
+            else:
+                num_of_energies = self.nmax - i
             
             H = self.FFH_R_list[i]
             
@@ -130,7 +135,7 @@ class tise:
             E = SLEPc.EPS().create()
             E.setOperators(H, self.S_R)
             
-            num_of_energies = self.nmax - i
+            
             E.setDimensions(nev=num_of_energies)
             
             E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)

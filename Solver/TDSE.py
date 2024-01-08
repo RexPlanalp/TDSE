@@ -39,7 +39,7 @@ if __name__ == "__main__":
     HAMILTONIAN = True
     PROPAGATE = True
 
-    LOG_PROP = True
+    LOG_PROP = False
 
     if comm.rank == 0:
         if not os.path.exists("matrix_files"):
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     if LOG_PROP:
         PETSc.Log.begin()
-        
+
     if PROPAGATE:
 
         if comm.rank == 0:

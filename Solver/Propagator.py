@@ -2,6 +2,7 @@
 from petsc4py import PETSc
 import petsc4py
 comm = PETSc.COMM_WORLD
+import gc
 
 class propagator:
     def __init__(self,tol):
@@ -17,22 +18,19 @@ class propagator:
 
         
         pulseFunc = laserInstance.pulse_func
-        ####################
+        
 
         ksp.setTolerances(rtol = self.tol)
         
-        ####################
 
-
-        
         for i,t in enumerate(t):
             if PETSc.COMM_WORLD.rank == 0:
                 print(i,L-1)
-                
-            
 
-            
-            
+
+
+
+
             pulse_val = pulseFunc(t)
 
             partial_L_copy = hamiltonianInstance.partial_L.copy()
@@ -54,20 +52,11 @@ class propagator:
             ksp.setOperators(partial_L_copy)
 
             
-            ksp.setType(PETSc.KSP.Type.BICG)
+            #ksp.setType(PETSc.KSP.Type.BICG)
             #pc = ksp.getPC()
             #pc.setType(PETSc.PC.Type.BJACOBI)
             
             
-            
-            # Changed sign on pulse
-            # using partial_L_copy as PC in setOperators
-            # got rid of T_mid
-            
-            
-
-            
-
 
 
             ksp.solve(known,solution)
