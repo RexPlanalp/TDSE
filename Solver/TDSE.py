@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
         basisInstance = basis()
         basisInstance.createBasis(gridInstance)
-        basisInstance.saveBasis(gridInstance,plot = False)
+        basisInstance.saveBasis(gridInstance,plot = False,save = False)
         
 
         if comm.rank == 0:
