@@ -88,6 +88,7 @@ if __name__ == "__main__":
             tiseInstance.createAllH(basisInstance)
             tiseInstance.createS_R(basisInstance)
             tiseInstance.solveEigensystem()
+            tiseInstance.addComplexPot(basisInstance)
 
         if comm.rank == 0:
             tiseend = time.time()
