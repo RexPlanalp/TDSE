@@ -178,7 +178,7 @@ class hamiltonian:
             I.setValue(i,i,1)
         I.assemble()
 
-        total = kronV4(I,S_R,2*(2*order+1))
+        total = kronV4(I,S_R,(2*order+1))
 
         I.destroy()
         self.S = total
