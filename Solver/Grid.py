@@ -34,7 +34,6 @@ class grid:
         self.dr = grid_spacing
         self.dt = time_spacing
 
-        
 
     def print(self,bool):
         if bool:

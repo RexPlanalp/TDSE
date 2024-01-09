@@ -17,47 +17,21 @@ class tise:
         self.lmax = input_par["lm"]["lmax"]
 
         CAP = input_par["box"]["CAP"]
-        if CAP != 0:
-            self.R0 = True,int(CAP*input_par["box"]["xmax"])
+        if CAP:
+            self.region = input_par["box"]["region"]
+            self.cap = True
+
+            self.R0 = int(self.region*input_par["box"]["xmax"])
             self.eta = input_par["box"]["eta"]
             self.n = input_par["box"]["n"]
-
         else:
-            self.R0 = False,CAP
+            self.cap = False
+            
         
-
-    
-
-
-
-
 
     def _createH_l(self,basisInstance,l):
-        def _H_element_1(x,i,j):
-            return basis_funcs[i](x) * (-1/2) * basis_funcs[j](x,2)
-        def _H_element_2(x,i,j):
-            return basis_funcs[i](x) * basis_funcs[j](x) * l*(l+1)/(2*np.sqrt(x**4 + 1E-25 ))
-        def _H_element_3(x,i,j):
-            return basis_funcs[i](x) * basis_funcs[j](x)* (-1/np.sqrt(x**2 + 1E-25))
-        
-
-        #### TESTING REMOVE WHEN DONE ####
-        def _polyCAP(x):
-
-            R0 = self.R0[1]
-            n = self.n
-            eta = self.eta
-
-
-            potential = np.zeros_like(x,dtype = "complex")
-   
-            index = int(R0/np.max(x)*len(x))
-            potential[index:] = -1j * eta *(x[index:]-R0)**n
-    
-            return potential
-        def _H_CAP(x,i,j):
-            return basis_funcs[i](x) * basis_funcs[j](x) * _polyCAP(x)
-        #### TESTING REMOVE WHEN DONE ####
+        def _H_element(x,i,j):
+            return basis_funcs[i](x) * (-1/2) * basis_funcs[j](x,2) + basis_funcs[i](x) * basis_funcs[j](x) * l*(l+1)/(2*np.sqrt(x**4 + 1E-25 )) + basis_funcs[i](x) * basis_funcs[j](x)* (-1/np.sqrt(x**2 + 1E-25))
 
         n_basis = basisInstance.n_basis
         basis_funcs = basisInstance.basis_funcs
@@ -68,18 +42,14 @@ class tise:
         rowstart,rowend = FFH_R.getOwnershipRange()
         for i in range(rowstart,rowend):
             for j in range(n_basis):
-                    H_1 = basisInstance.integrate(_H_element_1,i,j)
-                    H_2 = basisInstance.integrate(_H_element_2,i,j)
-                    H_3 = basisInstance.integrate(_H_element_3,i,j)
+                    
+
+                    H_element = basisInstance.integrate(_H_element,i,j)
 
 
-                    if self.R0[0]:
-                        H_CAP = basisInstance.integrate(_H_CAP,i,j)
-                        H_element = H_1 + H_2 + H_3 + H_CAP
-                    else:
-                        H_element = H_1 + H_2 + H_3
                     if H_element == 0:
                         continue
+
                     FFH_R.setValue(i,j,H_element)      
         FFH_R.assemble()
         self.FFH_R_list.append(FFH_R)
@@ -198,3 +168,35 @@ class tise:
                 ViewHDF5.view(energy)
         ViewHDF5.destroy()    
         return None
+    
+    def addComplexPot(self,basisInstance):
+        if not self.cap:
+            return
+        basis_funcs = basisInstance.basis_funcs
+        n_basis = basisInstance.n_basis
+        order = basisInstance.order
+
+        def _polyCAP(x):
+            x = x.astype("complex")
+            R0 = self.R0
+            eta = self.eta
+            n = self.n
+            mask = x - R0 >=0
+            x[mask] = -1j * eta * (x[mask]-R0)**n
+            return x
+        def _H_CAP(x,i,j):
+            return basis_funcs[i](x) * basis_funcs[j](x) * _polyCAP(x)
+        H_CAP = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD,nnz = 2*order +1)
+        rowstart,rowend = H_CAP.getOwnershipRange()
+        for i in range(rowstart,rowend):
+            for j in range(n_basis):
+                    H_cap_element = basisInstance.integrate(_H_CAP,i,j)
+                    if H_cap_element == 0:
+                        continue
+                    H_CAP.setValue(i,j,H_cap_element)      
+        H_CAP.assemble()
+
+        for l in range(self.lmax+1):
+            FFH_R_l = self.FFH_R_list[l]
+            FFH_R_l.axpy(1,H_CAP)
+        return 
