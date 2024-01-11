@@ -169,21 +169,19 @@ class tise:
         ViewHDF5.destroy()    
         return None
     
-    def addComplexPot(self,basisInstance):
+    def addComplexPot(self,basisInstance,gridInstance):
         if not self.cap:
             return
         basis_funcs = basisInstance.basis_funcs
         n_basis = basisInstance.n_basis
         order = basisInstance.order
 
+        xmax = gridInstance.rmax
+        if comm.rank == 0:
+            print("Adding Complex Potential")
         def _polyCAP(x):
-            x = x.astype("complex")
-            R0 = self.R0
-            eta = self.eta
-            n = self.n
-            mask = x - R0 >=0
-            x[mask] = -1j * eta * (x[mask]-R0)**n
-            return x
+            pot = np.log(1-np.cos((np.pi/2)*(1-x/(xmax))))
+            return 1j*pot
         def _H_CAP(x,i,j):
             return basis_funcs[i](x) * basis_funcs[j](x) * _polyCAP(x)
         H_CAP = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD,nnz = 2*order +1)

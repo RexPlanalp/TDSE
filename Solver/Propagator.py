@@ -28,10 +28,13 @@ class propagator:
                 print(i,L-1)
 
 
+            t_mid = t + dt /2
 
 
 
-            pulse_val = pulseFunc(t)
+
+
+            pulse_val = pulseFunc(t_mid)
 
             partial_L_copy = hamiltonianInstance.partial_L.copy()
             partial_R_copy = hamiltonianInstance.partial_R.copy()
