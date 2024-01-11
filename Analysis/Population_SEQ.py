@@ -120,7 +120,7 @@ def groundStatePop():
     psi_final = PETSc.Vec().createWithArray(psi_final)
 
     with h5py.File('Hydrogen.h5', 'r') as f:
-        data = f["Psi_2_1"][:]
+        data = f["Psi_1_0"][:]
         real_part = data[:,0]
         imaginary_part = data[:,1]
         ground_state = real_part + 1j*imaginary_part
