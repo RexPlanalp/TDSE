@@ -99,6 +99,45 @@ class hamiltonian:
         return None  
     
 
+    def H_LENGTH(self,basisInstance,gridInstance):
+        n_basis = basisInstance.n_basis
+        order = basisInstance.order
+        degree = basisInstance.degree
+        basis_funcs = basisInstance.basis_funcs
+
+        dt = gridInstance.dt
+
+        def H_length_R_element(x,i,j):
+            return basis_funcs[i](x)*basis_funcs[j](x)*x
+
+        H_length_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = comm,nnz = 2)
+        H_length_lm.setUp()
+        istart,iend = H_length_lm.getOwnershipRange()
+        for i in range(istart,iend):
+            for j in range(self.lmax+1):
+                if i == j+1:
+                    H_length_lm.setValue(i,j,self.clm(i-1,self.m))
+                elif j == i+1:
+                    H_length_lm.setValue(i,j,self.clm(j-1,self.m))
+        H_length_lm.assemble()
+
+        H_length_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree+1)
+        H_length_R.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
+        istart,iend = H_length_R.getOwnershipRange()
+        for i in range(istart,iend):
+            for j in range(n_basis):
+                        H_element = basisInstance.integrate(H_length_R_element,i,j)
+                        H_length_R.setValue(i,j,H_element)
+        H_length_R.assemble()
+
+        total = kronV4(H_length_lm,H_length_R,2*(2*order+1))
+        
+        H_length_lm.destroy()
+        H_length_R.destroy()
+        self.H_length = total
+        return None
+
+
     def H_ATOM(self,tiseInstance,basisInstance,gridInstance):
         if os.path.exists('matrix_files/H_0.bin'):
 
@@ -206,10 +245,18 @@ class hamiltonian:
         return None
     
 
-    def PartialAngular(self,gridInstance):
+    def PartialAngularVelocity(self,gridInstance):
         dt = gridInstance.dt
         H_mix_copy = self.H_mix.copy()
         H_mix_copy.axpy(1,self.H_ang)
         H_mix_copy.scale(1j*dt/2)
         self.partial_angular = H_mix_copy
+        return None
+
+
+    def PartialAngularLength(self,gridInstance):
+        dt = gridInstance.dt
+        H_length_copy = self.H_length.copy()
+        H_length_copy.scale(1j*dt/2)
+        self.partial_angular = H_length_copy
         return None

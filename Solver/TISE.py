@@ -182,8 +182,10 @@ class tise:
         def _polyCAP(x):
             pot = np.log(1-np.cos((np.pi/2)*(1-x/(xmax))))
             return 1j*pot
+        def _linearCAP(x):
+            return -1j*1*(x/xmax)
         def _H_CAP(x,i,j):
-            return basis_funcs[i](x) * basis_funcs[j](x) * _polyCAP(x)
+            return basis_funcs[i](x) * basis_funcs[j](x) * _linearCAP(x)
         H_CAP = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD,nnz = 2*order +1)
         rowstart,rowend = H_CAP.getOwnershipRange()
         for i in range(rowstart,rowend):

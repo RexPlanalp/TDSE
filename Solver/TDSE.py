@@ -27,6 +27,8 @@ import sys
 comm = PETSc.COMM_WORLD
 
 if __name__ == "__main__":
+    with open('input.json', 'r') as file:
+            input_par = json.load(file)
 
     if comm.rank == 0:
         start = time.time()
@@ -125,12 +127,19 @@ if __name__ == "__main__":
             hamstart = time.time()
         
         hamiltonianInstance = hamiltonian()
-        hamiltonianInstance.H_MIX(basisInstance,gridInstance)
-        hamiltonianInstance.H_ANG(basisInstance,gridInstance)
+
+        if laserInstance.gauge == "velocity":
+            hamiltonianInstance.H_MIX(basisInstance,gridInstance)
+            hamiltonianInstance.H_ANG(basisInstance,gridInstance)
+            hamiltonianInstance.PartialAngularVelocity(gridInstance)
+        elif laserInstance.gauge == "length":
+            hamiltonianInstance.H_LENGTH(basisInstance,gridInstance)
+            hamiltonianInstance.PartialAngularLength(gridInstance)
+
         hamiltonianInstance.H_ATOM(tiseInstance,basisInstance,gridInstance)
         hamiltonianInstance.S(tiseInstance,basisInstance)
         hamiltonianInstance.PartialAtomic(gridInstance)
-        hamiltonianInstance.PartialAngular(gridInstance)
+        
         
         if comm.rank == 0:
             hamend = time.time()

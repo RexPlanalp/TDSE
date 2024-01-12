@@ -14,24 +14,12 @@ class laser:
         self.w = input_par["laser"]["w"]
         self.envelope = input_par["laser"]["envelope"]
         self.N = input_par["box"]["N"]
+        self.gauge = input_par["laser"]["gauge"]
 
         return None
     
    
-    def createPulse(self,gridInstance):
-        t = gridInstance.t
-        tmax = gridInstance.tmax
-        if self.envelope == "sinsq":
-            def pulseFunc(t_i):
-                env = np.power(np.sin(pi*(t_i-tmax/2) / tmax), 2.0)
-                amplitude = pow(self.I, 0.5) / self.w
-                weighted_env = amplitude * env
-                pulse = weighted_env*np.cos(self.w*t_i)
-                return pulse
-            self.pulse_func = pulseFunc
-        self.pulse = self.pulse_func(t)
-        
-        return 
+    
 
 
     def createPulse(self,gridInstance):
@@ -41,6 +29,10 @@ class laser:
             def pulseFunc(t_i):
                 env = np.sin(self.w * (t_i-tmax/2)/(2*self.N))**2
                 amplitude = pow(self.I, 0.5) / self.w
+                if self.gauge == "length":
+                    amplitude *= self.w
+                else:
+                    pass
                 weighted_env = amplitude * env
                 pulse = weighted_env*np.sin(self.w * (t_i-tmax/2))
                 return pulse
