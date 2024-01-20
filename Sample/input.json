@@ -1,26 +1,30 @@
 {
     "box":{
-        "xmax": 1000,
+        "xmax": 3000,
         "dx": 0.01,
         "N": 20,
-        "dt": 0.01
+        "dt": 0.05,
+	"CAP": 0,
+	"eta": 0.001,
+	"n": 2,
+	"region": 0.975
     },
     "splines":{
-        "N_knots": 250,
-        "order": 14,
-        "N_gauss": 800,
+        "N_knots": 1500,
+        "order": 8,
         "knot_spacing":"linear"
     },
     "lm":{
-        "lmax":50,
-        "nmax": 1
+        "lmax":20,
+        "nmax": 10
     },
     "state":[1,0,0],
     "laser": {
         "center":0,
-        "w": 0.625,
-        "I": 0,
-        "envelope": "sinsq"
+        "w": 0.0853985242795603,
+        "I": 2.0E13,
+        "envelope": "sinsq",
+	"gauge": "velocity"
 
     }
 }

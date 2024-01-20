@@ -94,6 +94,8 @@ class tise:
 
         for i,l in enumerate(range(self.lmax+1)):
 
+            
+
             if self.nmax - i <= 0:
                 continue
             else:
@@ -114,10 +116,11 @@ class tise:
 
             
             E.solve()
+            print("TEST")
 
             nconv = E.getConverged()
             
-
+           
             
             for i in range(nconv):
                 eigenvalue = E.getEigenvalue(i)  # This retrieves the eigenvalue

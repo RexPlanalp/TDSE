@@ -2,6 +2,7 @@ from numpy import pi
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+from scipy.integrate import simps
 
 class laser:
 
@@ -20,6 +21,40 @@ class laser:
     
    
     
+
+    def createEnvelope(self):
+        if self.envelope == "sinsq":
+            def envFunc(t):
+                env = np.sin(self.w * (t-tmax/2)/(2*self.N))**2
+                return env
+        self.env_func = envFunc
+        
+    def prepareFreq(self,gridInstance):
+
+        t = gridInstance.t
+
+    
+        t_0_numerator = trapz(t*self.env_func(t),t)
+        t_0_denominator = trapz(self.env_func(t),t)
+
+        t_0 = t_0_numerator/t_0_denominator
+
+        G_numerator = trapz((t-t_0)**2 * self.env_func(t),t)
+        G_denominator = trapz(self.env_func(t),t)
+
+        G = G_numerator/G_denominator
+
+        F = self.w * np.sqrt(G)
+
+        H = (1+np.sqrt(1+4/F**2))/2
+
+        self.w = self.w/H
+
+
+            
+
+        
+            
 
 
     def createPulse(self,gridInstance):

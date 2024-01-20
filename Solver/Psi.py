@@ -28,7 +28,6 @@ class psi:
         global_indices = global_indices.astype("int32")
         psi_initial.setValues(global_indices,total)
         
-        psi_array = np.pad(total,(l*n_basis,(lmax-l)*n_basis),constant_values= (0,0))
        
         psi_initial.assemble()
         

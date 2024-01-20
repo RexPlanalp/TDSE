@@ -87,9 +87,14 @@ if __name__ == "__main__":
 
         # If we dont have the bound states, nor do we have the total matrices then we need to run all of this
         if not (os.path.exists("Hydrogen.h5") and os.path.exists("matrix_files/H_0.bin") and os.path.exists("matrix_files/overlap.bin")):
+            
+            
             tiseInstance.createAllH(basisInstance)
+            
             tiseInstance.createS_R(basisInstance)
+            
             tiseInstance.solveEigensystem()
+            print("RUNNING")
             tiseInstance.addComplexPot(basisInstance,gridInstance)
 
         if comm.rank == 0:
