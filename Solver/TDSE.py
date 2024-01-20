@@ -94,7 +94,7 @@ if __name__ == "__main__":
             tiseInstance.createS_R(basisInstance)
             
             tiseInstance.solveEigensystem()
-            print("RUNNING")
+            
             tiseInstance.addComplexPot(basisInstance,gridInstance)
 
         if comm.rank == 0:

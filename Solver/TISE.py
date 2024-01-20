@@ -116,7 +116,7 @@ class tise:
 
             
             E.solve()
-            print("TEST")
+            
 
             nconv = E.getConverged()
             

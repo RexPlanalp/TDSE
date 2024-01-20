@@ -161,6 +161,7 @@ class hamiltonian:
         rb,cb = n_basis,n_basis
 
         H_atom = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD,nnz =2*order+1)
+        H_atom.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
         ownershipH = H_atom.getOwnershipRange()
         H_range = range(ownershipH[0],ownershipH[1])
 
