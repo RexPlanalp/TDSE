@@ -16,8 +16,8 @@ class propagator:
 
         ksp = PETSc.KSP().create(comm = comm)
 
+        pulse_array = laserInstance.pulse_array
         
-        pulseFunc = laserInstance.pulse_func
         
 
         ksp.setTolerances(rtol = self.tol)
@@ -34,7 +34,7 @@ class propagator:
 
 
 
-            pulse_val = pulseFunc(t)
+            pulse_val = pulse_array[i]
 
             partial_L_copy = hamiltonianInstance.partial_L.copy()
             partial_R_copy = hamiltonianInstance.partial_R.copy()

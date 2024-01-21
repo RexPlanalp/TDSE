@@ -14,9 +14,6 @@ class grid:
         time_spacing = input_par["box"]["dt"]
         
 
-        #self.r = np.arange(0,grid_size+grid_spacing,grid_spacing) 
-        #self.t = np.arange(0,self.tmax + time_spacing,time_spacing)
-
         Nr = int(grid_size/grid_spacing)+1
         self.r = np.linspace(0,grid_size,Nr) 
 
@@ -24,7 +21,7 @@ class grid:
         self.tmax = N*self.tau
 
         Nt = int(np.rint(self.tmax / time_spacing)) + 1
-        self.t = np.linspace(-self.tmax/2,self.tmax/2,N)
+        self.t = np.linspace(0,self.tmax,Nt)
         
         
         self.rmax = grid_size

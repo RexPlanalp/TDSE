@@ -107,6 +107,9 @@ if __name__ == "__main__":
             laserstart = time.time()
     
         laserInstance = laser()
+        laserInstance.createEnvelope()
+        laserInstance.createCarrier()
+        laserInstance.createAmplitude()
         laserInstance.createPulse(gridInstance)
         laserInstance.plotPulse(True)
 
