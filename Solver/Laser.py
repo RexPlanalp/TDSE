@@ -25,7 +25,7 @@ class laser:
     def createEnvelope(self):
         if self.envelope == "sinsq":
             def envFunc(t):
-                env = np.sin(self.w * t/(2*self.N))**2
+                env = np.cos(self.w * t/(2*self.N))**2
                 return env
         self.env_func = envFunc
     
