@@ -14,6 +14,6 @@ REPO_DIR="/users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum"
 hostname
 pwd
 
-mpiexec -n $SLURM_NTASKS python $REPO_DIR/setup.py >> results.log
+mpiexec -n $SLURM_NTASKS python $REPO_DIR/run_photoenergy.py >> results.log
 
 
