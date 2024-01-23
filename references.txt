@@ -1,0 +1,44 @@
+Energy Window Operator Method:
+
+1.
+Electron dynamics induced by single and multiphoton
+processes in atoms and molecules
+Felipe Zapata Abellán
+
+2.
+The energy analysis of time-dependent numerical wave functions
+K.J. Schafer
+
+
+T-surff:
+
+1.
+Photoelectron spectra with Qprop and t-SURFF
+Volker Mosert, Dieter Bauer
+
+
+B-Splines:
+
+1.
+Above-threshold ionization spectrum of hydrogen using B-spline functions
+Cormier, E. ; Lambropoulos, P.
+
+2.
+Implementation of exterior complex scaling in
+B-splines to solve atomic and molecular collision
+problems
+C William McCurdy1,2 and Fernando Mart´ın
+
+General Atomic Physics:
+
+1.
+Elements of Photoionization Quantum Dynamics Methods
+Lampros A A Nikolopoulos
+
+2. 
+Computational Strong Field Quantum Dynamics Bauer
+
+3.
+Solving time-dependent Schrödinger equation in
+momentum space with application to strong-field
+problems
