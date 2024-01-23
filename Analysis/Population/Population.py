@@ -149,9 +149,9 @@ def checkHermitian():
     print(H_0.isHermitian(tol = 0.1))
 
    
-checkNorm()
+#checkNorm()
 #probDisribution()
-#groundStatePop()
+groundStatePop()
 #checkHermitian()
 
 
