@@ -25,13 +25,13 @@ class laser:
     def createEnvelope(self):
         if self.envelope == "sinsq":
             def envFunc(t):
-                env = np.cos(self.w * t/(2*self.N))**2
+                env = np.sin(self.w * t/(2*self.N))**2
                 return env
         self.env_func = envFunc
     
     def createCarrier(self):
         def carrierFunc(t):
-            return np.sin(self.w*t)
+            return np.cos(self.w*t)
         self.carrier_func = carrierFunc
         return
     
