@@ -52,7 +52,7 @@ class hamiltonian:
                         H_mix_R.setValue(i,j,H_element)
         H_mix_R.assemble()
 
-        total = kronV4(H_mix_lm,H_mix_R,2*(2*order+1))
+        total = kronV5(H_mix_lm,H_mix_R,2*(2*order+1))
         total.scale(-1j)
 
         H_mix_lm.destroy()
@@ -90,7 +90,7 @@ class hamiltonian:
                     H_ang_R.setValue(i,j,H_element)
         H_ang_R.assemble()
 
-        total = kronV4(H_ang_lm,H_ang_R,2*(2*order+1))
+        total = kronV5(H_ang_lm,H_ang_R,2*(2*order+1))
         total.scale(-1j)
 
         H_ang_lm.destroy()
