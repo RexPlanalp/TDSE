@@ -44,7 +44,7 @@ if LOAD_EXT:
         print("Reading Final State")
     
     
-    with h5py.File('../Sample/TDSE.h5', 'r') as f:
+    with h5py.File('TDSE.h5', 'r') as f:
         data = f["psi_final"][:]
         real_part = data[:,0]
         imaginary_part = data[:,1]
@@ -56,18 +56,18 @@ if LOAD_EXT:
         print("Reading Matrices")
     
     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
-    viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/overlap.bin', 'r')
+    viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
     S.load(viewer)
     viewer.destroy()
 
     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
-    viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/H_0.bin', 'r')
+    viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
     H_0.load(viewer)
     viewer.destroy()
     rows,cols = H_0.getSize()
 
     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
-    viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/S_T.bin', 'r')
+    viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')
     S_TILE.load(viewer)
     viewer.destroy()
 

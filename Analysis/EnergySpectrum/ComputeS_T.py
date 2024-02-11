@@ -13,7 +13,7 @@ n_basis = N_knots - order - 2
 
 
 S = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =(2*order + 1) )
-viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/overlap.bin', 'r')
+viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
 S.load(viewer)
 viewer.destroy()
 

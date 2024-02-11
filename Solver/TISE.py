@@ -187,8 +187,10 @@ class tise:
             return 1j*pot
         def _linearCAP(x):
             return -1j*0.1*(x/xmax)
+        def _tanhCAP(x):
+            return -100j * (1+np.tanh((x-xmax)))
         def _H_CAP(x,i,j):
-            return basis_funcs[i](x) * basis_funcs[j](x) * _linearCAP(x)
+            return basis_funcs[i](x) * basis_funcs[j](x) * _tanhCAP(x)
         H_CAP = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD,nnz = 2*order +1)
         rowstart,rowend = H_CAP.getOwnershipRange()
         for i in range(rowstart,rowend):

@@ -2396,6 +2396,7 @@ static const char __pyx_k_N_knots[] = "N_knots";
 static const char __pyx_k_PAD_npy[] = "PAD.npy";
 static const char __pyx_k_PES_npy[] = "PES.npy";
 static const char __pyx_k_PES_val[] = "PES_val";
+static const char __pyx_k_TDSE_h5[] = "TDSE.h5";
 static const char __pyx_k_destroy[] = "destroy";
 static const char __pyx_k_getSize[] = "getSize";
 static const char __pyx_k_n_basis[] = "n_basis";
@@ -2438,7 +2439,6 @@ static const char __pyx_k_class_getitem[] = "__class_getitem__";
 static const char __pyx_k_pointwiseMult[] = "pointwiseMult";
 static const char __pyx_k_scipy_special[] = "scipy.special";
 static const char __pyx_k_sph_harmonics[] = "sph_harmonics";
-static const char __pyx_k_Sample_TDSE_h5[] = "../Sample/TDSE.h5";
 static const char __pyx_k_createVecRight[] = "createVecRight";
 static const char __pyx_k_imaginary_part[] = "imaginary_part";
 static const char __pyx_k_photoAngularV2[] = "photoAngularV2";
@@ -2453,11 +2453,10 @@ static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_Reading_Final_State[] = "Reading Final State";
 static const char __pyx_k_Starting_Energy_Loop[] = "Starting Energy Loop";
+static const char __pyx_k_matrix_files_H_0_bin[] = "matrix_files/H_0.bin";
 static const char __pyx_k_matrix_files_S_T_bin[] = "matrix_files/S_T.bin";
-static const char __pyx_k_Sample_matrix_files_H_0_bin[] = "../Sample/matrix_files/H_0.bin";
-static const char __pyx_k_Sample_matrix_files_S_T_bin[] = "../Sample/matrix_files/S_T.bin";
+static const char __pyx_k_matrix_files_overlap_bin[] = "matrix_files/overlap.bin";
 static const char __pyx_k_Computing_Spherical_Harmonics[] = "Computing Spherical Harmonics";
-static const char __pyx_k_Sample_matrix_files_overlap_bin[] = "../Sample/matrix_files/overlap.bin";
 static const char __pyx_k_python_users_becker_dopl4670_Res[] = "python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py";
 /* #### Code section: decls ### */
 static PyObject *__pyx_pf_11Photoenergy_q_nk(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_n, PyObject *__pyx_v_k); /* proto */
@@ -2523,13 +2522,10 @@ typedef struct {
   PyObject *__pyx_kp_s_Reading_Matrices;
   PyObject *__pyx_n_s_S;
   PyObject *__pyx_n_s_S_TILE;
-  PyObject *__pyx_kp_s_Sample_TDSE_h5;
-  PyObject *__pyx_kp_s_Sample_matrix_files_H_0_bin;
-  PyObject *__pyx_kp_s_Sample_matrix_files_S_T_bin;
-  PyObject *__pyx_kp_s_Sample_matrix_files_overlap_bin;
   PyObject *__pyx_kp_s_Starting_Energy_Loop;
   PyObject *__pyx_n_s_Su;
   PyObject *__pyx_n_s_Sv;
+  PyObject *__pyx_kp_s_TDSE_h5;
   PyObject *__pyx_n_s_Vec;
   PyObject *__pyx_n_s_Viewer;
   PyObject *__pyx_n_s__27;
@@ -2586,7 +2582,9 @@ typedef struct {
   PyObject *__pyx_n_s_main;
   PyObject *__pyx_n_s_matplotlib;
   PyObject *__pyx_n_s_matplotlib_pyplot;
+  PyObject *__pyx_kp_s_matrix_files_H_0_bin;
   PyObject *__pyx_kp_s_matrix_files_S_T_bin;
+  PyObject *__pyx_kp_s_matrix_files_overlap_bin;
   PyObject *__pyx_n_s_meshgrid;
   PyObject *__pyx_n_s_mult;
   PyObject *__pyx_n_s_n;
@@ -2756,13 +2754,10 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_kp_s_Reading_Matrices);
   Py_CLEAR(clear_module_state->__pyx_n_s_S);
   Py_CLEAR(clear_module_state->__pyx_n_s_S_TILE);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_Sample_TDSE_h5);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_Sample_matrix_files_H_0_bin);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_Sample_matrix_files_S_T_bin);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_Sample_matrix_files_overlap_bin);
   Py_CLEAR(clear_module_state->__pyx_kp_s_Starting_Energy_Loop);
   Py_CLEAR(clear_module_state->__pyx_n_s_Su);
   Py_CLEAR(clear_module_state->__pyx_n_s_Sv);
+  Py_CLEAR(clear_module_state->__pyx_kp_s_TDSE_h5);
   Py_CLEAR(clear_module_state->__pyx_n_s_Vec);
   Py_CLEAR(clear_module_state->__pyx_n_s_Viewer);
   Py_CLEAR(clear_module_state->__pyx_n_s__27);
@@ -2819,7 +2814,9 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_main);
   Py_CLEAR(clear_module_state->__pyx_n_s_matplotlib);
   Py_CLEAR(clear_module_state->__pyx_n_s_matplotlib_pyplot);
+  Py_CLEAR(clear_module_state->__pyx_kp_s_matrix_files_H_0_bin);
   Py_CLEAR(clear_module_state->__pyx_kp_s_matrix_files_S_T_bin);
+  Py_CLEAR(clear_module_state->__pyx_kp_s_matrix_files_overlap_bin);
   Py_CLEAR(clear_module_state->__pyx_n_s_meshgrid);
   Py_CLEAR(clear_module_state->__pyx_n_s_mult);
   Py_CLEAR(clear_module_state->__pyx_n_s_n);
@@ -2967,13 +2964,10 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_kp_s_Reading_Matrices);
   Py_VISIT(traverse_module_state->__pyx_n_s_S);
   Py_VISIT(traverse_module_state->__pyx_n_s_S_TILE);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_Sample_TDSE_h5);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_Sample_matrix_files_H_0_bin);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_Sample_matrix_files_S_T_bin);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_Sample_matrix_files_overlap_bin);
   Py_VISIT(traverse_module_state->__pyx_kp_s_Starting_Energy_Loop);
   Py_VISIT(traverse_module_state->__pyx_n_s_Su);
   Py_VISIT(traverse_module_state->__pyx_n_s_Sv);
+  Py_VISIT(traverse_module_state->__pyx_kp_s_TDSE_h5);
   Py_VISIT(traverse_module_state->__pyx_n_s_Vec);
   Py_VISIT(traverse_module_state->__pyx_n_s_Viewer);
   Py_VISIT(traverse_module_state->__pyx_n_s__27);
@@ -3030,7 +3024,9 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_main);
   Py_VISIT(traverse_module_state->__pyx_n_s_matplotlib);
   Py_VISIT(traverse_module_state->__pyx_n_s_matplotlib_pyplot);
+  Py_VISIT(traverse_module_state->__pyx_kp_s_matrix_files_H_0_bin);
   Py_VISIT(traverse_module_state->__pyx_kp_s_matrix_files_S_T_bin);
+  Py_VISIT(traverse_module_state->__pyx_kp_s_matrix_files_overlap_bin);
   Py_VISIT(traverse_module_state->__pyx_n_s_meshgrid);
   Py_VISIT(traverse_module_state->__pyx_n_s_mult);
   Py_VISIT(traverse_module_state->__pyx_n_s_n);
@@ -3188,13 +3184,10 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_kp_s_Reading_Matrices __pyx_mstate_global->__pyx_kp_s_Reading_Matrices
 #define __pyx_n_s_S __pyx_mstate_global->__pyx_n_s_S
 #define __pyx_n_s_S_TILE __pyx_mstate_global->__pyx_n_s_S_TILE
-#define __pyx_kp_s_Sample_TDSE_h5 __pyx_mstate_global->__pyx_kp_s_Sample_TDSE_h5
-#define __pyx_kp_s_Sample_matrix_files_H_0_bin __pyx_mstate_global->__pyx_kp_s_Sample_matrix_files_H_0_bin
-#define __pyx_kp_s_Sample_matrix_files_S_T_bin __pyx_mstate_global->__pyx_kp_s_Sample_matrix_files_S_T_bin
-#define __pyx_kp_s_Sample_matrix_files_overlap_bin __pyx_mstate_global->__pyx_kp_s_Sample_matrix_files_overlap_bin
 #define __pyx_kp_s_Starting_Energy_Loop __pyx_mstate_global->__pyx_kp_s_Starting_Energy_Loop
 #define __pyx_n_s_Su __pyx_mstate_global->__pyx_n_s_Su
 #define __pyx_n_s_Sv __pyx_mstate_global->__pyx_n_s_Sv
+#define __pyx_kp_s_TDSE_h5 __pyx_mstate_global->__pyx_kp_s_TDSE_h5
 #define __pyx_n_s_Vec __pyx_mstate_global->__pyx_n_s_Vec
 #define __pyx_n_s_Viewer __pyx_mstate_global->__pyx_n_s_Viewer
 #define __pyx_n_s__27 __pyx_mstate_global->__pyx_n_s__27
@@ -3251,7 +3244,9 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_main __pyx_mstate_global->__pyx_n_s_main
 #define __pyx_n_s_matplotlib __pyx_mstate_global->__pyx_n_s_matplotlib
 #define __pyx_n_s_matplotlib_pyplot __pyx_mstate_global->__pyx_n_s_matplotlib_pyplot
+#define __pyx_kp_s_matrix_files_H_0_bin __pyx_mstate_global->__pyx_kp_s_matrix_files_H_0_bin
 #define __pyx_kp_s_matrix_files_S_T_bin __pyx_mstate_global->__pyx_kp_s_matrix_files_S_T_bin
+#define __pyx_kp_s_matrix_files_overlap_bin __pyx_mstate_global->__pyx_kp_s_matrix_files_overlap_bin
 #define __pyx_n_s_meshgrid __pyx_mstate_global->__pyx_n_s_meshgrid
 #define __pyx_n_s_mult __pyx_mstate_global->__pyx_n_s_mult
 #define __pyx_n_s_n __pyx_mstate_global->__pyx_n_s_n
@@ -6841,13 +6836,10 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_kp_s_Reading_Matrices, __pyx_k_Reading_Matrices, sizeof(__pyx_k_Reading_Matrices), 0, 0, 1, 0},
     {&__pyx_n_s_S, __pyx_k_S, sizeof(__pyx_k_S), 0, 0, 1, 1},
     {&__pyx_n_s_S_TILE, __pyx_k_S_TILE, sizeof(__pyx_k_S_TILE), 0, 0, 1, 1},
-    {&__pyx_kp_s_Sample_TDSE_h5, __pyx_k_Sample_TDSE_h5, sizeof(__pyx_k_Sample_TDSE_h5), 0, 0, 1, 0},
-    {&__pyx_kp_s_Sample_matrix_files_H_0_bin, __pyx_k_Sample_matrix_files_H_0_bin, sizeof(__pyx_k_Sample_matrix_files_H_0_bin), 0, 0, 1, 0},
-    {&__pyx_kp_s_Sample_matrix_files_S_T_bin, __pyx_k_Sample_matrix_files_S_T_bin, sizeof(__pyx_k_Sample_matrix_files_S_T_bin), 0, 0, 1, 0},
-    {&__pyx_kp_s_Sample_matrix_files_overlap_bin, __pyx_k_Sample_matrix_files_overlap_bin, sizeof(__pyx_k_Sample_matrix_files_overlap_bin), 0, 0, 1, 0},
     {&__pyx_kp_s_Starting_Energy_Loop, __pyx_k_Starting_Energy_Loop, sizeof(__pyx_k_Starting_Energy_Loop), 0, 0, 1, 0},
     {&__pyx_n_s_Su, __pyx_k_Su, sizeof(__pyx_k_Su), 0, 0, 1, 1},
     {&__pyx_n_s_Sv, __pyx_k_Sv, sizeof(__pyx_k_Sv), 0, 0, 1, 1},
+    {&__pyx_kp_s_TDSE_h5, __pyx_k_TDSE_h5, sizeof(__pyx_k_TDSE_h5), 0, 0, 1, 0},
     {&__pyx_n_s_Vec, __pyx_k_Vec, sizeof(__pyx_k_Vec), 0, 0, 1, 1},
     {&__pyx_n_s_Viewer, __pyx_k_Viewer, sizeof(__pyx_k_Viewer), 0, 0, 1, 1},
     {&__pyx_n_s__27, __pyx_k__27, sizeof(__pyx_k__27), 0, 0, 1, 1},
@@ -6904,7 +6896,9 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
     {&__pyx_n_s_matplotlib, __pyx_k_matplotlib, sizeof(__pyx_k_matplotlib), 0, 0, 1, 1},
     {&__pyx_n_s_matplotlib_pyplot, __pyx_k_matplotlib_pyplot, sizeof(__pyx_k_matplotlib_pyplot), 0, 0, 1, 1},
+    {&__pyx_kp_s_matrix_files_H_0_bin, __pyx_k_matrix_files_H_0_bin, sizeof(__pyx_k_matrix_files_H_0_bin), 0, 0, 1, 0},
     {&__pyx_kp_s_matrix_files_S_T_bin, __pyx_k_matrix_files_S_T_bin, sizeof(__pyx_k_matrix_files_S_T_bin), 0, 0, 1, 0},
+    {&__pyx_kp_s_matrix_files_overlap_bin, __pyx_k_matrix_files_overlap_bin, sizeof(__pyx_k_matrix_files_overlap_bin), 0, 0, 1, 0},
     {&__pyx_n_s_meshgrid, __pyx_k_meshgrid, sizeof(__pyx_k_meshgrid), 0, 0, 1, 1},
     {&__pyx_n_s_mult, __pyx_k_mult, sizeof(__pyx_k_mult), 0, 0, 1, 1},
     {&__pyx_n_s_n, __pyx_k_n, sizeof(__pyx_k_n), 0, 0, 1, 1},
@@ -7105,16 +7099,16 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "Photoenergy.pyx":47
  * 
  * 
- *     with h5py.File('../Sample/TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
+ *     with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
  *         data = f["psi_final"][:]
  *         real_part = data[:,0]
  */
-  __pyx_tuple__15 = PyTuple_Pack(2, __pyx_kp_s_Sample_TDSE_h5, __pyx_n_s_r); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_tuple__15 = PyTuple_Pack(2, __pyx_kp_s_TDSE_h5, __pyx_n_s_r); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
 
   /* "Photoenergy.pyx":49
- *     with h5py.File('../Sample/TDSE.h5', 'r') as f:
+ *     with h5py.File('TDSE.h5', 'r') as f:
  *         data = f["psi_final"][:]
  *         real_part = data[:,0]             # <<<<<<<<<<<<<<
  *         imaginary_part = data[:,1]
@@ -7149,33 +7143,33 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "Photoenergy.pyx":59
  * 
  *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/overlap.bin', 'r')             # <<<<<<<<<<<<<<
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')             # <<<<<<<<<<<<<<
  *     S.load(viewer)
  *     viewer.destroy()
  */
-  __pyx_tuple__19 = PyTuple_Pack(2, __pyx_kp_s_Sample_matrix_files_overlap_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_overlap_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
   /* "Photoenergy.pyx":64
  * 
  *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/H_0.bin', 'r')             # <<<<<<<<<<<<<<
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')             # <<<<<<<<<<<<<<
  *     H_0.load(viewer)
  *     viewer.destroy()
  */
-  __pyx_tuple__20 = PyTuple_Pack(2, __pyx_kp_s_Sample_matrix_files_H_0_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_tuple__20 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_H_0_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
 
   /* "Photoenergy.pyx":70
  * 
  *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/S_T.bin', 'r')             # <<<<<<<<<<<<<<
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')             # <<<<<<<<<<<<<<
  *     S_TILE.load(viewer)
  *     viewer.destroy()
  */
-  __pyx_tuple__21 = PyTuple_Pack(2, __pyx_kp_s_Sample_matrix_files_S_T_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_S_T_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 70, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
 
@@ -8238,7 +8232,7 @@ if (!__Pyx_RefNanny) {
     /* "Photoenergy.pyx":47
  * 
  * 
- *     with h5py.File('../Sample/TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
+ *     with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
  *         data = f["psi_final"][:]
  *         real_part = data[:,0]
  */
@@ -8275,7 +8269,7 @@ if (!__Pyx_RefNanny) {
 
             /* "Photoenergy.pyx":48
  * 
- *     with h5py.File('../Sample/TDSE.h5', 'r') as f:
+ *     with h5py.File('TDSE.h5', 'r') as f:
  *         data = f["psi_final"][:]             # <<<<<<<<<<<<<<
  *         real_part = data[:,0]
  *         imaginary_part = data[:,1]
@@ -8292,7 +8286,7 @@ if (!__Pyx_RefNanny) {
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
             /* "Photoenergy.pyx":49
- *     with h5py.File('../Sample/TDSE.h5', 'r') as f:
+ *     with h5py.File('TDSE.h5', 'r') as f:
  *         data = f["psi_final"][:]
  *         real_part = data[:,0]             # <<<<<<<<<<<<<<
  *         imaginary_part = data[:,1]
@@ -8348,7 +8342,7 @@ if (!__Pyx_RefNanny) {
             /* "Photoenergy.pyx":47
  * 
  * 
- *     with h5py.File('../Sample/TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
+ *     with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
  *         data = f["psi_final"][:]
  *         real_part = data[:,0]
  */
@@ -8509,7 +8503,7 @@ if (!__Pyx_RefNanny) {
  *         print("Reading Matrices")
  * 
  *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/overlap.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
  *     S.load(viewer)
  */
     __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
@@ -8575,7 +8569,7 @@ if (!__Pyx_RefNanny) {
     /* "Photoenergy.pyx":59
  * 
  *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/overlap.bin', 'r')             # <<<<<<<<<<<<<<
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')             # <<<<<<<<<<<<<<
  *     S.load(viewer)
  *     viewer.destroy()
  */
@@ -8598,7 +8592,7 @@ if (!__Pyx_RefNanny) {
 
     /* "Photoenergy.pyx":60
  *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/overlap.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
  *     S.load(viewer)             # <<<<<<<<<<<<<<
  *     viewer.destroy()
  * 
@@ -8617,7 +8611,7 @@ if (!__Pyx_RefNanny) {
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "Photoenergy.pyx":61
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/overlap.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
  *     S.load(viewer)
  *     viewer.destroy()             # <<<<<<<<<<<<<<
  * 
@@ -8637,7 +8631,7 @@ if (!__Pyx_RefNanny) {
  *     viewer.destroy()
  * 
  *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/H_0.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
  *     H_0.load(viewer)
  */
     __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
@@ -8703,7 +8697,7 @@ if (!__Pyx_RefNanny) {
     /* "Photoenergy.pyx":64
  * 
  *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/H_0.bin', 'r')             # <<<<<<<<<<<<<<
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')             # <<<<<<<<<<<<<<
  *     H_0.load(viewer)
  *     viewer.destroy()
  */
@@ -8726,7 +8720,7 @@ if (!__Pyx_RefNanny) {
 
     /* "Photoenergy.pyx":65
  *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/H_0.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
  *     H_0.load(viewer)             # <<<<<<<<<<<<<<
  *     viewer.destroy()
  *     rows,cols = H_0.getSize()
@@ -8745,7 +8739,7 @@ if (!__Pyx_RefNanny) {
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
     /* "Photoenergy.pyx":66
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/H_0.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
  *     H_0.load(viewer)
  *     viewer.destroy()             # <<<<<<<<<<<<<<
  *     rows,cols = H_0.getSize()
@@ -8831,7 +8825,7 @@ if (!__Pyx_RefNanny) {
  *     rows,cols = H_0.getSize()
  * 
  *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/S_T.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')
  *     S_TILE.load(viewer)
  */
     __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
@@ -8913,7 +8907,7 @@ if (!__Pyx_RefNanny) {
     /* "Photoenergy.pyx":70
  * 
  *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/S_T.bin', 'r')             # <<<<<<<<<<<<<<
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')             # <<<<<<<<<<<<<<
  *     S_TILE.load(viewer)
  *     viewer.destroy()
  */
@@ -8936,7 +8930,7 @@ if (!__Pyx_RefNanny) {
 
     /* "Photoenergy.pyx":71
  *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/S_T.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')
  *     S_TILE.load(viewer)             # <<<<<<<<<<<<<<
  *     viewer.destroy()
  * 
@@ -8955,7 +8949,7 @@ if (!__Pyx_RefNanny) {
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
     /* "Photoenergy.pyx":72
- *     viewer = PETSc.Viewer().createBinary('../Sample/matrix_files/S_T.bin', 'r')
+ *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')
  *     S_TILE.load(viewer)
  *     viewer.destroy()             # <<<<<<<<<<<<<<
  * 
