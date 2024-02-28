@@ -1,7 +1,9 @@
 from petsc4py import PETSc
 import json
+import sys
+sys.path.append("../../Solver")
 from Module import *
-
+comm = PETSc.COMM_WORLD
 
 with open('input.json', 'r') as file:
     input_par = json.load(file)
@@ -24,6 +26,7 @@ for i in range(n_basis):
         if value == 0:
             continue
         S_R.setValue(i, j, value)
+comm.barrier()
 S_R.assemble()
 
 ones = PETSc.Mat().createAIJ([lmax+1,lmax+1])
@@ -31,9 +34,10 @@ istart,iend = ones.getOwnershipRange()
 for i in range(istart,iend):
     for j in range(lmax+1):
         ones.setValue(i,j,1)
+comm.barrier()
 ones.assemble()
 
-S_T= kronV4(ones,S_R,n_basis*(2*order + 1))
+S_T= kronV5(ones,S_R,n_basis*(2*order + 1))
 
 ones.destroy()
 S_R.destroy()

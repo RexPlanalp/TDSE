@@ -21,7 +21,7 @@ class hamiltonian:
         return np.sqrt(((l+1)**2 - self.m**2)/((2*l+1)*(2*l+3)))
 
 
-    def H_MIX(self,basisInstance,gridInstance):
+    def H_MIX(self,basisInstance,gridInstance,tiseInstance):
         n_basis = basisInstance.n_basis
         order = basisInstance.order
         degree = basisInstance.degree
@@ -31,6 +31,7 @@ class hamiltonian:
 
         def H_mix_R_element(x,i,j):
             return basis_funcs[i](x)*basis_funcs[j](x,1)
+        
 
         H_mix_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = comm,nnz = 2)
         H_mix_lm.setUp()
@@ -61,15 +62,20 @@ class hamiltonian:
         return None
 
 
-    def H_ANG(self,basisInstance,gridInstance):
+    def H_ANG(self,basisInstance,gridInstance,tiseInstance):
         n_basis = basisInstance.n_basis
         order = basisInstance.order
         degree = basisInstance.degree
         basis_funcs = basisInstance.basis_funcs
         dt = gridInstance.dt
 
-        def H_ang_R_element(x,i,j):
-            return basis_funcs[i](x)*basis_funcs[j](x)/ np.sqrt(x**2 + 1E-25)
+        if tiseInstance.ECS:
+            def H_ang_R_element(x,i,j):
+                return basis_funcs[i](x)*basis_funcs[j](x)*tiseInstance.q(x)/ np.sqrt(tiseInstance.R(x)**2 + 1E-25) 
+        else:
+            def H_ang_R_element(x,i,j):
+                return basis_funcs[i](x)*basis_funcs[j](x)/ np.sqrt(x**2 + 1E-25)
+            
 
         H_ang_lm = PETSc.Mat().createAIJ([self.lmax+1,self.lmax+1],comm = comm,nnz = 2)
         istart,iend = H_ang_lm.getOwnershipRange()
@@ -79,6 +85,7 @@ class hamiltonian:
                     H_ang_lm.setValue(i,j,-(i)*self.clm(i-1,self.m))
                 elif j == i+1:
                     H_ang_lm.setValue(i,j,(j)*self.clm(j-1,self.m))
+        comm.barrier()
         H_ang_lm.assemble()
 
         H_ang_R =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree+1)
@@ -88,6 +95,7 @@ class hamiltonian:
             for j in range(n_basis):
                     H_element = basisInstance.integrate(H_ang_R_element,i,j)
                     H_ang_R.setValue(i,j,H_element)
+        comm.barrier()
         H_ang_R.assemble()
 
         total = kronV5(H_ang_lm,H_ang_R,2*(2*order+1))
@@ -119,6 +127,7 @@ class hamiltonian:
                     H_length_lm.setValue(i,j,self.clm(i-1,self.m))
                 elif j == i+1:
                     H_length_lm.setValue(i,j,self.clm(j-1,self.m))
+        comm.barrier()
         H_length_lm.assemble()
 
         H_length_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree+1)
@@ -128,6 +137,7 @@ class hamiltonian:
             for j in range(n_basis):
                         H_element = basisInstance.integrate(H_length_R_element,i,j)
                         H_length_R.setValue(i,j,H_element)
+        comm.barrier()
         H_length_R.assemble()
 
         total = kronV4(H_length_lm,H_length_R,2*(2*order+1))
@@ -187,7 +197,7 @@ class hamiltonian:
             column_indices = column_indices.astype("int32")
         
             H_atom.setValues(i,column_indices,values)
-
+        comm.barrier()
         H_atom.assemble()
         viewer = PETSc.Viewer().createBinary("matrix_files/H_0.bin","w")
         H_atom.view(viewer)
@@ -216,9 +226,10 @@ class hamiltonian:
         istart,iend = I.getOwnershipRange()
         for i in range(istart,iend):
             I.setValue(i,i,1)
+        comm.barrier()
         I.assemble()
 
-        total = kronV4(I,S_R,(2*order+1))
+        total = kronV5(I,S_R,(2*order+1))
 
         I.destroy()
         self.S = total

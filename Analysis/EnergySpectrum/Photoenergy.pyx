@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import json
 from scipy.special import sph_harm
 import os  
+import time
 
 
 comm = PETSc.COMM_WORLD
@@ -13,68 +14,71 @@ comm = PETSc.COMM_WORLD
 def q_nk(n,k):
         return ((2*k-1)*np.pi)/4
 
+if comm.rank == 0:
+    print("Reading Input File")
 
-LOAD_EXT = True
+with open('input.json', 'r') as file:
+        input_par = json.load(file)
+order = input_par["splines"]["order"]
+lmax = input_par["lm"]["lmax"]
+N_knots = input_par["splines"]["N_knots"]
+n_basis = N_knots - order - 2
+total_size = n_basis * (lmax+1)
+l_values = np.repeat(np.arange(lmax+1),n_basis)
 
+PES = input_par["PES"][0]
+PAD = input_par["PAD"][0]
 
-if LOAD_EXT:
-
-    if comm.rank == 0:
-        print("Reading Input File")
-
-    with open('input.json', 'r') as file:
-            input_par = json.load(file)
-    order = input_par["splines"]["order"]
-    lmax = input_par["lm"]["lmax"]
-    N_knots = input_par["splines"]["N_knots"]
-    n_basis = N_knots - order - 2
-    total_size = n_basis * (lmax+1)
-    l_values = np.repeat(np.arange(lmax+1),n_basis)
-
-    PES = input_par["PES"][0]
-    PAD = input_par["PAD"][0]
-
-    if PES:
-        E_min,E_max = input_par["PES"][1],input_par["PES"][2]
-    if PAD:
-        E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]
+if PES:
+    E_min,E_max = input_par["PES"][1],input_par["PES"][2]
+if PAD:
+    E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]
 
 
-    if comm.rank == 0:
-        print("Reading Final State")
+if comm.rank == 0:
+    print("Reading Final State")
     
     
-    with h5py.File('TDSE.h5', 'r') as f:
-        data = f["psi_final"][:]
-        real_part = data[:,0]
-        imaginary_part = data[:,1]
+with h5py.File('TDSE.h5', 'r') as f:
+    data = f["psi_final"][:]
+    real_part = data[:,0]
+    imaginary_part = data[:,1]
             
-        wavefunction = real_part + 1j*imaginary_part
-    psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)
+    wavefunction = real_part + 1j*imaginary_part
+#psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)
+psi_final= PETSc.Vec().createMPI(total_size,comm = comm)
+global_indices = np.arange(total_size)
+global_indices = global_indices.astype("int32")
+psi_final.setValues(global_indices,wavefunction)
+psi_final.assemble()
 
-    if comm.rank == 0:
-        print("Reading Matrices")
+if comm.rank == 0:
+    print("Reading Matrices")
     
-    S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
-    viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
-    S.load(viewer)
-    viewer.destroy()
+S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r',comm = comm)
+S.load(viewer)
+viewer.destroy()
 
-    H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
-    viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
-    H_0.load(viewer)
-    viewer.destroy()
-    rows,cols = H_0.getSize()
+H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r',comm = comm)
+H_0.load(viewer)
+viewer.destroy()
+rows,cols = H_0.getSize()
 
-    S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
-    viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')
-    S_TILE.load(viewer)
-    viewer.destroy()
+if not os.path.exists("matrix_files/S_T.bin"):
+    if comm.rank == 0:
+        print("Exiting Program, please compute S_T before running")
+    comm.abort()
+    
 
-    if not os.path.exists("matrix_files/S_T.bin"):
-        if comm.rank == 0:
-            print("Computing S_T")
-            os.system("python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py")
+
+S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
+viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r',comm = comm)
+S_TILE.load(viewer)
+viewer.destroy()
+
+    
 
 
 gamma = 0.001
@@ -178,11 +182,16 @@ def photoAngularV2(E_range,theta_range,phi_range,PAD,PES):
                     y = x.copy()
                     
                     
-
+                    
 
                     values = sph_harmonics[:, j, i]
+                    #spherical_vector = PETSc.Vec().createWithArray(values,size = total_size,comm = comm)
 
-                    spherical_vector = PETSc.Vec().createWithArray(values,size = total_size,comm = comm)
+                    spherical_vector = PETSc.Vec().createMPI(total_size,comm = comm)
+                    global_indices = np.arange(total_size)
+                    global_indices = global_indices.astype("int32")
+                    spherical_vector.setValues(global_indices,values)
+                    spherical_vector.assemble()
 
                     y.pointwiseMult(y, spherical_vector)
 
@@ -210,8 +219,12 @@ def photoAngularV2(E_range,theta_range,phi_range,PAD,PES):
         np.save("PAD.npy",PAD)
     return
 
-        
+if comm.rank == 0:
+    start = time.time()
 photoAngularV2(E_range,theta_range,phi_range,PAD,PES)
+if comm.rank == 0:
+    end = time.time()
+    print(f"Time to compute PES:{end-start}")
 
 
     

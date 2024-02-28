@@ -88,14 +88,23 @@ if __name__ == "__main__":
         # If we dont have the bound states, nor do we have the total matrices then we need to run all of this
         if not (os.path.exists("Hydrogen.h5") and os.path.exists("matrix_files/H_0.bin") and os.path.exists("matrix_files/overlap.bin")):
             
-            
+            if comm.rank == 0:
+                print("Creating Matrices")
             tiseInstance.createAllH(basisInstance)
+
+            if comm.rank == 0:
+                print("Creating Overlap")
             
             tiseInstance.createS_R(basisInstance)
+
+            if comm.rank ==0:
+                print("Solving Eigensystem")
             
             tiseInstance.solveEigensystem()
+
             
-            tiseInstance.addComplexPot(basisInstance,gridInstance)
+            
+            
 
         if comm.rank == 0:
             tiseend = time.time()
@@ -137,8 +146,8 @@ if __name__ == "__main__":
         hamiltonianInstance = hamiltonian()
 
         if laserInstance.gauge == "velocity":
-            hamiltonianInstance.H_MIX(basisInstance,gridInstance)
-            hamiltonianInstance.H_ANG(basisInstance,gridInstance)
+            hamiltonianInstance.H_MIX(basisInstance,gridInstance,tiseInstance)
+            hamiltonianInstance.H_ANG(basisInstance,gridInstance,tiseInstance)
             hamiltonianInstance.PartialAngularVelocity(gridInstance)
         elif laserInstance.gauge == "length":
             hamiltonianInstance.H_LENGTH(basisInstance,gridInstance)

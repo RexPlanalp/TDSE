@@ -2145,6 +2145,28 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(
         PyObject** py_start, PyObject** py_stop, PyObject** py_slice,
         int has_cstart, int has_cstop, int wraparound);
 
+/* PyObjectFormatSimple.proto */
+#if CYTHON_COMPILING_IN_PYPY
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        PyObject_Format(s, f))
+#elif PY_MAJOR_VERSION < 3
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        likely(PyString_CheckExact(s)) ? PyUnicode_FromEncodedObject(s, NULL, "strict") :\
+        PyObject_Format(s, f))
+#elif CYTHON_USE_TYPE_SLOTS
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        likely(PyLong_CheckExact(s)) ? PyLong_Type.tp_repr(s) :\
+        likely(PyFloat_CheckExact(s)) ? PyFloat_Type.tp_repr(s) :\
+        PyObject_Format(s, f))
+#else
+    #define __Pyx_PyObject_FormatSimple(s, f) (\
+        likely(PyUnicode_CheckExact(s)) ? (Py_INCREF(s), s) :\
+        PyObject_Format(s, f))
+#endif
+
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
 #define __Pyx_CLineForTraceback(tstate, c_line)  (((CYTHON_CLINE_IN_TRACEBACK)) ? c_line : 0)
@@ -2333,6 +2355,7 @@ static const char __pyx_k_PES[] = "PES";
 static const char __pyx_k_Vec[] = "Vec";
 static const char __pyx_k__27[] = "?";
 static const char __pyx_k_dot[] = "dot";
+static const char __pyx_k_end[] = "end";
 static const char __pyx_k_exp[] = "exp";
 static const char __pyx_k_nnz[] = "nnz";
 static const char __pyx_k_plt[] = "plt";
@@ -2358,16 +2381,18 @@ static const char __pyx_k_q_nk[] = "q_nk";
 static const char __pyx_k_rank[] = "rank";
 static const char __pyx_k_rows[] = "rows";
 static const char __pyx_k_save[] = "save";
-static const char __pyx_k_size[] = "size";
 static const char __pyx_k_spec[] = "__spec__";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_time[] = "time";
 static const char __pyx_k_E_max[] = "E_max";
 static const char __pyx_k_E_min[] = "E_min";
 static const char __pyx_k_PETSc[] = "PETSc";
+static const char __pyx_k_abort[] = "abort";
 static const char __pyx_k_array[] = "array";
 static const char __pyx_k_dtype[] = "dtype";
 static const char __pyx_k_enter[] = "__enter__";
 static const char __pyx_k_gamma[] = "gamma";
+static const char __pyx_k_int32[] = "int32";
 static const char __pyx_k_ksp_A[] = "ksp_A";
 static const char __pyx_k_ksp_B[] = "ksp_B";
 static const char __pyx_k_ksp_C[] = "ksp_C";
@@ -2376,18 +2401,19 @@ static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_order[] = "order";
 static const char __pyx_k_print[] = "print";
 static const char __pyx_k_solve[] = "solve";
+static const char __pyx_k_start[] = "start";
 static const char __pyx_k_value[] = "value";
 static const char __pyx_k_zeros[] = "zeros";
 static const char __pyx_k_E_vals[] = "E_vals";
 static const char __pyx_k_S_TILE[] = "S_TILE";
 static const char __pyx_k_Viewer[] = "Viewer";
 static const char __pyx_k_arange[] = "arange";
+static const char __pyx_k_astype[] = "astype";
 static const char __pyx_k_create[] = "create";
 static const char __pyx_k_exists[] = "exists";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_pyplot[] = "pyplot";
 static const char __pyx_k_repeat[] = "repeat";
-static const char __pyx_k_system[] = "system";
 static const char __pyx_k_values[] = "values";
 static const char __pyx_k_viewer[] = "viewer";
 static const char __pyx_k_vstack[] = "vstack";
@@ -2405,8 +2431,8 @@ static const char __pyx_k_splines[] = "splines";
 static const char __pyx_k_v_prime[] = "v_prime";
 static const char __pyx_k_w_prime[] = "w_prime";
 static const char __pyx_k_z_prime[] = "z_prime";
-static const char __pyx_k_LOAD_EXT[] = "LOAD_EXT";
 static const char __pyx_k_PES_vals[] = "PES_vals";
+static const char __pyx_k_assemble[] = "assemble";
 static const char __pyx_k_l_values[] = "l_values";
 static const char __pyx_k_meshgrid[] = "meshgrid";
 static const char __pyx_k_pad_vals[] = "pad_vals";
@@ -2415,11 +2441,13 @@ static const char __pyx_k_phi_grid[] = "phi_grid";
 static const char __pyx_k_phi_vals[] = "phi_vals";
 static const char __pyx_k_sph_harm[] = "sph_harm";
 static const char __pyx_k_createAIJ[] = "createAIJ";
+static const char __pyx_k_createMPI[] = "createMPI";
 static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_input_par[] = "input_par";
 static const char __pyx_k_phi_range[] = "phi_range";
 static const char __pyx_k_psi_final[] = "psi_final";
 static const char __pyx_k_real_part[] = "real_part";
+static const char __pyx_k_setValues[] = "setValues";
 static const char __pyx_k_theta_val[] = "theta_val";
 static const char __pyx_k_COMM_WORLD[] = "COMM_WORLD";
 static const char __pyx_k_input_json[] = "input.json";
@@ -2434,16 +2462,15 @@ static const char __pyx_k_initializing[] = "_initializing";
 static const char __pyx_k_is_coroutine[] = "_is_coroutine";
 static const char __pyx_k_setOperators[] = "setOperators";
 static const char __pyx_k_wavefunction[] = "wavefunction";
-static const char __pyx_k_Computing_S_T[] = "Computing S_T";
 static const char __pyx_k_class_getitem[] = "__class_getitem__";
 static const char __pyx_k_pointwiseMult[] = "pointwiseMult";
 static const char __pyx_k_scipy_special[] = "scipy.special";
 static const char __pyx_k_sph_harmonics[] = "sph_harmonics";
 static const char __pyx_k_createVecRight[] = "createVecRight";
+static const char __pyx_k_global_indices[] = "global_indices";
 static const char __pyx_k_imaginary_part[] = "imaginary_part";
 static const char __pyx_k_photoAngularV2[] = "photoAngularV2";
 static const char __pyx_k_Photoenergy_pyx[] = "Photoenergy.pyx";
-static const char __pyx_k_createWithArray[] = "createWithArray";
 static const char __pyx_k_psi_final_prime[] = "psi_final_prime";
 static const char __pyx_k_Reading_Matrices[] = "Reading Matrices";
 static const char __pyx_k_spherical_vector[] = "spherical_vector";
@@ -2452,12 +2479,13 @@ static const char __pyx_k_Reading_Input_File[] = "Reading Input File";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_Reading_Final_State[] = "Reading Final State";
+static const char __pyx_k_Time_to_compute_PES[] = "Time to compute PES:";
 static const char __pyx_k_Starting_Energy_Loop[] = "Starting Energy Loop";
 static const char __pyx_k_matrix_files_H_0_bin[] = "matrix_files/H_0.bin";
 static const char __pyx_k_matrix_files_S_T_bin[] = "matrix_files/S_T.bin";
 static const char __pyx_k_matrix_files_overlap_bin[] = "matrix_files/overlap.bin";
 static const char __pyx_k_Computing_Spherical_Harmonics[] = "Computing Spherical Harmonics";
-static const char __pyx_k_python_users_becker_dopl4670_Res[] = "python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py";
+static const char __pyx_k_Exiting_Program_please_compute_S[] = "Exiting Program, please compute S_T before running";
 /* #### Code section: decls ### */
 static PyObject *__pyx_pf_11Photoenergy_q_nk(CYTHON_UNUSED PyObject *__pyx_self, CYTHON_UNUSED PyObject *__pyx_v_n, PyObject *__pyx_v_k); /* proto */
 static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_E_range, PyObject *__pyx_v_theta_range, PyObject *__pyx_v_phi_range, PyObject *__pyx_v_PAD, PyObject *__pyx_v_PES); /* proto */
@@ -2494,7 +2522,6 @@ typedef struct {
   PyObject *__pyx_n_s_B;
   PyObject *__pyx_n_s_C;
   PyObject *__pyx_n_s_COMM_WORLD;
-  PyObject *__pyx_kp_s_Computing_S_T;
   PyObject *__pyx_kp_s_Computing_Spherical_Harmonics;
   PyObject *__pyx_n_s_D;
   PyObject *__pyx_n_s_E;
@@ -2502,10 +2529,10 @@ typedef struct {
   PyObject *__pyx_n_s_E_min;
   PyObject *__pyx_n_s_E_range;
   PyObject *__pyx_n_s_E_vals;
+  PyObject *__pyx_kp_s_Exiting_Program_please_compute_S;
   PyObject *__pyx_n_s_File;
   PyObject *__pyx_n_s_H_0;
   PyObject *__pyx_n_s_KSP;
-  PyObject *__pyx_n_s_LOAD_EXT;
   PyObject *__pyx_n_s_Mat;
   PyObject *__pyx_n_s_N_knots;
   PyObject *__pyx_n_s_PAD;
@@ -2526,13 +2553,17 @@ typedef struct {
   PyObject *__pyx_n_s_Su;
   PyObject *__pyx_n_s_Sv;
   PyObject *__pyx_kp_s_TDSE_h5;
+  PyObject *__pyx_kp_u_Time_to_compute_PES;
   PyObject *__pyx_n_s_Vec;
   PyObject *__pyx_n_s_Viewer;
   PyObject *__pyx_n_s__27;
   PyObject *__pyx_n_s__6;
   PyObject *__pyx_kp_u__7;
+  PyObject *__pyx_n_s_abort;
   PyObject *__pyx_n_s_arange;
   PyObject *__pyx_n_s_array;
+  PyObject *__pyx_n_s_assemble;
+  PyObject *__pyx_n_s_astype;
   PyObject *__pyx_n_s_asyncio_coroutines;
   PyObject *__pyx_n_s_axpy;
   PyObject *__pyx_n_s_class_getitem;
@@ -2543,13 +2574,14 @@ typedef struct {
   PyObject *__pyx_n_s_create;
   PyObject *__pyx_n_s_createAIJ;
   PyObject *__pyx_n_s_createBinary;
+  PyObject *__pyx_n_s_createMPI;
   PyObject *__pyx_n_s_createVecRight;
-  PyObject *__pyx_n_s_createWithArray;
   PyObject *__pyx_n_s_data;
   PyObject *__pyx_n_s_destroy;
   PyObject *__pyx_n_s_dot;
   PyObject *__pyx_n_s_dphi;
   PyObject *__pyx_n_s_dtype;
+  PyObject *__pyx_n_s_end;
   PyObject *__pyx_n_s_enter;
   PyObject *__pyx_n_s_enumerate;
   PyObject *__pyx_n_s_exists;
@@ -2559,6 +2591,7 @@ typedef struct {
   PyObject *__pyx_n_s_file;
   PyObject *__pyx_n_s_gamma;
   PyObject *__pyx_n_s_getSize;
+  PyObject *__pyx_n_s_global_indices;
   PyObject *__pyx_n_s_h5py;
   PyObject *__pyx_n_s_i;
   PyObject *__pyx_n_s_imaginary_part;
@@ -2566,6 +2599,7 @@ typedef struct {
   PyObject *__pyx_n_s_initializing;
   PyObject *__pyx_kp_s_input_json;
   PyObject *__pyx_n_s_input_par;
+  PyObject *__pyx_n_s_int32;
   PyObject *__pyx_n_s_is_coroutine;
   PyObject *__pyx_n_s_j;
   PyObject *__pyx_n_s_json;
@@ -2611,7 +2645,6 @@ typedef struct {
   PyObject *__pyx_n_s_psi_final;
   PyObject *__pyx_n_s_psi_final_prime;
   PyObject *__pyx_n_s_pyplot;
-  PyObject *__pyx_kp_s_python_users_becker_dopl4670_Res;
   PyObject *__pyx_n_s_q_nk;
   PyObject *__pyx_n_s_r;
   PyObject *__pyx_n_s_rank;
@@ -2621,19 +2654,20 @@ typedef struct {
   PyObject *__pyx_n_s_save;
   PyObject *__pyx_n_s_scipy_special;
   PyObject *__pyx_n_s_setOperators;
-  PyObject *__pyx_n_s_size;
+  PyObject *__pyx_n_s_setValues;
   PyObject *__pyx_n_s_solve;
   PyObject *__pyx_n_s_spec;
   PyObject *__pyx_n_s_sph_harm;
   PyObject *__pyx_n_s_sph_harmonics;
   PyObject *__pyx_n_s_spherical_vector;
   PyObject *__pyx_n_s_splines;
-  PyObject *__pyx_n_s_system;
+  PyObject *__pyx_n_s_start;
   PyObject *__pyx_n_s_test;
   PyObject *__pyx_n_s_theta_grid;
   PyObject *__pyx_n_s_theta_range;
   PyObject *__pyx_n_s_theta_val;
   PyObject *__pyx_n_s_theta_vals;
+  PyObject *__pyx_n_s_time;
   PyObject *__pyx_n_s_total_size;
   PyObject *__pyx_n_s_v;
   PyObject *__pyx_n_s_v_prime;
@@ -2726,7 +2760,6 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_B);
   Py_CLEAR(clear_module_state->__pyx_n_s_C);
   Py_CLEAR(clear_module_state->__pyx_n_s_COMM_WORLD);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_Computing_S_T);
   Py_CLEAR(clear_module_state->__pyx_kp_s_Computing_Spherical_Harmonics);
   Py_CLEAR(clear_module_state->__pyx_n_s_D);
   Py_CLEAR(clear_module_state->__pyx_n_s_E);
@@ -2734,10 +2767,10 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_E_min);
   Py_CLEAR(clear_module_state->__pyx_n_s_E_range);
   Py_CLEAR(clear_module_state->__pyx_n_s_E_vals);
+  Py_CLEAR(clear_module_state->__pyx_kp_s_Exiting_Program_please_compute_S);
   Py_CLEAR(clear_module_state->__pyx_n_s_File);
   Py_CLEAR(clear_module_state->__pyx_n_s_H_0);
   Py_CLEAR(clear_module_state->__pyx_n_s_KSP);
-  Py_CLEAR(clear_module_state->__pyx_n_s_LOAD_EXT);
   Py_CLEAR(clear_module_state->__pyx_n_s_Mat);
   Py_CLEAR(clear_module_state->__pyx_n_s_N_knots);
   Py_CLEAR(clear_module_state->__pyx_n_s_PAD);
@@ -2758,13 +2791,17 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_Su);
   Py_CLEAR(clear_module_state->__pyx_n_s_Sv);
   Py_CLEAR(clear_module_state->__pyx_kp_s_TDSE_h5);
+  Py_CLEAR(clear_module_state->__pyx_kp_u_Time_to_compute_PES);
   Py_CLEAR(clear_module_state->__pyx_n_s_Vec);
   Py_CLEAR(clear_module_state->__pyx_n_s_Viewer);
   Py_CLEAR(clear_module_state->__pyx_n_s__27);
   Py_CLEAR(clear_module_state->__pyx_n_s__6);
   Py_CLEAR(clear_module_state->__pyx_kp_u__7);
+  Py_CLEAR(clear_module_state->__pyx_n_s_abort);
   Py_CLEAR(clear_module_state->__pyx_n_s_arange);
   Py_CLEAR(clear_module_state->__pyx_n_s_array);
+  Py_CLEAR(clear_module_state->__pyx_n_s_assemble);
+  Py_CLEAR(clear_module_state->__pyx_n_s_astype);
   Py_CLEAR(clear_module_state->__pyx_n_s_asyncio_coroutines);
   Py_CLEAR(clear_module_state->__pyx_n_s_axpy);
   Py_CLEAR(clear_module_state->__pyx_n_s_class_getitem);
@@ -2775,13 +2812,14 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_create);
   Py_CLEAR(clear_module_state->__pyx_n_s_createAIJ);
   Py_CLEAR(clear_module_state->__pyx_n_s_createBinary);
+  Py_CLEAR(clear_module_state->__pyx_n_s_createMPI);
   Py_CLEAR(clear_module_state->__pyx_n_s_createVecRight);
-  Py_CLEAR(clear_module_state->__pyx_n_s_createWithArray);
   Py_CLEAR(clear_module_state->__pyx_n_s_data);
   Py_CLEAR(clear_module_state->__pyx_n_s_destroy);
   Py_CLEAR(clear_module_state->__pyx_n_s_dot);
   Py_CLEAR(clear_module_state->__pyx_n_s_dphi);
   Py_CLEAR(clear_module_state->__pyx_n_s_dtype);
+  Py_CLEAR(clear_module_state->__pyx_n_s_end);
   Py_CLEAR(clear_module_state->__pyx_n_s_enter);
   Py_CLEAR(clear_module_state->__pyx_n_s_enumerate);
   Py_CLEAR(clear_module_state->__pyx_n_s_exists);
@@ -2791,6 +2829,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_file);
   Py_CLEAR(clear_module_state->__pyx_n_s_gamma);
   Py_CLEAR(clear_module_state->__pyx_n_s_getSize);
+  Py_CLEAR(clear_module_state->__pyx_n_s_global_indices);
   Py_CLEAR(clear_module_state->__pyx_n_s_h5py);
   Py_CLEAR(clear_module_state->__pyx_n_s_i);
   Py_CLEAR(clear_module_state->__pyx_n_s_imaginary_part);
@@ -2798,6 +2837,7 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_initializing);
   Py_CLEAR(clear_module_state->__pyx_kp_s_input_json);
   Py_CLEAR(clear_module_state->__pyx_n_s_input_par);
+  Py_CLEAR(clear_module_state->__pyx_n_s_int32);
   Py_CLEAR(clear_module_state->__pyx_n_s_is_coroutine);
   Py_CLEAR(clear_module_state->__pyx_n_s_j);
   Py_CLEAR(clear_module_state->__pyx_n_s_json);
@@ -2843,7 +2883,6 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_psi_final);
   Py_CLEAR(clear_module_state->__pyx_n_s_psi_final_prime);
   Py_CLEAR(clear_module_state->__pyx_n_s_pyplot);
-  Py_CLEAR(clear_module_state->__pyx_kp_s_python_users_becker_dopl4670_Res);
   Py_CLEAR(clear_module_state->__pyx_n_s_q_nk);
   Py_CLEAR(clear_module_state->__pyx_n_s_r);
   Py_CLEAR(clear_module_state->__pyx_n_s_rank);
@@ -2853,19 +2892,20 @@ static int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_n_s_save);
   Py_CLEAR(clear_module_state->__pyx_n_s_scipy_special);
   Py_CLEAR(clear_module_state->__pyx_n_s_setOperators);
-  Py_CLEAR(clear_module_state->__pyx_n_s_size);
+  Py_CLEAR(clear_module_state->__pyx_n_s_setValues);
   Py_CLEAR(clear_module_state->__pyx_n_s_solve);
   Py_CLEAR(clear_module_state->__pyx_n_s_spec);
   Py_CLEAR(clear_module_state->__pyx_n_s_sph_harm);
   Py_CLEAR(clear_module_state->__pyx_n_s_sph_harmonics);
   Py_CLEAR(clear_module_state->__pyx_n_s_spherical_vector);
   Py_CLEAR(clear_module_state->__pyx_n_s_splines);
-  Py_CLEAR(clear_module_state->__pyx_n_s_system);
+  Py_CLEAR(clear_module_state->__pyx_n_s_start);
   Py_CLEAR(clear_module_state->__pyx_n_s_test);
   Py_CLEAR(clear_module_state->__pyx_n_s_theta_grid);
   Py_CLEAR(clear_module_state->__pyx_n_s_theta_range);
   Py_CLEAR(clear_module_state->__pyx_n_s_theta_val);
   Py_CLEAR(clear_module_state->__pyx_n_s_theta_vals);
+  Py_CLEAR(clear_module_state->__pyx_n_s_time);
   Py_CLEAR(clear_module_state->__pyx_n_s_total_size);
   Py_CLEAR(clear_module_state->__pyx_n_s_v);
   Py_CLEAR(clear_module_state->__pyx_n_s_v_prime);
@@ -2936,7 +2976,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_B);
   Py_VISIT(traverse_module_state->__pyx_n_s_C);
   Py_VISIT(traverse_module_state->__pyx_n_s_COMM_WORLD);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_Computing_S_T);
   Py_VISIT(traverse_module_state->__pyx_kp_s_Computing_Spherical_Harmonics);
   Py_VISIT(traverse_module_state->__pyx_n_s_D);
   Py_VISIT(traverse_module_state->__pyx_n_s_E);
@@ -2944,10 +2983,10 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_E_min);
   Py_VISIT(traverse_module_state->__pyx_n_s_E_range);
   Py_VISIT(traverse_module_state->__pyx_n_s_E_vals);
+  Py_VISIT(traverse_module_state->__pyx_kp_s_Exiting_Program_please_compute_S);
   Py_VISIT(traverse_module_state->__pyx_n_s_File);
   Py_VISIT(traverse_module_state->__pyx_n_s_H_0);
   Py_VISIT(traverse_module_state->__pyx_n_s_KSP);
-  Py_VISIT(traverse_module_state->__pyx_n_s_LOAD_EXT);
   Py_VISIT(traverse_module_state->__pyx_n_s_Mat);
   Py_VISIT(traverse_module_state->__pyx_n_s_N_knots);
   Py_VISIT(traverse_module_state->__pyx_n_s_PAD);
@@ -2968,13 +3007,17 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_Su);
   Py_VISIT(traverse_module_state->__pyx_n_s_Sv);
   Py_VISIT(traverse_module_state->__pyx_kp_s_TDSE_h5);
+  Py_VISIT(traverse_module_state->__pyx_kp_u_Time_to_compute_PES);
   Py_VISIT(traverse_module_state->__pyx_n_s_Vec);
   Py_VISIT(traverse_module_state->__pyx_n_s_Viewer);
   Py_VISIT(traverse_module_state->__pyx_n_s__27);
   Py_VISIT(traverse_module_state->__pyx_n_s__6);
   Py_VISIT(traverse_module_state->__pyx_kp_u__7);
+  Py_VISIT(traverse_module_state->__pyx_n_s_abort);
   Py_VISIT(traverse_module_state->__pyx_n_s_arange);
   Py_VISIT(traverse_module_state->__pyx_n_s_array);
+  Py_VISIT(traverse_module_state->__pyx_n_s_assemble);
+  Py_VISIT(traverse_module_state->__pyx_n_s_astype);
   Py_VISIT(traverse_module_state->__pyx_n_s_asyncio_coroutines);
   Py_VISIT(traverse_module_state->__pyx_n_s_axpy);
   Py_VISIT(traverse_module_state->__pyx_n_s_class_getitem);
@@ -2985,13 +3028,14 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_create);
   Py_VISIT(traverse_module_state->__pyx_n_s_createAIJ);
   Py_VISIT(traverse_module_state->__pyx_n_s_createBinary);
+  Py_VISIT(traverse_module_state->__pyx_n_s_createMPI);
   Py_VISIT(traverse_module_state->__pyx_n_s_createVecRight);
-  Py_VISIT(traverse_module_state->__pyx_n_s_createWithArray);
   Py_VISIT(traverse_module_state->__pyx_n_s_data);
   Py_VISIT(traverse_module_state->__pyx_n_s_destroy);
   Py_VISIT(traverse_module_state->__pyx_n_s_dot);
   Py_VISIT(traverse_module_state->__pyx_n_s_dphi);
   Py_VISIT(traverse_module_state->__pyx_n_s_dtype);
+  Py_VISIT(traverse_module_state->__pyx_n_s_end);
   Py_VISIT(traverse_module_state->__pyx_n_s_enter);
   Py_VISIT(traverse_module_state->__pyx_n_s_enumerate);
   Py_VISIT(traverse_module_state->__pyx_n_s_exists);
@@ -3001,6 +3045,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_file);
   Py_VISIT(traverse_module_state->__pyx_n_s_gamma);
   Py_VISIT(traverse_module_state->__pyx_n_s_getSize);
+  Py_VISIT(traverse_module_state->__pyx_n_s_global_indices);
   Py_VISIT(traverse_module_state->__pyx_n_s_h5py);
   Py_VISIT(traverse_module_state->__pyx_n_s_i);
   Py_VISIT(traverse_module_state->__pyx_n_s_imaginary_part);
@@ -3008,6 +3053,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_initializing);
   Py_VISIT(traverse_module_state->__pyx_kp_s_input_json);
   Py_VISIT(traverse_module_state->__pyx_n_s_input_par);
+  Py_VISIT(traverse_module_state->__pyx_n_s_int32);
   Py_VISIT(traverse_module_state->__pyx_n_s_is_coroutine);
   Py_VISIT(traverse_module_state->__pyx_n_s_j);
   Py_VISIT(traverse_module_state->__pyx_n_s_json);
@@ -3053,7 +3099,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_psi_final);
   Py_VISIT(traverse_module_state->__pyx_n_s_psi_final_prime);
   Py_VISIT(traverse_module_state->__pyx_n_s_pyplot);
-  Py_VISIT(traverse_module_state->__pyx_kp_s_python_users_becker_dopl4670_Res);
   Py_VISIT(traverse_module_state->__pyx_n_s_q_nk);
   Py_VISIT(traverse_module_state->__pyx_n_s_r);
   Py_VISIT(traverse_module_state->__pyx_n_s_rank);
@@ -3063,19 +3108,20 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
   Py_VISIT(traverse_module_state->__pyx_n_s_save);
   Py_VISIT(traverse_module_state->__pyx_n_s_scipy_special);
   Py_VISIT(traverse_module_state->__pyx_n_s_setOperators);
-  Py_VISIT(traverse_module_state->__pyx_n_s_size);
+  Py_VISIT(traverse_module_state->__pyx_n_s_setValues);
   Py_VISIT(traverse_module_state->__pyx_n_s_solve);
   Py_VISIT(traverse_module_state->__pyx_n_s_spec);
   Py_VISIT(traverse_module_state->__pyx_n_s_sph_harm);
   Py_VISIT(traverse_module_state->__pyx_n_s_sph_harmonics);
   Py_VISIT(traverse_module_state->__pyx_n_s_spherical_vector);
   Py_VISIT(traverse_module_state->__pyx_n_s_splines);
-  Py_VISIT(traverse_module_state->__pyx_n_s_system);
+  Py_VISIT(traverse_module_state->__pyx_n_s_start);
   Py_VISIT(traverse_module_state->__pyx_n_s_test);
   Py_VISIT(traverse_module_state->__pyx_n_s_theta_grid);
   Py_VISIT(traverse_module_state->__pyx_n_s_theta_range);
   Py_VISIT(traverse_module_state->__pyx_n_s_theta_val);
   Py_VISIT(traverse_module_state->__pyx_n_s_theta_vals);
+  Py_VISIT(traverse_module_state->__pyx_n_s_time);
   Py_VISIT(traverse_module_state->__pyx_n_s_total_size);
   Py_VISIT(traverse_module_state->__pyx_n_s_v);
   Py_VISIT(traverse_module_state->__pyx_n_s_v_prime);
@@ -3156,7 +3202,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_B __pyx_mstate_global->__pyx_n_s_B
 #define __pyx_n_s_C __pyx_mstate_global->__pyx_n_s_C
 #define __pyx_n_s_COMM_WORLD __pyx_mstate_global->__pyx_n_s_COMM_WORLD
-#define __pyx_kp_s_Computing_S_T __pyx_mstate_global->__pyx_kp_s_Computing_S_T
 #define __pyx_kp_s_Computing_Spherical_Harmonics __pyx_mstate_global->__pyx_kp_s_Computing_Spherical_Harmonics
 #define __pyx_n_s_D __pyx_mstate_global->__pyx_n_s_D
 #define __pyx_n_s_E __pyx_mstate_global->__pyx_n_s_E
@@ -3164,10 +3209,10 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_E_min __pyx_mstate_global->__pyx_n_s_E_min
 #define __pyx_n_s_E_range __pyx_mstate_global->__pyx_n_s_E_range
 #define __pyx_n_s_E_vals __pyx_mstate_global->__pyx_n_s_E_vals
+#define __pyx_kp_s_Exiting_Program_please_compute_S __pyx_mstate_global->__pyx_kp_s_Exiting_Program_please_compute_S
 #define __pyx_n_s_File __pyx_mstate_global->__pyx_n_s_File
 #define __pyx_n_s_H_0 __pyx_mstate_global->__pyx_n_s_H_0
 #define __pyx_n_s_KSP __pyx_mstate_global->__pyx_n_s_KSP
-#define __pyx_n_s_LOAD_EXT __pyx_mstate_global->__pyx_n_s_LOAD_EXT
 #define __pyx_n_s_Mat __pyx_mstate_global->__pyx_n_s_Mat
 #define __pyx_n_s_N_knots __pyx_mstate_global->__pyx_n_s_N_knots
 #define __pyx_n_s_PAD __pyx_mstate_global->__pyx_n_s_PAD
@@ -3188,13 +3233,17 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_Su __pyx_mstate_global->__pyx_n_s_Su
 #define __pyx_n_s_Sv __pyx_mstate_global->__pyx_n_s_Sv
 #define __pyx_kp_s_TDSE_h5 __pyx_mstate_global->__pyx_kp_s_TDSE_h5
+#define __pyx_kp_u_Time_to_compute_PES __pyx_mstate_global->__pyx_kp_u_Time_to_compute_PES
 #define __pyx_n_s_Vec __pyx_mstate_global->__pyx_n_s_Vec
 #define __pyx_n_s_Viewer __pyx_mstate_global->__pyx_n_s_Viewer
 #define __pyx_n_s__27 __pyx_mstate_global->__pyx_n_s__27
 #define __pyx_n_s__6 __pyx_mstate_global->__pyx_n_s__6
 #define __pyx_kp_u__7 __pyx_mstate_global->__pyx_kp_u__7
+#define __pyx_n_s_abort __pyx_mstate_global->__pyx_n_s_abort
 #define __pyx_n_s_arange __pyx_mstate_global->__pyx_n_s_arange
 #define __pyx_n_s_array __pyx_mstate_global->__pyx_n_s_array
+#define __pyx_n_s_assemble __pyx_mstate_global->__pyx_n_s_assemble
+#define __pyx_n_s_astype __pyx_mstate_global->__pyx_n_s_astype
 #define __pyx_n_s_asyncio_coroutines __pyx_mstate_global->__pyx_n_s_asyncio_coroutines
 #define __pyx_n_s_axpy __pyx_mstate_global->__pyx_n_s_axpy
 #define __pyx_n_s_class_getitem __pyx_mstate_global->__pyx_n_s_class_getitem
@@ -3205,13 +3254,14 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_create __pyx_mstate_global->__pyx_n_s_create
 #define __pyx_n_s_createAIJ __pyx_mstate_global->__pyx_n_s_createAIJ
 #define __pyx_n_s_createBinary __pyx_mstate_global->__pyx_n_s_createBinary
+#define __pyx_n_s_createMPI __pyx_mstate_global->__pyx_n_s_createMPI
 #define __pyx_n_s_createVecRight __pyx_mstate_global->__pyx_n_s_createVecRight
-#define __pyx_n_s_createWithArray __pyx_mstate_global->__pyx_n_s_createWithArray
 #define __pyx_n_s_data __pyx_mstate_global->__pyx_n_s_data
 #define __pyx_n_s_destroy __pyx_mstate_global->__pyx_n_s_destroy
 #define __pyx_n_s_dot __pyx_mstate_global->__pyx_n_s_dot
 #define __pyx_n_s_dphi __pyx_mstate_global->__pyx_n_s_dphi
 #define __pyx_n_s_dtype __pyx_mstate_global->__pyx_n_s_dtype
+#define __pyx_n_s_end __pyx_mstate_global->__pyx_n_s_end
 #define __pyx_n_s_enter __pyx_mstate_global->__pyx_n_s_enter
 #define __pyx_n_s_enumerate __pyx_mstate_global->__pyx_n_s_enumerate
 #define __pyx_n_s_exists __pyx_mstate_global->__pyx_n_s_exists
@@ -3221,6 +3271,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_file __pyx_mstate_global->__pyx_n_s_file
 #define __pyx_n_s_gamma __pyx_mstate_global->__pyx_n_s_gamma
 #define __pyx_n_s_getSize __pyx_mstate_global->__pyx_n_s_getSize
+#define __pyx_n_s_global_indices __pyx_mstate_global->__pyx_n_s_global_indices
 #define __pyx_n_s_h5py __pyx_mstate_global->__pyx_n_s_h5py
 #define __pyx_n_s_i __pyx_mstate_global->__pyx_n_s_i
 #define __pyx_n_s_imaginary_part __pyx_mstate_global->__pyx_n_s_imaginary_part
@@ -3228,6 +3279,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_initializing __pyx_mstate_global->__pyx_n_s_initializing
 #define __pyx_kp_s_input_json __pyx_mstate_global->__pyx_kp_s_input_json
 #define __pyx_n_s_input_par __pyx_mstate_global->__pyx_n_s_input_par
+#define __pyx_n_s_int32 __pyx_mstate_global->__pyx_n_s_int32
 #define __pyx_n_s_is_coroutine __pyx_mstate_global->__pyx_n_s_is_coroutine
 #define __pyx_n_s_j __pyx_mstate_global->__pyx_n_s_j
 #define __pyx_n_s_json __pyx_mstate_global->__pyx_n_s_json
@@ -3273,7 +3325,6 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_psi_final __pyx_mstate_global->__pyx_n_s_psi_final
 #define __pyx_n_s_psi_final_prime __pyx_mstate_global->__pyx_n_s_psi_final_prime
 #define __pyx_n_s_pyplot __pyx_mstate_global->__pyx_n_s_pyplot
-#define __pyx_kp_s_python_users_becker_dopl4670_Res __pyx_mstate_global->__pyx_kp_s_python_users_becker_dopl4670_Res
 #define __pyx_n_s_q_nk __pyx_mstate_global->__pyx_n_s_q_nk
 #define __pyx_n_s_r __pyx_mstate_global->__pyx_n_s_r
 #define __pyx_n_s_rank __pyx_mstate_global->__pyx_n_s_rank
@@ -3283,19 +3334,20 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_save __pyx_mstate_global->__pyx_n_s_save
 #define __pyx_n_s_scipy_special __pyx_mstate_global->__pyx_n_s_scipy_special
 #define __pyx_n_s_setOperators __pyx_mstate_global->__pyx_n_s_setOperators
-#define __pyx_n_s_size __pyx_mstate_global->__pyx_n_s_size
+#define __pyx_n_s_setValues __pyx_mstate_global->__pyx_n_s_setValues
 #define __pyx_n_s_solve __pyx_mstate_global->__pyx_n_s_solve
 #define __pyx_n_s_spec __pyx_mstate_global->__pyx_n_s_spec
 #define __pyx_n_s_sph_harm __pyx_mstate_global->__pyx_n_s_sph_harm
 #define __pyx_n_s_sph_harmonics __pyx_mstate_global->__pyx_n_s_sph_harmonics
 #define __pyx_n_s_spherical_vector __pyx_mstate_global->__pyx_n_s_spherical_vector
 #define __pyx_n_s_splines __pyx_mstate_global->__pyx_n_s_splines
-#define __pyx_n_s_system __pyx_mstate_global->__pyx_n_s_system
+#define __pyx_n_s_start __pyx_mstate_global->__pyx_n_s_start
 #define __pyx_n_s_test __pyx_mstate_global->__pyx_n_s_test
 #define __pyx_n_s_theta_grid __pyx_mstate_global->__pyx_n_s_theta_grid
 #define __pyx_n_s_theta_range __pyx_mstate_global->__pyx_n_s_theta_range
 #define __pyx_n_s_theta_val __pyx_mstate_global->__pyx_n_s_theta_val
 #define __pyx_n_s_theta_vals __pyx_mstate_global->__pyx_n_s_theta_vals
+#define __pyx_n_s_time __pyx_mstate_global->__pyx_n_s_time
 #define __pyx_n_s_total_size __pyx_mstate_global->__pyx_n_s_total_size
 #define __pyx_n_s_v __pyx_mstate_global->__pyx_n_s_v
 #define __pyx_n_s_v_prime __pyx_mstate_global->__pyx_n_s_v_prime
@@ -3344,7 +3396,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_codeobj__26 __pyx_mstate_global->__pyx_codeobj__26
 /* #### Code section: module_code ### */
 
-/* "Photoenergy.pyx":13
+/* "Photoenergy.pyx":14
  * 
  * 
  * def q_nk(n,k):             # <<<<<<<<<<<<<<
@@ -3408,7 +3460,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 13, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -3416,14 +3468,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 13, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("q_nk", 1, 2, 2, 1); __PYX_ERR(0, 13, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("q_nk", 1, 2, 2, 1); __PYX_ERR(0, 14, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "q_nk") < 0)) __PYX_ERR(0, 13, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "q_nk") < 0)) __PYX_ERR(0, 14, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
@@ -3436,7 +3488,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("q_nk", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 13, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("q_nk", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 14, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3474,36 +3526,36 @@ static PyObject *__pyx_pf_11Photoenergy_q_nk(CYTHON_UNUSED PyObject *__pyx_self,
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("q_nk", 1);
 
-  /* "Photoenergy.pyx":14
+  /* "Photoenergy.pyx":15
  * 
  * def q_nk(n,k):
  *         return ((2*k-1)*np.pi)/4             # <<<<<<<<<<<<<<
  * 
- * 
+ * if comm.rank == 0:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_v_k, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_v_k, 2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_t_1, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_SubtractObjC(__pyx_t_1, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_pi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_pi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Multiply(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Multiply(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_1, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_TrueDivideObjC(__pyx_t_1, __pyx_int_4, 4, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "Photoenergy.pyx":13
+  /* "Photoenergy.pyx":14
  * 
  * 
  * def q_nk(n,k):             # <<<<<<<<<<<<<<
@@ -3524,7 +3576,7 @@ static PyObject *__pyx_pf_11Photoenergy_q_nk(CYTHON_UNUSED PyObject *__pyx_self,
   return __pyx_r;
 }
 
-/* "Photoenergy.pyx":88
+/* "Photoenergy.pyx":92
  * 
  * 
  * def photoAngularV2(E_range,theta_range,phi_range,PAD,PES):             # <<<<<<<<<<<<<<
@@ -3597,7 +3649,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[0]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L3_error)
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -3605,9 +3657,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[1]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, 1); __PYX_ERR(0, 88, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, 1); __PYX_ERR(0, 92, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -3615,9 +3667,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[2]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, 2); __PYX_ERR(0, 88, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, 2); __PYX_ERR(0, 92, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
@@ -3625,9 +3677,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[3]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, 3); __PYX_ERR(0, 88, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, 3); __PYX_ERR(0, 92, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
@@ -3635,14 +3687,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
           (void)__Pyx_Arg_NewRef_FASTCALL(values[4]);
           kw_args--;
         }
-        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 88, __pyx_L3_error)
+        else if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 92, __pyx_L3_error)
         else {
-          __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, 4); __PYX_ERR(0, 88, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, 4); __PYX_ERR(0, 92, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t kwd_pos_args = __pyx_nargs;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "photoAngularV2") < 0)) __PYX_ERR(0, 88, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values + 0, kwd_pos_args, "photoAngularV2") < 0)) __PYX_ERR(0, 92, __pyx_L3_error)
       }
     } else if (unlikely(__pyx_nargs != 5)) {
       goto __pyx_L5_argtuple_error;
@@ -3661,7 +3713,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 88, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("photoAngularV2", 1, 5, 5, __pyx_nargs); __PYX_ERR(0, 92, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3724,6 +3776,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
   PyObject *__pyx_v_y = NULL;
   PyObject *__pyx_v_values = NULL;
   PyObject *__pyx_v_spherical_vector = NULL;
+  PyObject *__pyx_v_global_indices = NULL;
   PyObject *__pyx_v_Su = NULL;
   PyObject *__pyx_v_value = NULL;
   PyObject *__pyx_r = NULL;
@@ -3754,76 +3807,76 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
   __Pyx_RefNannySetupContext("photoAngularV2", 0);
   __Pyx_INCREF(__pyx_v_PAD);
 
-  /* "Photoenergy.pyx":89
+  /* "Photoenergy.pyx":93
  * 
  * def photoAngularV2(E_range,theta_range,phi_range,PAD,PES):
  *     PES_vals = []             # <<<<<<<<<<<<<<
  *     E_vals = []
  *     theta_vals = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_PES_vals = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "Photoenergy.pyx":90
+  /* "Photoenergy.pyx":94
  * def photoAngularV2(E_range,theta_range,phi_range,PAD,PES):
  *     PES_vals = []
  *     E_vals = []             # <<<<<<<<<<<<<<
  *     theta_vals = []
  *     phi_vals = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_E_vals = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "Photoenergy.pyx":91
+  /* "Photoenergy.pyx":95
  *     PES_vals = []
  *     E_vals = []
  *     theta_vals = []             # <<<<<<<<<<<<<<
  *     phi_vals = []
  *     pad_vals = []
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_theta_vals = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "Photoenergy.pyx":92
+  /* "Photoenergy.pyx":96
  *     E_vals = []
  *     theta_vals = []
  *     phi_vals = []             # <<<<<<<<<<<<<<
  *     pad_vals = []
  * 
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_phi_vals = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "Photoenergy.pyx":93
+  /* "Photoenergy.pyx":97
  *     theta_vals = []
  *     phi_vals = []
  *     pad_vals = []             # <<<<<<<<<<<<<<
  * 
  *     # Create KSP solvers for each equation
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_pad_vals = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "Photoenergy.pyx":96
+  /* "Photoenergy.pyx":100
  * 
  *     # Create KSP solvers for each equation
  *     ksp_A = PETSc.KSP().create(comm = comm)             # <<<<<<<<<<<<<<
  *     ksp_B = PETSc.KSP().create(comm = comm)
  *     ksp_C = PETSc.KSP().create(comm = comm)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_KSP); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_KSP); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -3844,36 +3897,36 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_create); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_create); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_comm, __pyx_t_2) < 0) __PYX_ERR(0, 96, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_comm, __pyx_t_2) < 0) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_ksp_A = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "Photoenergy.pyx":97
+  /* "Photoenergy.pyx":101
  *     # Create KSP solvers for each equation
  *     ksp_A = PETSc.KSP().create(comm = comm)
  *     ksp_B = PETSc.KSP().create(comm = comm)             # <<<<<<<<<<<<<<
  *     ksp_C = PETSc.KSP().create(comm = comm)
  *     ksp_D = PETSc.KSP().create(comm = comm)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_KSP); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_KSP); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -3894,36 +3947,36 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_create); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_create); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_comm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_comm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_comm, __pyx_t_1) < 0) __PYX_ERR(0, 97, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_comm, __pyx_t_1) < 0) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_ksp_B = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "Photoenergy.pyx":98
+  /* "Photoenergy.pyx":102
  *     ksp_A = PETSc.KSP().create(comm = comm)
  *     ksp_B = PETSc.KSP().create(comm = comm)
  *     ksp_C = PETSc.KSP().create(comm = comm)             # <<<<<<<<<<<<<<
  *     ksp_D = PETSc.KSP().create(comm = comm)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_KSP); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_KSP); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -3944,36 +3997,36 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_create); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_create); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_comm, __pyx_t_2) < 0) __PYX_ERR(0, 98, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_comm, __pyx_t_2) < 0) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_ksp_C = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "Photoenergy.pyx":99
+  /* "Photoenergy.pyx":103
  *     ksp_B = PETSc.KSP().create(comm = comm)
  *     ksp_C = PETSc.KSP().create(comm = comm)
  *     ksp_D = PETSc.KSP().create(comm = comm)             # <<<<<<<<<<<<<<
  * 
  *     if PAD:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_KSP); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_KSP); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = NULL;
@@ -3994,64 +4047,64 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
     __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 99, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_create); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_create); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_comm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_comm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_comm, __pyx_t_1) < 0) __PYX_ERR(0, 99, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_comm, __pyx_t_1) < 0) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_ksp_D = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "Photoenergy.pyx":101
+  /* "Photoenergy.pyx":105
  *     ksp_D = PETSc.KSP().create(comm = comm)
  * 
  *     if PAD:             # <<<<<<<<<<<<<<
  *         if comm.rank == 0:
  *             print("Computing Spherical Harmonics")
  */
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PAD); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 101, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PAD); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 105, __pyx_L1_error)
   if (__pyx_t_5) {
 
-    /* "Photoenergy.pyx":102
+    /* "Photoenergy.pyx":106
  * 
  *     if PAD:
  *         if comm.rank == 0:             # <<<<<<<<<<<<<<
  *             print("Computing Spherical Harmonics")
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_comm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 102, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_comm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_rank); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 102, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_rank); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_2, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 102, __pyx_L1_error)
+    __pyx_t_5 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_2, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 106, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     if (__pyx_t_5) {
 
-      /* "Photoenergy.pyx":103
+      /* "Photoenergy.pyx":107
  *     if PAD:
  *         if comm.rank == 0:
  *             print("Computing Spherical Harmonics")             # <<<<<<<<<<<<<<
  * 
  *         theta_grid, phi_grid = np.meshgrid(theta_range, phi_range)
  */
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 107, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "Photoenergy.pyx":102
+      /* "Photoenergy.pyx":106
  * 
  *     if PAD:
  *         if comm.rank == 0:             # <<<<<<<<<<<<<<
@@ -4060,16 +4113,16 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
     }
 
-    /* "Photoenergy.pyx":105
+    /* "Photoenergy.pyx":109
  *             print("Computing Spherical Harmonics")
  * 
  *         theta_grid, phi_grid = np.meshgrid(theta_range, phi_range)             # <<<<<<<<<<<<<<
  *         sph_harmonics = np.zeros((len(l_values), len(phi_range), len(theta_range)), dtype=complex)
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 105, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_meshgrid); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 105, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_meshgrid); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -4090,7 +4143,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_1, __pyx_v_theta_range, __pyx_v_phi_range};
       __pyx_t_2 = __Pyx_PyObject_FastCall(__pyx_t_3, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 109, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
@@ -4100,7 +4153,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 105, __pyx_L1_error)
+        __PYX_ERR(0, 109, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -4113,15 +4166,15 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_1);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 105, __pyx_L1_error)
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 105, __pyx_L1_error)
+      __pyx_t_1 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       #endif
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_6 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 105, __pyx_L1_error)
+      __pyx_t_6 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 109, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_7 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_6);
@@ -4129,7 +4182,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_1 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_1)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_1);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 105, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) __PYX_ERR(0, 109, __pyx_L1_error)
       __pyx_t_7 = NULL;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       goto __pyx_L6_unpacking_done;
@@ -4137,7 +4190,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 105, __pyx_L1_error)
+      __PYX_ERR(0, 109, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __pyx_v_theta_grid = __pyx_t_3;
@@ -4145,50 +4198,50 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     __pyx_v_phi_grid = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "Photoenergy.pyx":106
+    /* "Photoenergy.pyx":110
  * 
  *         theta_grid, phi_grid = np.meshgrid(theta_range, phi_range)
  *         sph_harmonics = np.zeros((len(l_values), len(phi_range), len(theta_range)), dtype=complex)             # <<<<<<<<<<<<<<
  * 
  *         for i, l in enumerate(l_values):
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_l_values); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_l_values); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_8 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = PyObject_Length(__pyx_v_phi_range); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 106, __pyx_L1_error)
-    __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_8 = PyObject_Length(__pyx_v_phi_range); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_8); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = PyObject_Length(__pyx_v_theta_range); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 106, __pyx_L1_error)
-    __pyx_t_6 = PyInt_FromSsize_t(__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_8 = PyObject_Length(__pyx_v_theta_range); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_6 = PyInt_FromSsize_t(__pyx_t_8); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_2)) __PYX_ERR(0, 106, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_3);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_3)) __PYX_ERR(0, 110, __pyx_L1_error);
     __Pyx_GIVEREF(__pyx_t_6);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_6)) __PYX_ERR(0, 106, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_6)) __PYX_ERR(0, 110, __pyx_L1_error);
     __pyx_t_2 = 0;
     __pyx_t_3 = 0;
     __pyx_t_6 = 0;
-    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_9);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_9)) __PYX_ERR(0, 106, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_9)) __PYX_ERR(0, 110, __pyx_L1_error);
     __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 106, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_dtype, ((PyObject *)(&PyComplex_Type))) < 0) __PYX_ERR(0, 106, __pyx_L1_error)
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 106, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_dtype, ((PyObject *)(&PyComplex_Type))) < 0) __PYX_ERR(0, 110, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_6, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -4196,7 +4249,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     __pyx_v_sph_harmonics = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "Photoenergy.pyx":108
+    /* "Photoenergy.pyx":112
  *         sph_harmonics = np.zeros((len(l_values), len(phi_range), len(theta_range)), dtype=complex)
  * 
  *         for i, l in enumerate(l_values):             # <<<<<<<<<<<<<<
@@ -4205,16 +4258,16 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
     __Pyx_INCREF(__pyx_int_0);
     __pyx_t_3 = __pyx_int_0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_l_values); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 108, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_l_values); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 112, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     if (likely(PyList_CheckExact(__pyx_t_9)) || PyTuple_CheckExact(__pyx_t_9)) {
       __pyx_t_6 = __pyx_t_9; __Pyx_INCREF(__pyx_t_6);
       __pyx_t_8 = 0;
       __pyx_t_10 = NULL;
     } else {
-      __pyx_t_8 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 108, __pyx_L1_error)
+      __pyx_t_8 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 112, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_10 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 108, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 112, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     for (;;) {
@@ -4223,28 +4276,28 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_6);
             #if !CYTHON_ASSUME_SAFE_MACROS
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 108, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 112, __pyx_L1_error)
             #endif
             if (__pyx_t_8 >= __pyx_temp) break;
           }
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_9 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_8); __Pyx_INCREF(__pyx_t_9); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 108, __pyx_L1_error)
+          __pyx_t_9 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_8); __Pyx_INCREF(__pyx_t_9); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 112, __pyx_L1_error)
           #else
-          __pyx_t_9 = __Pyx_PySequence_ITEM(__pyx_t_6, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 108, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_PySequence_ITEM(__pyx_t_6, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 112, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           #endif
         } else {
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_6);
             #if !CYTHON_ASSUME_SAFE_MACROS
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 108, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 112, __pyx_L1_error)
             #endif
             if (__pyx_t_8 >= __pyx_temp) break;
           }
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_9 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_8); __Pyx_INCREF(__pyx_t_9); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 108, __pyx_L1_error)
+          __pyx_t_9 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_8); __Pyx_INCREF(__pyx_t_9); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 112, __pyx_L1_error)
           #else
-          __pyx_t_9 = __Pyx_PySequence_ITEM(__pyx_t_6, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 108, __pyx_L1_error)
+          __pyx_t_9 = __Pyx_PySequence_ITEM(__pyx_t_6, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 112, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           #endif
         }
@@ -4254,7 +4307,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 108, __pyx_L1_error)
+            else __PYX_ERR(0, 112, __pyx_L1_error)
           }
           break;
         }
@@ -4264,20 +4317,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __pyx_t_9 = 0;
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_3);
-      __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 108, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_t_3, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 112, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_3);
       __pyx_t_3 = __pyx_t_9;
       __pyx_t_9 = 0;
 
-      /* "Photoenergy.pyx":109
+      /* "Photoenergy.pyx":113
  * 
  *         for i, l in enumerate(l_values):
  *             sph_harmonics[i, :, :] = sph_harm(0, l, phi_grid, theta_grid)             # <<<<<<<<<<<<<<
  * 
  *     if comm.rank == 0:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_sph_harm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_sph_harm); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 113, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_2 = NULL;
       __pyx_t_4 = 0;
@@ -4297,26 +4350,26 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         PyObject *__pyx_callargs[5] = {__pyx_t_2, __pyx_int_0, __pyx_v_l, __pyx_v_phi_grid, __pyx_v_theta_grid};
         __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_4, 4+__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 109, __pyx_L1_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 113, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       }
-      __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
+      __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 113, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_INCREF(__pyx_v_i);
       __Pyx_GIVEREF(__pyx_v_i);
-      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_i)) __PYX_ERR(0, 109, __pyx_L1_error);
+      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_i)) __PYX_ERR(0, 113, __pyx_L1_error);
       __Pyx_INCREF(__pyx_slice__2);
       __Pyx_GIVEREF(__pyx_slice__2);
-      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_slice__2)) __PYX_ERR(0, 109, __pyx_L1_error);
+      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_slice__2)) __PYX_ERR(0, 113, __pyx_L1_error);
       __Pyx_INCREF(__pyx_slice__2);
       __Pyx_GIVEREF(__pyx_slice__2);
-      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_slice__2)) __PYX_ERR(0, 109, __pyx_L1_error);
-      if (unlikely((PyObject_SetItem(__pyx_v_sph_harmonics, __pyx_t_1, __pyx_t_9) < 0))) __PYX_ERR(0, 109, __pyx_L1_error)
+      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_slice__2)) __PYX_ERR(0, 113, __pyx_L1_error);
+      if (unlikely((PyObject_SetItem(__pyx_v_sph_harmonics, __pyx_t_1, __pyx_t_9) < 0))) __PYX_ERR(0, 113, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "Photoenergy.pyx":108
+      /* "Photoenergy.pyx":112
  *         sph_harmonics = np.zeros((len(l_values), len(phi_range), len(theta_range)), dtype=complex)
  * 
  *         for i, l in enumerate(l_values):             # <<<<<<<<<<<<<<
@@ -4327,7 +4380,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "Photoenergy.pyx":101
+    /* "Photoenergy.pyx":105
  *     ksp_D = PETSc.KSP().create(comm = comm)
  * 
  *     if PAD:             # <<<<<<<<<<<<<<
@@ -4336,34 +4389,34 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
   }
 
-  /* "Photoenergy.pyx":111
+  /* "Photoenergy.pyx":115
  *             sph_harmonics[i, :, :] = sph_harm(0, l, phi_grid, theta_grid)
  * 
  *     if comm.rank == 0:             # <<<<<<<<<<<<<<
  *         print("Starting Energy Loop")
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rank); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rank); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_6, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 111, __pyx_L1_error)
+  __pyx_t_5 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_6, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 115, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   if (__pyx_t_5) {
 
-    /* "Photoenergy.pyx":112
+    /* "Photoenergy.pyx":116
  * 
  *     if comm.rank == 0:
  *         print("Starting Energy Loop")             # <<<<<<<<<<<<<<
  * 
  *     for E in E_range:
  */
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 112, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "Photoenergy.pyx":111
+    /* "Photoenergy.pyx":115
  *             sph_harmonics[i, :, :] = sph_harm(0, l, phi_grid, theta_grid)
  * 
  *     if comm.rank == 0:             # <<<<<<<<<<<<<<
@@ -4372,7 +4425,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
   }
 
-  /* "Photoenergy.pyx":114
+  /* "Photoenergy.pyx":118
  *         print("Starting Energy Loop")
  * 
  *     for E in E_range:             # <<<<<<<<<<<<<<
@@ -4384,9 +4437,9 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     __pyx_t_8 = 0;
     __pyx_t_10 = NULL;
   } else {
-    __pyx_t_8 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_v_E_range); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_8 = -1; __pyx_t_6 = PyObject_GetIter(__pyx_v_E_range); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_10 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 118, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_10)) {
@@ -4394,28 +4447,28 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_6);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 114, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 118, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_8); __Pyx_INCREF(__pyx_t_3); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 114, __pyx_L1_error)
+        __pyx_t_3 = PyList_GET_ITEM(__pyx_t_6, __pyx_t_8); __Pyx_INCREF(__pyx_t_3); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 118, __pyx_L1_error)
         #else
-        __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_6, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_6, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 118, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       } else {
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_6);
           #if !CYTHON_ASSUME_SAFE_MACROS
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 114, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 118, __pyx_L1_error)
           #endif
           if (__pyx_t_8 >= __pyx_temp) break;
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_8); __Pyx_INCREF(__pyx_t_3); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 114, __pyx_L1_error)
+        __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_6, __pyx_t_8); __Pyx_INCREF(__pyx_t_3); __pyx_t_8++; if (unlikely((0 < 0))) __PYX_ERR(0, 118, __pyx_L1_error)
         #else
-        __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_6, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PySequence_ITEM(__pyx_t_6, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 118, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         #endif
       }
@@ -4425,7 +4478,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 114, __pyx_L1_error)
+          else __PYX_ERR(0, 118, __pyx_L1_error)
         }
         break;
       }
@@ -4434,34 +4487,34 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     __Pyx_XDECREF_SET(__pyx_v_E, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "Photoenergy.pyx":115
+    /* "Photoenergy.pyx":119
  * 
  *     for E in E_range:
  *         if comm.rank == 0:             # <<<<<<<<<<<<<<
  *             print(E)
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 119, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rank); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rank); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 119, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_5 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_9, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_5 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_9, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 119, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     if (__pyx_t_5) {
 
-      /* "Photoenergy.pyx":116
+      /* "Photoenergy.pyx":120
  *     for E in E_range:
  *         if comm.rank == 0:
  *             print(E)             # <<<<<<<<<<<<<<
  * 
  *         A = H_0.copy()
  */
-      __pyx_t_9 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_v_E); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 116, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_v_E); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 120, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "Photoenergy.pyx":115
+      /* "Photoenergy.pyx":119
  * 
  *     for E in E_range:
  *         if comm.rank == 0:             # <<<<<<<<<<<<<<
@@ -4470,16 +4523,16 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
     }
 
-    /* "Photoenergy.pyx":118
+    /* "Photoenergy.pyx":122
  *             print(E)
  * 
  *         A = H_0.copy()             # <<<<<<<<<<<<<<
  *         A.axpy(-E+gamma*np.exp(1j*q_nk(2,1)),S)
  *         B = H_0.copy()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_H_0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_H_0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_3 = NULL;
@@ -4500,39 +4553,39 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 118, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_A, __pyx_t_9);
     __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":119
+    /* "Photoenergy.pyx":123
  * 
  *         A = H_0.copy()
  *         A.axpy(-E+gamma*np.exp(1j*q_nk(2,1)),S)             # <<<<<<<<<<<<<<
  *         B = H_0.copy()
  *         B.axpy(-E-gamma*np.exp(1j*q_nk(2,1)),S)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_A, __pyx_n_s_axpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_A, __pyx_n_s_axpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyNumber_Negative(__pyx_v_E); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Negative(__pyx_v_E); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gamma); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gamma); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_np); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_np); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_exp); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_exp); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_12 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_12 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_q_nk); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_q_nk); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_14, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_14, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-    __pyx_t_14 = PyNumber_Multiply(__pyx_t_12, __pyx_t_15); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_14 = PyNumber_Multiply(__pyx_t_12, __pyx_t_15); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
@@ -4555,19 +4608,19 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_13, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 119, __pyx_L1_error)
+      if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 123, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     }
-    __pyx_t_13 = PyNumber_Multiply(__pyx_t_2, __pyx_t_11); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_13 = PyNumber_Multiply(__pyx_t_2, __pyx_t_11); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyNumber_Add(__pyx_t_3, __pyx_t_13); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __pyx_t_11 = PyNumber_Add(__pyx_t_3, __pyx_t_13); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_S); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 119, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_S); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __pyx_t_3 = NULL;
     __pyx_t_4 = 0;
@@ -4589,22 +4642,22 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 119, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 123, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":120
+    /* "Photoenergy.pyx":124
  *         A = H_0.copy()
  *         A.axpy(-E+gamma*np.exp(1j*q_nk(2,1)),S)
  *         B = H_0.copy()             # <<<<<<<<<<<<<<
  *         B.axpy(-E-gamma*np.exp(1j*q_nk(2,1)),S)
  *         C = H_0.copy()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_H_0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_H_0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 120, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_copy); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 124, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
@@ -4625,39 +4678,39 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_13, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 120, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 124, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_B, __pyx_t_9);
     __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":121
+    /* "Photoenergy.pyx":125
  *         A.axpy(-E+gamma*np.exp(1j*q_nk(2,1)),S)
  *         B = H_0.copy()
  *         B.axpy(-E-gamma*np.exp(1j*q_nk(2,1)),S)             # <<<<<<<<<<<<<<
  *         C = H_0.copy()
  *         C.axpy(-E+gamma*np.exp(1j*q_nk(2,2)),S)
  */
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_B, __pyx_n_s_axpy); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_B, __pyx_n_s_axpy); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __pyx_t_1 = PyNumber_Negative(__pyx_v_E); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Negative(__pyx_v_E); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_gamma); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_gamma); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_exp); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_exp); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_2 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_q_nk); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_q_nk); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = PyNumber_Multiply(__pyx_t_2, __pyx_t_12); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_15 = PyNumber_Multiply(__pyx_t_2, __pyx_t_12); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
@@ -4680,19 +4733,19 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __pyx_t_3 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     }
-    __pyx_t_14 = PyNumber_Multiply(__pyx_t_11, __pyx_t_3); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_14 = PyNumber_Multiply(__pyx_t_11, __pyx_t_3); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyNumber_Subtract(__pyx_t_1, __pyx_t_14); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Subtract(__pyx_t_1, __pyx_t_14); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_S); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_S); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __pyx_t_1 = NULL;
     __pyx_t_4 = 0;
@@ -4714,22 +4767,22 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 121, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 125, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":122
+    /* "Photoenergy.pyx":126
  *         B = H_0.copy()
  *         B.axpy(-E-gamma*np.exp(1j*q_nk(2,1)),S)
  *         C = H_0.copy()             # <<<<<<<<<<<<<<
  *         C.axpy(-E+gamma*np.exp(1j*q_nk(2,2)),S)
  *         D = H_0.copy()
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_H_0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 122, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_H_0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_copy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 122, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_copy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     __pyx_t_13 = NULL;
@@ -4750,39 +4803,39 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_13, NULL};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 122, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 126, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_C, __pyx_t_9);
     __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":123
+    /* "Photoenergy.pyx":127
  *         B.axpy(-E-gamma*np.exp(1j*q_nk(2,1)),S)
  *         C = H_0.copy()
  *         C.axpy(-E+gamma*np.exp(1j*q_nk(2,2)),S)             # <<<<<<<<<<<<<<
  *         D = H_0.copy()
  *         D.axpy(-E-gamma*np.exp(1j*q_nk(2,2)),S)
  */
-    __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_C, __pyx_n_s_axpy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_C, __pyx_n_s_axpy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_13 = PyNumber_Negative(__pyx_v_E); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_13 = PyNumber_Negative(__pyx_v_E); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_gamma); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_gamma); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_exp); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_exp); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_11 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_q_nk); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_q_nk); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_12 = PyNumber_Multiply(__pyx_t_11, __pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_12 = PyNumber_Multiply(__pyx_t_11, __pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4805,19 +4858,19 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
-    __pyx_t_15 = PyNumber_Multiply(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_15 = PyNumber_Multiply(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyNumber_Add(__pyx_t_13, __pyx_t_15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Add(__pyx_t_13, __pyx_t_15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_S); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 123, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_S); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 127, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __pyx_t_13 = NULL;
     __pyx_t_4 = 0;
@@ -4839,22 +4892,22 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 123, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 127, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":124
+    /* "Photoenergy.pyx":128
  *         C = H_0.copy()
  *         C.axpy(-E+gamma*np.exp(1j*q_nk(2,2)),S)
  *         D = H_0.copy()             # <<<<<<<<<<<<<<
  *         D.axpy(-E-gamma*np.exp(1j*q_nk(2,2)),S)
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_H_0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_H_0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 128, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_copy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_copy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 128, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     __pyx_t_14 = NULL;
@@ -4875,39 +4928,39 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_14, NULL};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 124, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 128, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_XDECREF_SET(__pyx_v_D, __pyx_t_9);
     __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":125
+    /* "Photoenergy.pyx":129
  *         C.axpy(-E+gamma*np.exp(1j*q_nk(2,2)),S)
  *         D = H_0.copy()
  *         D.axpy(-E-gamma*np.exp(1j*q_nk(2,2)),S)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_D, __pyx_n_s_axpy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_D, __pyx_n_s_axpy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_14 = PyNumber_Negative(__pyx_v_E); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_14 = PyNumber_Negative(__pyx_v_E); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_14);
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gamma); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_gamma); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_exp); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_exp); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_3 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_q_nk); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_q_nk); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
@@ -4930,19 +4983,19 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __pyx_t_13 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 125, __pyx_L1_error)
+      if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 129, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
-    __pyx_t_12 = PyNumber_Multiply(__pyx_t_1, __pyx_t_13); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_12 = PyNumber_Multiply(__pyx_t_1, __pyx_t_13); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __pyx_t_13 = PyNumber_Subtract(__pyx_t_14, __pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __pyx_t_13 = PyNumber_Subtract(__pyx_t_14, __pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
     __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 125, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 129, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_14 = NULL;
     __pyx_t_4 = 0;
@@ -4964,82 +5017,6 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 125, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":128
- * 
- * 
- *         psi_final_prime = psi_final.copy()             # <<<<<<<<<<<<<<
- *         S.mult(psi_final,psi_final_prime)
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 128, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_copy); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 128, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = NULL;
-    __pyx_t_4 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (unlikely(PyMethod_Check(__pyx_t_12))) {
-      __pyx_t_15 = PyMethod_GET_SELF(__pyx_t_12);
-      if (likely(__pyx_t_15)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
-        __Pyx_INCREF(__pyx_t_15);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_12, function);
-        __pyx_t_4 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_15, NULL};
-      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 128, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    }
-    __Pyx_XDECREF_SET(__pyx_v_psi_final_prime, __pyx_t_9);
-    __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":129
- * 
- *         psi_final_prime = psi_final.copy()
- *         S.mult(psi_final,psi_final_prime)             # <<<<<<<<<<<<<<
- * 
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 129, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_mult); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 129, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 129, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_13 = NULL;
-    __pyx_t_4 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (unlikely(PyMethod_Check(__pyx_t_15))) {
-      __pyx_t_13 = PyMethod_GET_SELF(__pyx_t_15);
-      if (likely(__pyx_t_13)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
-        __Pyx_INCREF(__pyx_t_13);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_15, function);
-        __pyx_t_4 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[3] = {__pyx_t_13, __pyx_t_12, __pyx_v_psi_final_prime};
-      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 129, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
@@ -5049,9 +5026,9 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     /* "Photoenergy.pyx":132
  * 
  * 
- *         z = psi_final.copy()             # <<<<<<<<<<<<<<
- *         z_prime = psi_final.copy()
- *         w = psi_final.copy()
+ *         psi_final_prime = psi_final.copy()             # <<<<<<<<<<<<<<
+ *         S.mult(psi_final,psi_final_prime)
+ * 
  */
     __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
@@ -5080,29 +5057,31 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
-    __Pyx_XDECREF_SET(__pyx_v_z, __pyx_t_9);
+    __Pyx_XDECREF_SET(__pyx_v_psi_final_prime, __pyx_t_9);
     __pyx_t_9 = 0;
 
     /* "Photoenergy.pyx":133
  * 
- *         z = psi_final.copy()
- *         z_prime = psi_final.copy()             # <<<<<<<<<<<<<<
- *         w = psi_final.copy()
- *         w_prime = psi_final.copy()
+ *         psi_final_prime = psi_final.copy()
+ *         S.mult(psi_final,psi_final_prime)             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 133, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 133, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_copy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 133, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_mult); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 133, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_12 = NULL;
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 133, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __pyx_t_13 = NULL;
     __pyx_t_4 = 0;
     #if CYTHON_UNPACK_METHODS
     if (unlikely(PyMethod_Check(__pyx_t_15))) {
-      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
-      if (likely(__pyx_t_12)) {
+      __pyx_t_13 = PyMethod_GET_SELF(__pyx_t_15);
+      if (likely(__pyx_t_13)) {
         PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
-        __Pyx_INCREF(__pyx_t_12);
+        __Pyx_INCREF(__pyx_t_13);
         __Pyx_INCREF(function);
         __Pyx_DECREF_SET(__pyx_t_15, function);
         __pyx_t_4 = 1;
@@ -5110,96 +5089,22 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
     }
     #endif
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
-      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+      PyObject *__pyx_callargs[3] = {__pyx_t_13, __pyx_t_12, __pyx_v_psi_final_prime};
+      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 133, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
-    __Pyx_XDECREF_SET(__pyx_v_z_prime, __pyx_t_9);
-    __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":134
- *         z = psi_final.copy()
- *         z_prime = psi_final.copy()
- *         w = psi_final.copy()             # <<<<<<<<<<<<<<
- *         w_prime = psi_final.copy()
- *         v = psi_final.copy()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 134, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_copy); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 134, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = NULL;
-    __pyx_t_4 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (unlikely(PyMethod_Check(__pyx_t_12))) {
-      __pyx_t_15 = PyMethod_GET_SELF(__pyx_t_12);
-      if (likely(__pyx_t_15)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
-        __Pyx_INCREF(__pyx_t_15);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_12, function);
-        __pyx_t_4 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_15, NULL};
-      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 134, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    }
-    __Pyx_XDECREF_SET(__pyx_v_w, __pyx_t_9);
-    __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":135
- *         z_prime = psi_final.copy()
- *         w = psi_final.copy()
- *         w_prime = psi_final.copy()             # <<<<<<<<<<<<<<
- *         v = psi_final.copy()
- *         v_prime = psi_final.copy()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 135, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_copy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 135, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_12 = NULL;
-    __pyx_t_4 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (unlikely(PyMethod_Check(__pyx_t_15))) {
-      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
-      if (likely(__pyx_t_12)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
-        __Pyx_INCREF(__pyx_t_12);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_15, function);
-        __pyx_t_4 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
-      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 135, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    }
-    __Pyx_XDECREF_SET(__pyx_v_w_prime, __pyx_t_9);
-    __pyx_t_9 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
     /* "Photoenergy.pyx":136
- *         w = psi_final.copy()
- *         w_prime = psi_final.copy()
- *         v = psi_final.copy()             # <<<<<<<<<<<<<<
- *         v_prime = psi_final.copy()
  * 
+ * 
+ *         z = psi_final.copy()             # <<<<<<<<<<<<<<
+ *         z_prime = psi_final.copy()
+ *         w = psi_final.copy()
  */
     __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 136, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
@@ -5228,15 +5133,15 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
-    __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_9);
+    __Pyx_XDECREF_SET(__pyx_v_z, __pyx_t_9);
     __pyx_t_9 = 0;
 
     /* "Photoenergy.pyx":137
+ * 
+ *         z = psi_final.copy()
+ *         z_prime = psi_final.copy()             # <<<<<<<<<<<<<<
+ *         w = psi_final.copy()
  *         w_prime = psi_final.copy()
- *         v = psi_final.copy()
- *         v_prime = psi_final.copy()             # <<<<<<<<<<<<<<
- * 
- * 
  */
     __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 137, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
@@ -5265,14 +5170,88 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
-    __Pyx_XDECREF_SET(__pyx_v_v_prime, __pyx_t_9);
+    __Pyx_XDECREF_SET(__pyx_v_z_prime, __pyx_t_9);
+    __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":138
+ *         z = psi_final.copy()
+ *         z_prime = psi_final.copy()
+ *         w = psi_final.copy()             # <<<<<<<<<<<<<<
+ *         w_prime = psi_final.copy()
+ *         v = psi_final.copy()
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 138, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_copy); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 138, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+    __pyx_t_15 = NULL;
+    __pyx_t_4 = 0;
+    #if CYTHON_UNPACK_METHODS
+    if (unlikely(PyMethod_Check(__pyx_t_12))) {
+      __pyx_t_15 = PyMethod_GET_SELF(__pyx_t_12);
+      if (likely(__pyx_t_15)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
+        __Pyx_INCREF(__pyx_t_15);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_12, function);
+        __pyx_t_4 = 1;
+      }
+    }
+    #endif
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_15, NULL};
+      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 138, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    }
+    __Pyx_XDECREF_SET(__pyx_v_w, __pyx_t_9);
+    __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":139
+ *         z_prime = psi_final.copy()
+ *         w = psi_final.copy()
+ *         w_prime = psi_final.copy()             # <<<<<<<<<<<<<<
+ *         v = psi_final.copy()
+ *         v_prime = psi_final.copy()
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_copy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __pyx_t_12 = NULL;
+    __pyx_t_4 = 0;
+    #if CYTHON_UNPACK_METHODS
+    if (unlikely(PyMethod_Check(__pyx_t_15))) {
+      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
+      if (likely(__pyx_t_12)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
+        __Pyx_INCREF(__pyx_t_12);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_15, function);
+        __pyx_t_4 = 1;
+      }
+    }
+    #endif
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
+      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 139, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+    }
+    __Pyx_XDECREF_SET(__pyx_v_w_prime, __pyx_t_9);
     __pyx_t_9 = 0;
 
     /* "Photoenergy.pyx":140
- * 
- * 
- *         x = psi_final.copy()             # <<<<<<<<<<<<<<
- * 
+ *         w = psi_final.copy()
+ *         w_prime = psi_final.copy()
+ *         v = psi_final.copy()             # <<<<<<<<<<<<<<
+ *         v_prime = psi_final.copy()
  * 
  */
     __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 140, __pyx_L1_error)
@@ -5302,17 +5281,91 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
-    __Pyx_XDECREF_SET(__pyx_v_x, __pyx_t_9);
+    __Pyx_XDECREF_SET(__pyx_v_v, __pyx_t_9);
+    __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":141
+ *         w_prime = psi_final.copy()
+ *         v = psi_final.copy()
+ *         v_prime = psi_final.copy()             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 141, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_copy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 141, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    __pyx_t_12 = NULL;
+    __pyx_t_4 = 0;
+    #if CYTHON_UNPACK_METHODS
+    if (unlikely(PyMethod_Check(__pyx_t_15))) {
+      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
+      if (likely(__pyx_t_12)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
+        __Pyx_INCREF(__pyx_t_12);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_15, function);
+        __pyx_t_4 = 1;
+      }
+    }
+    #endif
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
+      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 141, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+    }
+    __Pyx_XDECREF_SET(__pyx_v_v_prime, __pyx_t_9);
     __pyx_t_9 = 0;
 
     /* "Photoenergy.pyx":144
+ * 
+ * 
+ *         x = psi_final.copy()             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_copy); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_12);
+    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+    __pyx_t_15 = NULL;
+    __pyx_t_4 = 0;
+    #if CYTHON_UNPACK_METHODS
+    if (unlikely(PyMethod_Check(__pyx_t_12))) {
+      __pyx_t_15 = PyMethod_GET_SELF(__pyx_t_12);
+      if (likely(__pyx_t_15)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_12);
+        __Pyx_INCREF(__pyx_t_15);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_12, function);
+        __pyx_t_4 = 1;
+      }
+    }
+    #endif
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_15, NULL};
+      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 144, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+    }
+    __Pyx_XDECREF_SET(__pyx_v_x, __pyx_t_9);
+    __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":148
  * 
  *         # Set operators for each solver
  *         ksp_A.setOperators(A)             # <<<<<<<<<<<<<<
  *         ksp_B.setOperators(B)
  *         ksp_C.setOperators(C)
  */
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_A, __pyx_n_s_setOperators); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_A, __pyx_n_s_setOperators); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_15 = NULL;
     __pyx_t_4 = 0;
@@ -5332,20 +5385,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_15, __pyx_v_A};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 144, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 148, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":145
+    /* "Photoenergy.pyx":149
  *         # Set operators for each solver
  *         ksp_A.setOperators(A)
  *         ksp_B.setOperators(B)             # <<<<<<<<<<<<<<
  *         ksp_C.setOperators(C)
  *         ksp_D.setOperators(D)
  */
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_B, __pyx_n_s_setOperators); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 145, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_B, __pyx_n_s_setOperators); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 149, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_15 = NULL;
     __pyx_t_4 = 0;
@@ -5365,20 +5418,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_15, __pyx_v_B};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 145, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 149, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":146
+    /* "Photoenergy.pyx":150
  *         ksp_A.setOperators(A)
  *         ksp_B.setOperators(B)
  *         ksp_C.setOperators(C)             # <<<<<<<<<<<<<<
  *         ksp_D.setOperators(D)
  * 
  */
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_C, __pyx_n_s_setOperators); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_C, __pyx_n_s_setOperators); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 150, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_15 = NULL;
     __pyx_t_4 = 0;
@@ -5398,20 +5451,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_15, __pyx_v_C};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 146, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 150, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":147
+    /* "Photoenergy.pyx":151
  *         ksp_B.setOperators(B)
  *         ksp_C.setOperators(C)
  *         ksp_D.setOperators(D)             # <<<<<<<<<<<<<<
  * 
  *         # Solve Az = y and then multiply by S
  */
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_D, __pyx_n_s_setOperators); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_D, __pyx_n_s_setOperators); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 151, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_15 = NULL;
     __pyx_t_4 = 0;
@@ -5431,20 +5484,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_15, __pyx_v_D};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 147, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 151, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":150
+    /* "Photoenergy.pyx":154
  * 
  *         # Solve Az = y and then multiply by S
  *         ksp_A.solve(psi_final_prime, z)             # <<<<<<<<<<<<<<
  *         S.mult(z, z_prime)
  * 
  */
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_A, __pyx_n_s_solve); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 150, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_A, __pyx_n_s_solve); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 154, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_15 = NULL;
     __pyx_t_4 = 0;
@@ -5464,22 +5517,22 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_15, __pyx_v_psi_final_prime, __pyx_v_z};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 150, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 154, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":151
+    /* "Photoenergy.pyx":155
  *         # Solve Az = y and then multiply by S
  *         ksp_A.solve(psi_final_prime, z)
  *         S.mult(z, z_prime)             # <<<<<<<<<<<<<<
  * 
  *         # Solve Bw = z_prime and then multiply by S
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 151, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 155, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_mult); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 151, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_mult); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 155, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __pyx_t_12 = NULL;
@@ -5500,20 +5553,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_12, __pyx_v_z, __pyx_v_z_prime};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 151, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 155, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":154
+    /* "Photoenergy.pyx":158
  * 
  *         # Solve Bw = z_prime and then multiply by S
  *         ksp_B.solve(z_prime, w)             # <<<<<<<<<<<<<<
  *         S.mult(w, w_prime)
  * 
  */
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_B, __pyx_n_s_solve); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_B, __pyx_n_s_solve); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 158, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __pyx_t_12 = NULL;
     __pyx_t_4 = 0;
@@ -5533,22 +5586,22 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_12, __pyx_v_z_prime, __pyx_v_w};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 154, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 158, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":155
+    /* "Photoenergy.pyx":159
  *         # Solve Bw = z_prime and then multiply by S
  *         ksp_B.solve(z_prime, w)
  *         S.mult(w, w_prime)             # <<<<<<<<<<<<<<
  * 
  *         # Solve Cv = w_prime and then multiply by S
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_S); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 155, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_S); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_mult); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 155, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_mult); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 159, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     __pyx_t_15 = NULL;
@@ -5569,20 +5622,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_15, __pyx_v_w, __pyx_v_w_prime};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 155, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 159, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":158
+    /* "Photoenergy.pyx":162
  * 
  *         # Solve Cv = w_prime and then multiply by S
  *         ksp_C.solve(w_prime, v)             # <<<<<<<<<<<<<<
  *         S.mult(v, v_prime)
  * 
  */
-    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_C, __pyx_n_s_solve); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_C, __pyx_n_s_solve); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 162, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_15 = NULL;
     __pyx_t_4 = 0;
@@ -5602,22 +5655,22 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_15, __pyx_v_w_prime, __pyx_v_v};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 158, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 162, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":159
+    /* "Photoenergy.pyx":163
  *         # Solve Cv = w_prime and then multiply by S
  *         ksp_C.solve(w_prime, v)
  *         S.mult(v, v_prime)             # <<<<<<<<<<<<<<
  * 
  *         # Finally, solve Dx = v_prime (the final result is x)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 163, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_mult); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_mult); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 163, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __pyx_t_12 = NULL;
@@ -5638,20 +5691,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_12, __pyx_v_v, __pyx_v_v_prime};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 159, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 163, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":162
+    /* "Photoenergy.pyx":166
  * 
  *         # Finally, solve Dx = v_prime (the final result is x)
  *         ksp_D.solve(v_prime, x)             # <<<<<<<<<<<<<<
  * 
  *         A.destroy()
  */
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_D, __pyx_n_s_solve); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 162, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_ksp_D, __pyx_n_s_solve); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __pyx_t_12 = NULL;
     __pyx_t_4 = 0;
@@ -5671,119 +5724,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_12, __pyx_v_v_prime, __pyx_v_x};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 162, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":164
- *         ksp_D.solve(v_prime, x)
- * 
- *         A.destroy()             # <<<<<<<<<<<<<<
- *         B.destroy()
- *         C.destroy()
- */
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_A, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 164, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_12 = NULL;
-    __pyx_t_4 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (likely(PyMethod_Check(__pyx_t_15))) {
-      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
-      if (likely(__pyx_t_12)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
-        __Pyx_INCREF(__pyx_t_12);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_15, function);
-        __pyx_t_4 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
-      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 164, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":165
- * 
- *         A.destroy()
- *         B.destroy()             # <<<<<<<<<<<<<<
- *         C.destroy()
- *         D.destroy()
- */
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_B, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 165, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_12 = NULL;
-    __pyx_t_4 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (likely(PyMethod_Check(__pyx_t_15))) {
-      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
-      if (likely(__pyx_t_12)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
-        __Pyx_INCREF(__pyx_t_12);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_15, function);
-        __pyx_t_4 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
-      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 165, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    }
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":166
- *         A.destroy()
- *         B.destroy()
- *         C.destroy()             # <<<<<<<<<<<<<<
- *         D.destroy()
- * 
- */
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_C, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 166, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_12 = NULL;
-    __pyx_t_4 = 0;
-    #if CYTHON_UNPACK_METHODS
-    if (likely(PyMethod_Check(__pyx_t_15))) {
-      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
-      if (likely(__pyx_t_12)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
-        __Pyx_INCREF(__pyx_t_12);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_15, function);
-        __pyx_t_4 = 1;
-      }
-    }
-    #endif
-    {
-      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
-      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
-      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
       if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 166, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "Photoenergy.pyx":167
+    /* "Photoenergy.pyx":168
+ *         ksp_D.solve(v_prime, x)
+ * 
+ *         A.destroy()             # <<<<<<<<<<<<<<
  *         B.destroy()
  *         C.destroy()
- *         D.destroy()             # <<<<<<<<<<<<<<
- * 
- *         if PES:
  */
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_D, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 167, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_A, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 168, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __pyx_t_12 = NULL;
     __pyx_t_4 = 0;
@@ -5803,32 +5757,131 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
       __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 167, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 168, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
     /* "Photoenergy.pyx":169
+ * 
+ *         A.destroy()
+ *         B.destroy()             # <<<<<<<<<<<<<<
+ *         C.destroy()
+ *         D.destroy()
+ */
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_B, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 169, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __pyx_t_12 = NULL;
+    __pyx_t_4 = 0;
+    #if CYTHON_UNPACK_METHODS
+    if (likely(PyMethod_Check(__pyx_t_15))) {
+      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
+      if (likely(__pyx_t_12)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
+        __Pyx_INCREF(__pyx_t_12);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_15, function);
+        __pyx_t_4 = 1;
+      }
+    }
+    #endif
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
+      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 169, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":170
+ *         A.destroy()
+ *         B.destroy()
+ *         C.destroy()             # <<<<<<<<<<<<<<
+ *         D.destroy()
+ * 
+ */
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_C, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __pyx_t_12 = NULL;
+    __pyx_t_4 = 0;
+    #if CYTHON_UNPACK_METHODS
+    if (likely(PyMethod_Check(__pyx_t_15))) {
+      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
+      if (likely(__pyx_t_12)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
+        __Pyx_INCREF(__pyx_t_12);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_15, function);
+        __pyx_t_4 = 1;
+      }
+    }
+    #endif
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
+      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 170, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":171
+ *         B.destroy()
+ *         C.destroy()
+ *         D.destroy()             # <<<<<<<<<<<<<<
+ * 
+ *         if PES:
+ */
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_D, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_15);
+    __pyx_t_12 = NULL;
+    __pyx_t_4 = 0;
+    #if CYTHON_UNPACK_METHODS
+    if (likely(PyMethod_Check(__pyx_t_15))) {
+      __pyx_t_12 = PyMethod_GET_SELF(__pyx_t_15);
+      if (likely(__pyx_t_12)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_15);
+        __Pyx_INCREF(__pyx_t_12);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_15, function);
+        __pyx_t_4 = 1;
+      }
+    }
+    #endif
+    {
+      PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
+      __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+      __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 171, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":173
  *         D.destroy()
  * 
  *         if PES:             # <<<<<<<<<<<<<<
  *             Sv = S.createVecRight()
  *             S.mult(x,Sv)
  */
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PES); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 169, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PES); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 173, __pyx_L1_error)
     if (__pyx_t_5) {
 
-      /* "Photoenergy.pyx":170
+      /* "Photoenergy.pyx":174
  * 
  *         if PES:
  *             Sv = S.createVecRight()             # <<<<<<<<<<<<<<
  *             S.mult(x,Sv)
  *             PES_val = x.dot(Sv)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_S); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 170, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_S); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_createVecRight); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 170, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_createVecRight); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
       __pyx_t_15 = NULL;
@@ -5849,23 +5902,23 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         PyObject *__pyx_callargs[2] = {__pyx_t_15, NULL};
         __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_12, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 170, __pyx_L1_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 174, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       }
       __Pyx_XDECREF_SET(__pyx_v_Sv, __pyx_t_9);
       __pyx_t_9 = 0;
 
-      /* "Photoenergy.pyx":171
+      /* "Photoenergy.pyx":175
  *         if PES:
  *             Sv = S.createVecRight()
  *             S.mult(x,Sv)             # <<<<<<<<<<<<<<
  *             PES_val = x.dot(Sv)
  *             PES_vals.append(PES_val*gamma**8)
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 171, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_n_s_S); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 175, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_mult); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 171, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_n_s_mult); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 175, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_t_12 = NULL;
@@ -5886,20 +5939,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         PyObject *__pyx_callargs[3] = {__pyx_t_12, __pyx_v_x, __pyx_v_Sv};
         __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 171, __pyx_L1_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 175, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "Photoenergy.pyx":172
+      /* "Photoenergy.pyx":176
  *             Sv = S.createVecRight()
  *             S.mult(x,Sv)
  *             PES_val = x.dot(Sv)             # <<<<<<<<<<<<<<
  *             PES_vals.append(PES_val*gamma**8)
  * 
  */
-      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_dot); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 172, __pyx_L1_error)
+      __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_dot); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 176, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __pyx_t_12 = NULL;
       __pyx_t_4 = 0;
@@ -5919,32 +5972,32 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_v_Sv};
         __pyx_t_9 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 172, __pyx_L1_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 176, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
       }
       __Pyx_XDECREF_SET(__pyx_v_PES_val, __pyx_t_9);
       __pyx_t_9 = 0;
 
-      /* "Photoenergy.pyx":173
+      /* "Photoenergy.pyx":177
  *             S.mult(x,Sv)
  *             PES_val = x.dot(Sv)
  *             PES_vals.append(PES_val*gamma**8)             # <<<<<<<<<<<<<<
  * 
  *         if PAD:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_gamma); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_gamma); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_15 = PyNumber_Power(__pyx_t_9, __pyx_int_8, Py_None); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_15 = PyNumber_Power(__pyx_t_9, __pyx_int_8, Py_None); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_15);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = PyNumber_Multiply(__pyx_v_PES_val, __pyx_t_15); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_9 = PyNumber_Multiply(__pyx_v_PES_val, __pyx_t_15); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_PES_vals, __pyx_t_9); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 173, __pyx_L1_error)
+      __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_PES_vals, __pyx_t_9); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "Photoenergy.pyx":169
+      /* "Photoenergy.pyx":173
  *         D.destroy()
  * 
  *         if PES:             # <<<<<<<<<<<<<<
@@ -5953,17 +6006,17 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
     }
 
-    /* "Photoenergy.pyx":175
+    /* "Photoenergy.pyx":179
  *             PES_vals.append(PES_val*gamma**8)
  * 
  *         if PAD:             # <<<<<<<<<<<<<<
  *             for i,theta_val in enumerate(theta_range):
  *                 for j,phi_val in enumerate(phi_range):
  */
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PAD); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PAD); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 179, __pyx_L1_error)
     if (__pyx_t_5) {
 
-      /* "Photoenergy.pyx":176
+      /* "Photoenergy.pyx":180
  * 
  *         if PAD:
  *             for i,theta_val in enumerate(theta_range):             # <<<<<<<<<<<<<<
@@ -5977,9 +6030,9 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         __pyx_t_17 = 0;
         __pyx_t_18 = NULL;
       } else {
-        __pyx_t_17 = -1; __pyx_t_15 = PyObject_GetIter(__pyx_v_theta_range); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 176, __pyx_L1_error)
+        __pyx_t_17 = -1; __pyx_t_15 = PyObject_GetIter(__pyx_v_theta_range); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 180, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_15);
-        __pyx_t_18 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_15); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 176, __pyx_L1_error)
+        __pyx_t_18 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_15); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 180, __pyx_L1_error)
       }
       for (;;) {
         if (likely(!__pyx_t_18)) {
@@ -5987,28 +6040,28 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_15);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 176, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 180, __pyx_L1_error)
               #endif
               if (__pyx_t_17 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_12 = PyList_GET_ITEM(__pyx_t_15, __pyx_t_17); __Pyx_INCREF(__pyx_t_12); __pyx_t_17++; if (unlikely((0 < 0))) __PYX_ERR(0, 176, __pyx_L1_error)
+            __pyx_t_12 = PyList_GET_ITEM(__pyx_t_15, __pyx_t_17); __Pyx_INCREF(__pyx_t_12); __pyx_t_17++; if (unlikely((0 < 0))) __PYX_ERR(0, 180, __pyx_L1_error)
             #else
-            __pyx_t_12 = __Pyx_PySequence_ITEM(__pyx_t_15, __pyx_t_17); __pyx_t_17++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 176, __pyx_L1_error)
+            __pyx_t_12 = __Pyx_PySequence_ITEM(__pyx_t_15, __pyx_t_17); __pyx_t_17++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 180, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_12);
             #endif
           } else {
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_15);
               #if !CYTHON_ASSUME_SAFE_MACROS
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 176, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 180, __pyx_L1_error)
               #endif
               if (__pyx_t_17 >= __pyx_temp) break;
             }
             #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-            __pyx_t_12 = PyTuple_GET_ITEM(__pyx_t_15, __pyx_t_17); __Pyx_INCREF(__pyx_t_12); __pyx_t_17++; if (unlikely((0 < 0))) __PYX_ERR(0, 176, __pyx_L1_error)
+            __pyx_t_12 = PyTuple_GET_ITEM(__pyx_t_15, __pyx_t_17); __Pyx_INCREF(__pyx_t_12); __pyx_t_17++; if (unlikely((0 < 0))) __PYX_ERR(0, 180, __pyx_L1_error)
             #else
-            __pyx_t_12 = __Pyx_PySequence_ITEM(__pyx_t_15, __pyx_t_17); __pyx_t_17++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 176, __pyx_L1_error)
+            __pyx_t_12 = __Pyx_PySequence_ITEM(__pyx_t_15, __pyx_t_17); __pyx_t_17++; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 180, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_12);
             #endif
           }
@@ -6018,7 +6071,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
               if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-              else __PYX_ERR(0, 176, __pyx_L1_error)
+              else __PYX_ERR(0, 180, __pyx_L1_error)
             }
             break;
           }
@@ -6028,13 +6081,13 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         __pyx_t_12 = 0;
         __Pyx_INCREF(__pyx_t_9);
         __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_9);
-        __pyx_t_12 = __Pyx_PyInt_AddObjC(__pyx_t_9, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 176, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyInt_AddObjC(__pyx_t_9, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 180, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_9);
         __pyx_t_9 = __pyx_t_12;
         __pyx_t_12 = 0;
 
-        /* "Photoenergy.pyx":177
+        /* "Photoenergy.pyx":181
  *         if PAD:
  *             for i,theta_val in enumerate(theta_range):
  *                 for j,phi_val in enumerate(phi_range):             # <<<<<<<<<<<<<<
@@ -6048,9 +6101,9 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
           __pyx_t_19 = 0;
           __pyx_t_20 = NULL;
         } else {
-          __pyx_t_19 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_v_phi_range); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 177, __pyx_L1_error)
+          __pyx_t_19 = -1; __pyx_t_13 = PyObject_GetIter(__pyx_v_phi_range); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 181, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
-          __pyx_t_20 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 177, __pyx_L1_error)
+          __pyx_t_20 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_13); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 181, __pyx_L1_error)
         }
         for (;;) {
           if (likely(!__pyx_t_20)) {
@@ -6058,28 +6111,28 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
               {
                 Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_13);
                 #if !CYTHON_ASSUME_SAFE_MACROS
-                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 177, __pyx_L1_error)
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 181, __pyx_L1_error)
                 #endif
                 if (__pyx_t_19 >= __pyx_temp) break;
               }
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_14 = PyList_GET_ITEM(__pyx_t_13, __pyx_t_19); __Pyx_INCREF(__pyx_t_14); __pyx_t_19++; if (unlikely((0 < 0))) __PYX_ERR(0, 177, __pyx_L1_error)
+              __pyx_t_14 = PyList_GET_ITEM(__pyx_t_13, __pyx_t_19); __Pyx_INCREF(__pyx_t_14); __pyx_t_19++; if (unlikely((0 < 0))) __PYX_ERR(0, 181, __pyx_L1_error)
               #else
-              __pyx_t_14 = __Pyx_PySequence_ITEM(__pyx_t_13, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 177, __pyx_L1_error)
+              __pyx_t_14 = __Pyx_PySequence_ITEM(__pyx_t_13, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 181, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_14);
               #endif
             } else {
               {
                 Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_13);
                 #if !CYTHON_ASSUME_SAFE_MACROS
-                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 177, __pyx_L1_error)
+                if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 181, __pyx_L1_error)
                 #endif
                 if (__pyx_t_19 >= __pyx_temp) break;
               }
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_14 = PyTuple_GET_ITEM(__pyx_t_13, __pyx_t_19); __Pyx_INCREF(__pyx_t_14); __pyx_t_19++; if (unlikely((0 < 0))) __PYX_ERR(0, 177, __pyx_L1_error)
+              __pyx_t_14 = PyTuple_GET_ITEM(__pyx_t_13, __pyx_t_19); __Pyx_INCREF(__pyx_t_14); __pyx_t_19++; if (unlikely((0 < 0))) __PYX_ERR(0, 181, __pyx_L1_error)
               #else
-              __pyx_t_14 = __Pyx_PySequence_ITEM(__pyx_t_13, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 177, __pyx_L1_error)
+              __pyx_t_14 = __Pyx_PySequence_ITEM(__pyx_t_13, __pyx_t_19); __pyx_t_19++; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 181, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_14);
               #endif
             }
@@ -6089,7 +6142,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
               PyObject* exc_type = PyErr_Occurred();
               if (exc_type) {
                 if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                else __PYX_ERR(0, 177, __pyx_L1_error)
+                else __PYX_ERR(0, 181, __pyx_L1_error)
               }
               break;
             }
@@ -6099,20 +6152,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
           __pyx_t_14 = 0;
           __Pyx_INCREF(__pyx_t_12);
           __Pyx_XDECREF_SET(__pyx_v_j, __pyx_t_12);
-          __pyx_t_14 = __Pyx_PyInt_AddObjC(__pyx_t_12, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 177, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyInt_AddObjC(__pyx_t_12, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 181, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __Pyx_DECREF(__pyx_t_12);
           __pyx_t_12 = __pyx_t_14;
           __pyx_t_14 = 0;
 
-          /* "Photoenergy.pyx":178
+          /* "Photoenergy.pyx":182
  *             for i,theta_val in enumerate(theta_range):
  *                 for j,phi_val in enumerate(phi_range):
  *                     y = x.copy()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_x, __pyx_n_s_copy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __pyx_t_2 = NULL;
           __pyx_t_4 = 0;
@@ -6132,48 +6185,48 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
             __pyx_t_14 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 178, __pyx_L1_error)
+            if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 182, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           }
           __Pyx_XDECREF_SET(__pyx_v_y, __pyx_t_14);
           __pyx_t_14 = 0;
 
-          /* "Photoenergy.pyx":183
+          /* "Photoenergy.pyx":187
  * 
  * 
  *                     values = sph_harmonics[:, j, i]             # <<<<<<<<<<<<<<
+ *                     #spherical_vector = PETSc.Vec().createWithArray(values,size = total_size,comm = comm)
  * 
- *                     spherical_vector = PETSc.Vec().createWithArray(values,size = total_size,comm = comm)
  */
-          if (unlikely(!__pyx_v_sph_harmonics)) { __Pyx_RaiseUnboundLocalError("sph_harmonics"); __PYX_ERR(0, 183, __pyx_L1_error) }
-          __pyx_t_14 = PyTuple_New(3); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 183, __pyx_L1_error)
+          if (unlikely(!__pyx_v_sph_harmonics)) { __Pyx_RaiseUnboundLocalError("sph_harmonics"); __PYX_ERR(0, 187, __pyx_L1_error) }
+          __pyx_t_14 = PyTuple_New(3); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 187, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __Pyx_INCREF(__pyx_slice__2);
           __Pyx_GIVEREF(__pyx_slice__2);
-          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_slice__2)) __PYX_ERR(0, 183, __pyx_L1_error);
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_slice__2)) __PYX_ERR(0, 187, __pyx_L1_error);
           __Pyx_INCREF(__pyx_v_j);
           __Pyx_GIVEREF(__pyx_v_j);
-          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_14, 1, __pyx_v_j)) __PYX_ERR(0, 183, __pyx_L1_error);
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_14, 1, __pyx_v_j)) __PYX_ERR(0, 187, __pyx_L1_error);
           __Pyx_INCREF(__pyx_v_i);
           __Pyx_GIVEREF(__pyx_v_i);
-          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_14, 2, __pyx_v_i)) __PYX_ERR(0, 183, __pyx_L1_error);
-          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_sph_harmonics, __pyx_t_14); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_14, 2, __pyx_v_i)) __PYX_ERR(0, 187, __pyx_L1_error);
+          __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_sph_harmonics, __pyx_t_14); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           __Pyx_XDECREF_SET(__pyx_v_values, __pyx_t_1);
           __pyx_t_1 = 0;
 
-          /* "Photoenergy.pyx":185
- *                     values = sph_harmonics[:, j, i]
+          /* "Photoenergy.pyx":190
+ *                     #spherical_vector = PETSc.Vec().createWithArray(values,size = total_size,comm = comm)
  * 
- *                     spherical_vector = PETSc.Vec().createWithArray(values,size = total_size,comm = comm)             # <<<<<<<<<<<<<<
- * 
- *                     y.pointwiseMult(y, spherical_vector)
+ *                     spherical_vector = PETSc.Vec().createMPI(total_size,comm = comm)             # <<<<<<<<<<<<<<
+ *                     global_indices = np.arange(total_size)
+ *                     global_indices = global_indices.astype("int32")
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 185, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 190, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_Vec); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_Vec); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           __pyx_t_14 = NULL;
@@ -6194,44 +6247,182 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[2] = {__pyx_t_14, NULL};
             __pyx_t_1 = __Pyx_PyObject_FastCall(__pyx_t_2, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
+            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           }
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_createWithArray); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_createMPI); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_total_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __Pyx_INCREF(__pyx_v_values);
-          __Pyx_GIVEREF(__pyx_v_values);
-          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_values)) __PYX_ERR(0, 185, __pyx_L1_error);
-          __pyx_t_14 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 185, __pyx_L1_error)
+          __pyx_t_14 = PyTuple_New(1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 190, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
-          __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_total_size); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 185, __pyx_L1_error)
+          __Pyx_GIVEREF(__pyx_t_1);
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error);
+          __pyx_t_1 = 0;
+          __pyx_t_1 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_comm); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 190, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
-          if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_size, __pyx_t_11) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_comm, __pyx_t_11) < 0) __PYX_ERR(0, 190, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_comm); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 185, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_11);
-          if (PyDict_SetItem(__pyx_t_14, __pyx_n_s_comm, __pyx_t_11) < 0) __PYX_ERR(0, 185, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_1, __pyx_t_14); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 185, __pyx_L1_error)
+          __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_14, __pyx_t_1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 190, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_XDECREF_SET(__pyx_v_spherical_vector, __pyx_t_11);
           __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":187
- *                     spherical_vector = PETSc.Vec().createWithArray(values,size = total_size,comm = comm)
+          /* "Photoenergy.pyx":191
+ * 
+ *                     spherical_vector = PETSc.Vec().createMPI(total_size,comm = comm)
+ *                     global_indices = np.arange(total_size)             # <<<<<<<<<<<<<<
+ *                     global_indices = global_indices.astype("int32")
+ *                     spherical_vector.setValues(global_indices,values)
+ */
+          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_arange); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 191, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_14);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_total_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_1);
+          __pyx_t_2 = NULL;
+          __pyx_t_4 = 0;
+          #if CYTHON_UNPACK_METHODS
+          if (unlikely(PyMethod_Check(__pyx_t_14))) {
+            __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_14);
+            if (likely(__pyx_t_2)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_14);
+              __Pyx_INCREF(__pyx_t_2);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_14, function);
+              __pyx_t_4 = 1;
+            }
+          }
+          #endif
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_t_1};
+            __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
+            __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 191, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          }
+          __Pyx_XDECREF_SET(__pyx_v_global_indices, __pyx_t_11);
+          __pyx_t_11 = 0;
+
+          /* "Photoenergy.pyx":192
+ *                     spherical_vector = PETSc.Vec().createMPI(total_size,comm = comm)
+ *                     global_indices = np.arange(total_size)
+ *                     global_indices = global_indices.astype("int32")             # <<<<<<<<<<<<<<
+ *                     spherical_vector.setValues(global_indices,values)
+ *                     spherical_vector.assemble()
+ */
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_global_indices, __pyx_n_s_astype); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 192, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_14);
+          __pyx_t_1 = NULL;
+          __pyx_t_4 = 0;
+          #if CYTHON_UNPACK_METHODS
+          if (likely(PyMethod_Check(__pyx_t_14))) {
+            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_14);
+            if (likely(__pyx_t_1)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_14);
+              __Pyx_INCREF(__pyx_t_1);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_14, function);
+              __pyx_t_4 = 1;
+            }
+          }
+          #endif
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_n_s_int32};
+            __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
+            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 192, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          }
+          __Pyx_DECREF_SET(__pyx_v_global_indices, __pyx_t_11);
+          __pyx_t_11 = 0;
+
+          /* "Photoenergy.pyx":193
+ *                     global_indices = np.arange(total_size)
+ *                     global_indices = global_indices.astype("int32")
+ *                     spherical_vector.setValues(global_indices,values)             # <<<<<<<<<<<<<<
+ *                     spherical_vector.assemble()
+ * 
+ */
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_spherical_vector, __pyx_n_s_setValues); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 193, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_14);
+          __pyx_t_1 = NULL;
+          __pyx_t_4 = 0;
+          #if CYTHON_UNPACK_METHODS
+          if (likely(PyMethod_Check(__pyx_t_14))) {
+            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_14);
+            if (likely(__pyx_t_1)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_14);
+              __Pyx_INCREF(__pyx_t_1);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_14, function);
+              __pyx_t_4 = 1;
+            }
+          }
+          #endif
+          {
+            PyObject *__pyx_callargs[3] = {__pyx_t_1, __pyx_v_global_indices, __pyx_v_values};
+            __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
+            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 193, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          }
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+
+          /* "Photoenergy.pyx":194
+ *                     global_indices = global_indices.astype("int32")
+ *                     spherical_vector.setValues(global_indices,values)
+ *                     spherical_vector.assemble()             # <<<<<<<<<<<<<<
+ * 
+ *                     y.pointwiseMult(y, spherical_vector)
+ */
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_spherical_vector, __pyx_n_s_assemble); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 194, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_14);
+          __pyx_t_1 = NULL;
+          __pyx_t_4 = 0;
+          #if CYTHON_UNPACK_METHODS
+          if (likely(PyMethod_Check(__pyx_t_14))) {
+            __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_14);
+            if (likely(__pyx_t_1)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_14);
+              __Pyx_INCREF(__pyx_t_1);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_14, function);
+              __pyx_t_4 = 1;
+            }
+          }
+          #endif
+          {
+            PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
+            __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
+            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 194, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_11);
+            __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          }
+          __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+
+          /* "Photoenergy.pyx":196
+ *                     spherical_vector.assemble()
  * 
  *                     y.pointwiseMult(y, spherical_vector)             # <<<<<<<<<<<<<<
  * 
  *                     Su = S_TILE.createVecRight()
  */
-          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_y, __pyx_n_s_pointwiseMult); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 187, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_y, __pyx_n_s_pointwiseMult); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 196, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __pyx_t_1 = NULL;
           __pyx_t_4 = 0;
@@ -6251,22 +6442,22 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[3] = {__pyx_t_1, __pyx_v_y, __pyx_v_spherical_vector};
             __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 187, __pyx_L1_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 196, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":189
+          /* "Photoenergy.pyx":198
  *                     y.pointwiseMult(y, spherical_vector)
  * 
  *                     Su = S_TILE.createVecRight()             # <<<<<<<<<<<<<<
  *                     S_TILE.mult(y,Su)
  *                     value = Su.dot(y)
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_S_TILE); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 189, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_n_s_S_TILE); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 198, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
-          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_createVecRight); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_14, __pyx_n_s_createVecRight); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           __pyx_t_14 = NULL;
@@ -6287,23 +6478,23 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[2] = {__pyx_t_14, NULL};
             __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_1, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 189, __pyx_L1_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 198, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           }
           __Pyx_XDECREF_SET(__pyx_v_Su, __pyx_t_11);
           __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":190
+          /* "Photoenergy.pyx":199
  * 
  *                     Su = S_TILE.createVecRight()
  *                     S_TILE.mult(y,Su)             # <<<<<<<<<<<<<<
  *                     value = Su.dot(y)
  * 
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_S_TILE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_S_TILE); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_mult); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 190, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_mult); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 199, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __pyx_t_1 = NULL;
@@ -6324,20 +6515,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[3] = {__pyx_t_1, __pyx_v_y, __pyx_v_Su};
             __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 190, __pyx_L1_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 199, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":191
+          /* "Photoenergy.pyx":200
  *                     Su = S_TILE.createVecRight()
  *                     S_TILE.mult(y,Su)
  *                     value = Su.dot(y)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_Su, __pyx_n_s_dot); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 191, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_Su, __pyx_n_s_dot); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 200, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __pyx_t_1 = NULL;
           __pyx_t_4 = 0;
@@ -6357,66 +6548,66 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_v_y};
             __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 191, __pyx_L1_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 200, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           }
           __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_11);
           __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":194
+          /* "Photoenergy.pyx":203
  * 
  * 
  *                     E_vals.append(E)             # <<<<<<<<<<<<<<
  *                     theta_vals.append(theta_val)
  *                     phi_vals.append(phi_val)
  */
-          __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_E_vals, __pyx_v_E); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 194, __pyx_L1_error)
+          __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_E_vals, __pyx_v_E); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 203, __pyx_L1_error)
 
-          /* "Photoenergy.pyx":195
+          /* "Photoenergy.pyx":204
  * 
  *                     E_vals.append(E)
  *                     theta_vals.append(theta_val)             # <<<<<<<<<<<<<<
  *                     phi_vals.append(phi_val)
  *                     pad_vals.append(value * gamma**8)
  */
-          __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_theta_vals, __pyx_v_theta_val); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 195, __pyx_L1_error)
+          __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_theta_vals, __pyx_v_theta_val); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 204, __pyx_L1_error)
 
-          /* "Photoenergy.pyx":196
+          /* "Photoenergy.pyx":205
  *                     E_vals.append(E)
  *                     theta_vals.append(theta_val)
  *                     phi_vals.append(phi_val)             # <<<<<<<<<<<<<<
  *                     pad_vals.append(value * gamma**8)
  * 
  */
-          __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_phi_vals, __pyx_v_phi_val); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 196, __pyx_L1_error)
+          __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_phi_vals, __pyx_v_phi_val); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 205, __pyx_L1_error)
 
-          /* "Photoenergy.pyx":197
+          /* "Photoenergy.pyx":206
  *                     theta_vals.append(theta_val)
  *                     phi_vals.append(phi_val)
  *                     pad_vals.append(value * gamma**8)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-          __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_gamma); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 197, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_gamma); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 206, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
-          __pyx_t_14 = PyNumber_Power(__pyx_t_11, __pyx_int_8, Py_None); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 197, __pyx_L1_error)
+          __pyx_t_14 = PyNumber_Power(__pyx_t_11, __pyx_int_8, Py_None); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 206, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          __pyx_t_11 = PyNumber_Multiply(__pyx_v_value, __pyx_t_14); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 197, __pyx_L1_error)
+          __pyx_t_11 = PyNumber_Multiply(__pyx_v_value, __pyx_t_14); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 206, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_pad_vals, __pyx_t_11); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 197, __pyx_L1_error)
+          __pyx_t_16 = __Pyx_PyList_Append(__pyx_v_pad_vals, __pyx_t_11); if (unlikely(__pyx_t_16 == ((int)-1))) __PYX_ERR(0, 206, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":200
+          /* "Photoenergy.pyx":209
  * 
  * 
  *                     Su.destroy()             # <<<<<<<<<<<<<<
  *                     y.destroy()
  *                     spherical_vector.destroy()
  */
-          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_Su, __pyx_n_s_destroy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 200, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_Su, __pyx_n_s_destroy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 209, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __pyx_t_1 = NULL;
           __pyx_t_4 = 0;
@@ -6436,20 +6627,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
             __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 200, __pyx_L1_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 209, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":201
+          /* "Photoenergy.pyx":210
  * 
  *                     Su.destroy()
  *                     y.destroy()             # <<<<<<<<<<<<<<
  *                     spherical_vector.destroy()
  * 
  */
-          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_y, __pyx_n_s_destroy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 201, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_y, __pyx_n_s_destroy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 210, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __pyx_t_1 = NULL;
           __pyx_t_4 = 0;
@@ -6469,20 +6660,20 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
             __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 201, __pyx_L1_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 210, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":202
+          /* "Photoenergy.pyx":211
  *                     Su.destroy()
  *                     y.destroy()
  *                     spherical_vector.destroy()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_spherical_vector, __pyx_n_s_destroy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 202, __pyx_L1_error)
+          __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_v_spherical_vector, __pyx_n_s_destroy); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 211, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_14);
           __pyx_t_1 = NULL;
           __pyx_t_4 = 0;
@@ -6502,13 +6693,13 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
             PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
             __pyx_t_11 = __Pyx_PyObject_FastCall(__pyx_t_14, __pyx_callargs+1-__pyx_t_4, 0+__pyx_t_4);
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 202, __pyx_L1_error)
+            if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 211, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_11);
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-          /* "Photoenergy.pyx":177
+          /* "Photoenergy.pyx":181
  *         if PAD:
  *             for i,theta_val in enumerate(theta_range):
  *                 for j,phi_val in enumerate(phi_range):             # <<<<<<<<<<<<<<
@@ -6519,7 +6710,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-        /* "Photoenergy.pyx":176
+        /* "Photoenergy.pyx":180
  * 
  *         if PAD:
  *             for i,theta_val in enumerate(theta_range):             # <<<<<<<<<<<<<<
@@ -6530,7 +6721,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "Photoenergy.pyx":175
+      /* "Photoenergy.pyx":179
  *             PES_vals.append(PES_val*gamma**8)
  * 
  *         if PAD:             # <<<<<<<<<<<<<<
@@ -6539,7 +6730,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
     }
 
-    /* "Photoenergy.pyx":114
+    /* "Photoenergy.pyx":118
  *         print("Starting Energy Loop")
  * 
  *     for E in E_range:             # <<<<<<<<<<<<<<
@@ -6549,26 +6740,26 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "Photoenergy.pyx":206
+  /* "Photoenergy.pyx":215
  * 
  * 
  *     if PES:             # <<<<<<<<<<<<<<
  *         np.save("PES.npy",PES_vals)
  *     if PAD:
  */
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PES); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 206, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PES); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 215, __pyx_L1_error)
   if (__pyx_t_5) {
 
-    /* "Photoenergy.pyx":207
+    /* "Photoenergy.pyx":216
  * 
  *     if PES:
  *         np.save("PES.npy",PES_vals)             # <<<<<<<<<<<<<<
  *     if PAD:
  *         PAD = np.vstack((E_vals,theta_vals,phi_vals,pad_vals))
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 207, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_save); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 207, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_save); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 216, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_t_9 = NULL;
@@ -6589,13 +6780,13 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_9, __pyx_kp_s_PES_npy, __pyx_v_PES_vals};
       __pyx_t_6 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 216, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "Photoenergy.pyx":206
+    /* "Photoenergy.pyx":215
  * 
  * 
  *     if PES:             # <<<<<<<<<<<<<<
@@ -6604,42 +6795,42 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
   }
 
-  /* "Photoenergy.pyx":208
+  /* "Photoenergy.pyx":217
  *     if PES:
  *         np.save("PES.npy",PES_vals)
  *     if PAD:             # <<<<<<<<<<<<<<
  *         PAD = np.vstack((E_vals,theta_vals,phi_vals,pad_vals))
  *         np.save("PAD.npy",PAD)
  */
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PAD); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_v_PAD); if (unlikely((__pyx_t_5 < 0))) __PYX_ERR(0, 217, __pyx_L1_error)
   if (__pyx_t_5) {
 
-    /* "Photoenergy.pyx":209
+    /* "Photoenergy.pyx":218
  *         np.save("PES.npy",PES_vals)
  *     if PAD:
  *         PAD = np.vstack((E_vals,theta_vals,phi_vals,pad_vals))             # <<<<<<<<<<<<<<
  *         np.save("PAD.npy",PAD)
  *     return
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_np); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_np); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_vstack); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_vstack); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = PyTuple_New(4); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __pyx_t_15 = PyTuple_New(4); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_INCREF(__pyx_v_E_vals);
     __Pyx_GIVEREF(__pyx_v_E_vals);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_v_E_vals)) __PYX_ERR(0, 209, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_v_E_vals)) __PYX_ERR(0, 218, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_theta_vals);
     __Pyx_GIVEREF(__pyx_v_theta_vals);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_v_theta_vals)) __PYX_ERR(0, 209, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_15, 1, __pyx_v_theta_vals)) __PYX_ERR(0, 218, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_phi_vals);
     __Pyx_GIVEREF(__pyx_v_phi_vals);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_15, 2, __pyx_v_phi_vals)) __PYX_ERR(0, 209, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_15, 2, __pyx_v_phi_vals)) __PYX_ERR(0, 218, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_pad_vals);
     __Pyx_GIVEREF(__pyx_v_pad_vals);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_15, 3, __pyx_v_pad_vals)) __PYX_ERR(0, 209, __pyx_L1_error);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_15, 3, __pyx_v_pad_vals)) __PYX_ERR(0, 218, __pyx_L1_error);
     __pyx_t_12 = NULL;
     __pyx_t_4 = 0;
     #if CYTHON_UNPACK_METHODS
@@ -6659,23 +6850,23 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       __pyx_t_6 = __Pyx_PyObject_FastCall(__pyx_t_9, __pyx_callargs+1-__pyx_t_4, 1+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 209, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 218, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     }
     __Pyx_DECREF_SET(__pyx_v_PAD, __pyx_t_6);
     __pyx_t_6 = 0;
 
-    /* "Photoenergy.pyx":210
+    /* "Photoenergy.pyx":219
  *     if PAD:
  *         PAD = np.vstack((E_vals,theta_vals,phi_vals,pad_vals))
  *         np.save("PAD.npy",PAD)             # <<<<<<<<<<<<<<
  *     return
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 210, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_save); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 210, __pyx_L1_error)
+    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_save); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_t_9 = NULL;
@@ -6696,13 +6887,13 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
       PyObject *__pyx_callargs[3] = {__pyx_t_9, __pyx_kp_s_PAD_npy, __pyx_v_PAD};
       __pyx_t_6 = __Pyx_PyObject_FastCall(__pyx_t_15, __pyx_callargs+1-__pyx_t_4, 2+__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 210, __pyx_L1_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 219, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "Photoenergy.pyx":208
+    /* "Photoenergy.pyx":217
  *     if PES:
  *         np.save("PES.npy",PES_vals)
  *     if PAD:             # <<<<<<<<<<<<<<
@@ -6711,18 +6902,18 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
  */
   }
 
-  /* "Photoenergy.pyx":211
+  /* "Photoenergy.pyx":220
  *         PAD = np.vstack((E_vals,theta_vals,phi_vals,pad_vals))
  *         np.save("PAD.npy",PAD)
  *     return             # <<<<<<<<<<<<<<
  * 
- * 
+ * if comm.rank == 0:
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "Photoenergy.pyx":88
+  /* "Photoenergy.pyx":92
  * 
  * 
  * def photoAngularV2(E_range,theta_range,phi_range,PAD,PES):             # <<<<<<<<<<<<<<
@@ -6780,6 +6971,7 @@ static PyObject *__pyx_pf_11Photoenergy_2photoAngularV2(CYTHON_UNUSED PyObject *
   __Pyx_XDECREF(__pyx_v_y);
   __Pyx_XDECREF(__pyx_v_values);
   __Pyx_XDECREF(__pyx_v_spherical_vector);
+  __Pyx_XDECREF(__pyx_v_global_indices);
   __Pyx_XDECREF(__pyx_v_Su);
   __Pyx_XDECREF(__pyx_v_value);
   __Pyx_XDECREF(__pyx_v_PAD);
@@ -6808,7 +7000,6 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_B, __pyx_k_B, sizeof(__pyx_k_B), 0, 0, 1, 1},
     {&__pyx_n_s_C, __pyx_k_C, sizeof(__pyx_k_C), 0, 0, 1, 1},
     {&__pyx_n_s_COMM_WORLD, __pyx_k_COMM_WORLD, sizeof(__pyx_k_COMM_WORLD), 0, 0, 1, 1},
-    {&__pyx_kp_s_Computing_S_T, __pyx_k_Computing_S_T, sizeof(__pyx_k_Computing_S_T), 0, 0, 1, 0},
     {&__pyx_kp_s_Computing_Spherical_Harmonics, __pyx_k_Computing_Spherical_Harmonics, sizeof(__pyx_k_Computing_Spherical_Harmonics), 0, 0, 1, 0},
     {&__pyx_n_s_D, __pyx_k_D, sizeof(__pyx_k_D), 0, 0, 1, 1},
     {&__pyx_n_s_E, __pyx_k_E, sizeof(__pyx_k_E), 0, 0, 1, 1},
@@ -6816,10 +7007,10 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_E_min, __pyx_k_E_min, sizeof(__pyx_k_E_min), 0, 0, 1, 1},
     {&__pyx_n_s_E_range, __pyx_k_E_range, sizeof(__pyx_k_E_range), 0, 0, 1, 1},
     {&__pyx_n_s_E_vals, __pyx_k_E_vals, sizeof(__pyx_k_E_vals), 0, 0, 1, 1},
+    {&__pyx_kp_s_Exiting_Program_please_compute_S, __pyx_k_Exiting_Program_please_compute_S, sizeof(__pyx_k_Exiting_Program_please_compute_S), 0, 0, 1, 0},
     {&__pyx_n_s_File, __pyx_k_File, sizeof(__pyx_k_File), 0, 0, 1, 1},
     {&__pyx_n_s_H_0, __pyx_k_H_0, sizeof(__pyx_k_H_0), 0, 0, 1, 1},
     {&__pyx_n_s_KSP, __pyx_k_KSP, sizeof(__pyx_k_KSP), 0, 0, 1, 1},
-    {&__pyx_n_s_LOAD_EXT, __pyx_k_LOAD_EXT, sizeof(__pyx_k_LOAD_EXT), 0, 0, 1, 1},
     {&__pyx_n_s_Mat, __pyx_k_Mat, sizeof(__pyx_k_Mat), 0, 0, 1, 1},
     {&__pyx_n_s_N_knots, __pyx_k_N_knots, sizeof(__pyx_k_N_knots), 0, 0, 1, 1},
     {&__pyx_n_s_PAD, __pyx_k_PAD, sizeof(__pyx_k_PAD), 0, 0, 1, 1},
@@ -6840,13 +7031,17 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_Su, __pyx_k_Su, sizeof(__pyx_k_Su), 0, 0, 1, 1},
     {&__pyx_n_s_Sv, __pyx_k_Sv, sizeof(__pyx_k_Sv), 0, 0, 1, 1},
     {&__pyx_kp_s_TDSE_h5, __pyx_k_TDSE_h5, sizeof(__pyx_k_TDSE_h5), 0, 0, 1, 0},
+    {&__pyx_kp_u_Time_to_compute_PES, __pyx_k_Time_to_compute_PES, sizeof(__pyx_k_Time_to_compute_PES), 0, 1, 0, 0},
     {&__pyx_n_s_Vec, __pyx_k_Vec, sizeof(__pyx_k_Vec), 0, 0, 1, 1},
     {&__pyx_n_s_Viewer, __pyx_k_Viewer, sizeof(__pyx_k_Viewer), 0, 0, 1, 1},
     {&__pyx_n_s__27, __pyx_k__27, sizeof(__pyx_k__27), 0, 0, 1, 1},
     {&__pyx_n_s__6, __pyx_k__6, sizeof(__pyx_k__6), 0, 0, 1, 1},
     {&__pyx_kp_u__7, __pyx_k__7, sizeof(__pyx_k__7), 0, 1, 0, 0},
+    {&__pyx_n_s_abort, __pyx_k_abort, sizeof(__pyx_k_abort), 0, 0, 1, 1},
     {&__pyx_n_s_arange, __pyx_k_arange, sizeof(__pyx_k_arange), 0, 0, 1, 1},
     {&__pyx_n_s_array, __pyx_k_array, sizeof(__pyx_k_array), 0, 0, 1, 1},
+    {&__pyx_n_s_assemble, __pyx_k_assemble, sizeof(__pyx_k_assemble), 0, 0, 1, 1},
+    {&__pyx_n_s_astype, __pyx_k_astype, sizeof(__pyx_k_astype), 0, 0, 1, 1},
     {&__pyx_n_s_asyncio_coroutines, __pyx_k_asyncio_coroutines, sizeof(__pyx_k_asyncio_coroutines), 0, 0, 1, 1},
     {&__pyx_n_s_axpy, __pyx_k_axpy, sizeof(__pyx_k_axpy), 0, 0, 1, 1},
     {&__pyx_n_s_class_getitem, __pyx_k_class_getitem, sizeof(__pyx_k_class_getitem), 0, 0, 1, 1},
@@ -6857,13 +7052,14 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_create, __pyx_k_create, sizeof(__pyx_k_create), 0, 0, 1, 1},
     {&__pyx_n_s_createAIJ, __pyx_k_createAIJ, sizeof(__pyx_k_createAIJ), 0, 0, 1, 1},
     {&__pyx_n_s_createBinary, __pyx_k_createBinary, sizeof(__pyx_k_createBinary), 0, 0, 1, 1},
+    {&__pyx_n_s_createMPI, __pyx_k_createMPI, sizeof(__pyx_k_createMPI), 0, 0, 1, 1},
     {&__pyx_n_s_createVecRight, __pyx_k_createVecRight, sizeof(__pyx_k_createVecRight), 0, 0, 1, 1},
-    {&__pyx_n_s_createWithArray, __pyx_k_createWithArray, sizeof(__pyx_k_createWithArray), 0, 0, 1, 1},
     {&__pyx_n_s_data, __pyx_k_data, sizeof(__pyx_k_data), 0, 0, 1, 1},
     {&__pyx_n_s_destroy, __pyx_k_destroy, sizeof(__pyx_k_destroy), 0, 0, 1, 1},
     {&__pyx_n_s_dot, __pyx_k_dot, sizeof(__pyx_k_dot), 0, 0, 1, 1},
     {&__pyx_n_s_dphi, __pyx_k_dphi, sizeof(__pyx_k_dphi), 0, 0, 1, 1},
     {&__pyx_n_s_dtype, __pyx_k_dtype, sizeof(__pyx_k_dtype), 0, 0, 1, 1},
+    {&__pyx_n_s_end, __pyx_k_end, sizeof(__pyx_k_end), 0, 0, 1, 1},
     {&__pyx_n_s_enter, __pyx_k_enter, sizeof(__pyx_k_enter), 0, 0, 1, 1},
     {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
     {&__pyx_n_s_exists, __pyx_k_exists, sizeof(__pyx_k_exists), 0, 0, 1, 1},
@@ -6873,6 +7069,7 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_file, __pyx_k_file, sizeof(__pyx_k_file), 0, 0, 1, 1},
     {&__pyx_n_s_gamma, __pyx_k_gamma, sizeof(__pyx_k_gamma), 0, 0, 1, 1},
     {&__pyx_n_s_getSize, __pyx_k_getSize, sizeof(__pyx_k_getSize), 0, 0, 1, 1},
+    {&__pyx_n_s_global_indices, __pyx_k_global_indices, sizeof(__pyx_k_global_indices), 0, 0, 1, 1},
     {&__pyx_n_s_h5py, __pyx_k_h5py, sizeof(__pyx_k_h5py), 0, 0, 1, 1},
     {&__pyx_n_s_i, __pyx_k_i, sizeof(__pyx_k_i), 0, 0, 1, 1},
     {&__pyx_n_s_imaginary_part, __pyx_k_imaginary_part, sizeof(__pyx_k_imaginary_part), 0, 0, 1, 1},
@@ -6880,6 +7077,7 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_initializing, __pyx_k_initializing, sizeof(__pyx_k_initializing), 0, 0, 1, 1},
     {&__pyx_kp_s_input_json, __pyx_k_input_json, sizeof(__pyx_k_input_json), 0, 0, 1, 0},
     {&__pyx_n_s_input_par, __pyx_k_input_par, sizeof(__pyx_k_input_par), 0, 0, 1, 1},
+    {&__pyx_n_s_int32, __pyx_k_int32, sizeof(__pyx_k_int32), 0, 0, 1, 1},
     {&__pyx_n_s_is_coroutine, __pyx_k_is_coroutine, sizeof(__pyx_k_is_coroutine), 0, 0, 1, 1},
     {&__pyx_n_s_j, __pyx_k_j, sizeof(__pyx_k_j), 0, 0, 1, 1},
     {&__pyx_n_s_json, __pyx_k_json, sizeof(__pyx_k_json), 0, 0, 1, 1},
@@ -6925,7 +7123,6 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_psi_final, __pyx_k_psi_final, sizeof(__pyx_k_psi_final), 0, 0, 1, 1},
     {&__pyx_n_s_psi_final_prime, __pyx_k_psi_final_prime, sizeof(__pyx_k_psi_final_prime), 0, 0, 1, 1},
     {&__pyx_n_s_pyplot, __pyx_k_pyplot, sizeof(__pyx_k_pyplot), 0, 0, 1, 1},
-    {&__pyx_kp_s_python_users_becker_dopl4670_Res, __pyx_k_python_users_becker_dopl4670_Res, sizeof(__pyx_k_python_users_becker_dopl4670_Res), 0, 0, 1, 0},
     {&__pyx_n_s_q_nk, __pyx_k_q_nk, sizeof(__pyx_k_q_nk), 0, 0, 1, 1},
     {&__pyx_n_s_r, __pyx_k_r, sizeof(__pyx_k_r), 0, 0, 1, 1},
     {&__pyx_n_s_rank, __pyx_k_rank, sizeof(__pyx_k_rank), 0, 0, 1, 1},
@@ -6935,19 +7132,20 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
     {&__pyx_n_s_save, __pyx_k_save, sizeof(__pyx_k_save), 0, 0, 1, 1},
     {&__pyx_n_s_scipy_special, __pyx_k_scipy_special, sizeof(__pyx_k_scipy_special), 0, 0, 1, 1},
     {&__pyx_n_s_setOperators, __pyx_k_setOperators, sizeof(__pyx_k_setOperators), 0, 0, 1, 1},
-    {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
+    {&__pyx_n_s_setValues, __pyx_k_setValues, sizeof(__pyx_k_setValues), 0, 0, 1, 1},
     {&__pyx_n_s_solve, __pyx_k_solve, sizeof(__pyx_k_solve), 0, 0, 1, 1},
     {&__pyx_n_s_spec, __pyx_k_spec, sizeof(__pyx_k_spec), 0, 0, 1, 1},
     {&__pyx_n_s_sph_harm, __pyx_k_sph_harm, sizeof(__pyx_k_sph_harm), 0, 0, 1, 1},
     {&__pyx_n_s_sph_harmonics, __pyx_k_sph_harmonics, sizeof(__pyx_k_sph_harmonics), 0, 0, 1, 1},
     {&__pyx_n_s_spherical_vector, __pyx_k_spherical_vector, sizeof(__pyx_k_spherical_vector), 0, 0, 1, 1},
     {&__pyx_n_s_splines, __pyx_k_splines, sizeof(__pyx_k_splines), 0, 0, 1, 1},
-    {&__pyx_n_s_system, __pyx_k_system, sizeof(__pyx_k_system), 0, 0, 1, 1},
+    {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
     {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
     {&__pyx_n_s_theta_grid, __pyx_k_theta_grid, sizeof(__pyx_k_theta_grid), 0, 0, 1, 1},
     {&__pyx_n_s_theta_range, __pyx_k_theta_range, sizeof(__pyx_k_theta_range), 0, 0, 1, 1},
     {&__pyx_n_s_theta_val, __pyx_k_theta_val, sizeof(__pyx_k_theta_val), 0, 0, 1, 1},
     {&__pyx_n_s_theta_vals, __pyx_k_theta_vals, sizeof(__pyx_k_theta_vals), 0, 0, 1, 1},
+    {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
     {&__pyx_n_s_total_size, __pyx_k_total_size, sizeof(__pyx_k_total_size), 0, 0, 1, 1},
     {&__pyx_n_s_v, __pyx_k_v, sizeof(__pyx_k_v), 0, 0, 1, 1},
     {&__pyx_n_s_v_prime, __pyx_k_v_prime, sizeof(__pyx_k_v_prime), 0, 0, 1, 1},
@@ -6969,9 +7167,9 @@ static int __Pyx_CreateStringTabAndInitStrings(void) {
 }
 /* #### Code section: cached_builtins ### */
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 23, __pyx_L1_error)
-  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 25, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 108, __pyx_L1_error)
+  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 20, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 112, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -6982,58 +7180,58 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "Photoenergy.pyx":103
+  /* "Photoenergy.pyx":107
  *     if PAD:
  *         if comm.rank == 0:
  *             print("Computing Spherical Harmonics")             # <<<<<<<<<<<<<<
  * 
  *         theta_grid, phi_grid = np.meshgrid(theta_range, phi_range)
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Computing_Spherical_Harmonics); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Computing_Spherical_Harmonics); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 107, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "Photoenergy.pyx":109
+  /* "Photoenergy.pyx":113
  * 
  *         for i, l in enumerate(l_values):
  *             sph_harmonics[i, :, :] = sph_harm(0, l, phi_grid, theta_grid)             # <<<<<<<<<<<<<<
  * 
  *     if comm.rank == 0:
  */
-  __pyx_slice__2 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__2)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __pyx_slice__2 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__2)) __PYX_ERR(0, 113, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_slice__2);
   __Pyx_GIVEREF(__pyx_slice__2);
 
-  /* "Photoenergy.pyx":112
+  /* "Photoenergy.pyx":116
  * 
  *     if comm.rank == 0:
  *         print("Starting Energy Loop")             # <<<<<<<<<<<<<<
  * 
  *     for E in E_range:
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_Starting_Energy_Loop); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_s_Starting_Energy_Loop); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 116, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "Photoenergy.pyx":119
+  /* "Photoenergy.pyx":123
  * 
  *         A = H_0.copy()
  *         A.axpy(-E+gamma*np.exp(1j*q_nk(2,1)),S)             # <<<<<<<<<<<<<<
  *         B = H_0.copy()
  *         B.axpy(-E-gamma*np.exp(1j*q_nk(2,1)),S)
  */
-  __pyx_tuple__4 = PyTuple_Pack(2, __pyx_int_2, __pyx_int_1); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 119, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(2, __pyx_int_2, __pyx_int_1); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "Photoenergy.pyx":123
+  /* "Photoenergy.pyx":127
  *         B.axpy(-E-gamma*np.exp(1j*q_nk(2,1)),S)
  *         C = H_0.copy()
  *         C.axpy(-E+gamma*np.exp(1j*q_nk(2,2)),S)             # <<<<<<<<<<<<<<
  *         D = H_0.copy()
  *         D.axpy(-E-gamma*np.exp(1j*q_nk(2,2)),S)
  */
-  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_int_2, __pyx_int_2); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 123, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_int_2, __pyx_int_2); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
@@ -7048,175 +7246,175 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "Photoenergy.pyx":13
+  /* "Photoenergy.pyx":14
  * 
  * 
  * def q_nk(n,k):             # <<<<<<<<<<<<<<
  *         return ((2*k-1)*np.pi)/4
  * 
  */
-  __pyx_tuple__9 = PyTuple_Pack(2, __pyx_n_s_n, __pyx_n_s_k); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(2, __pyx_n_s_n, __pyx_n_s_k); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
-  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Photoenergy_pyx, __pyx_n_s_q_nk, 13, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(2, 0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Photoenergy_pyx, __pyx_n_s_q_nk, 14, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 14, __pyx_L1_error)
 
-  /* "Photoenergy.pyx":23
+  /* "Photoenergy.pyx":18
  * 
- *     if comm.rank == 0:
- *         print("Reading Input File")             # <<<<<<<<<<<<<<
+ * if comm.rank == 0:
+ *     print("Reading Input File")             # <<<<<<<<<<<<<<
  * 
- *     with open('input.json', 'r') as file:
+ * with open('input.json', 'r') as file:
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_Reading_Input_File); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_s_Reading_Input_File); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
 
-  /* "Photoenergy.pyx":25
- *         print("Reading Input File")
+  /* "Photoenergy.pyx":20
+ *     print("Reading Input File")
  * 
- *     with open('input.json', 'r') as file:             # <<<<<<<<<<<<<<
- *             input_par = json.load(file)
- *     order = input_par["splines"]["order"]
+ * with open('input.json', 'r') as file:             # <<<<<<<<<<<<<<
+ *         input_par = json.load(file)
+ * order = input_par["splines"]["order"]
  */
-  __pyx_tuple__12 = PyTuple_Pack(2, __pyx_kp_s_input_json, __pyx_n_s_r); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(2, __pyx_kp_s_input_json, __pyx_n_s_r); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
-  __pyx_tuple__13 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_tuple__13 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__13);
   __Pyx_GIVEREF(__pyx_tuple__13);
 
-  /* "Photoenergy.pyx":44
+  /* "Photoenergy.pyx":39
  * 
- *     if comm.rank == 0:
- *         print("Reading Final State")             # <<<<<<<<<<<<<<
+ * if comm.rank == 0:
+ *     print("Reading Final State")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_s_Reading_Final_State); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_s_Reading_Final_State); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
 
-  /* "Photoenergy.pyx":47
+  /* "Photoenergy.pyx":42
  * 
  * 
- *     with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
- *         data = f["psi_final"][:]
- *         real_part = data[:,0]
+ * with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
+ *     data = f["psi_final"][:]
+ *     real_part = data[:,0]
  */
-  __pyx_tuple__15 = PyTuple_Pack(2, __pyx_kp_s_TDSE_h5, __pyx_n_s_r); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_tuple__15 = PyTuple_Pack(2, __pyx_kp_s_TDSE_h5, __pyx_n_s_r); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
 
-  /* "Photoenergy.pyx":49
- *     with h5py.File('TDSE.h5', 'r') as f:
- *         data = f["psi_final"][:]
- *         real_part = data[:,0]             # <<<<<<<<<<<<<<
- *         imaginary_part = data[:,1]
+  /* "Photoenergy.pyx":44
+ * with h5py.File('TDSE.h5', 'r') as f:
+ *     data = f["psi_final"][:]
+ *     real_part = data[:,0]             # <<<<<<<<<<<<<<
+ *     imaginary_part = data[:,1]
  * 
  */
-  __pyx_tuple__16 = PyTuple_Pack(2, __pyx_slice__2, __pyx_int_0); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(2, __pyx_slice__2, __pyx_int_0); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 44, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__16);
   __Pyx_GIVEREF(__pyx_tuple__16);
 
-  /* "Photoenergy.pyx":50
- *         data = f["psi_final"][:]
- *         real_part = data[:,0]
- *         imaginary_part = data[:,1]             # <<<<<<<<<<<<<<
+  /* "Photoenergy.pyx":45
+ *     data = f["psi_final"][:]
+ *     real_part = data[:,0]
+ *     imaginary_part = data[:,1]             # <<<<<<<<<<<<<<
  * 
- *         wavefunction = real_part + 1j*imaginary_part
+ *     wavefunction = real_part + 1j*imaginary_part
  */
-  __pyx_tuple__17 = PyTuple_Pack(2, __pyx_slice__2, __pyx_int_1); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(2, __pyx_slice__2, __pyx_int_1); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_tuple__17);
 
-  /* "Photoenergy.pyx":56
- * 
- *     if comm.rank == 0:
- *         print("Reading Matrices")             # <<<<<<<<<<<<<<
- * 
- *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+  /* "Photoenergy.pyx":51
+ * psi_final= PETSc.Vec().createMPI(total_size,comm = comm)
+ * global_indices = np.arange(total_size)
+ * global_indices = global_indices.astype("int32")             # <<<<<<<<<<<<<<
+ * psi_final.setValues(global_indices,wavefunction)
+ * psi_final.assemble()
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_Reading_Matrices); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_n_s_int32); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "Photoenergy.pyx":59
+  /* "Photoenergy.pyx":56
  * 
- *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')             # <<<<<<<<<<<<<<
- *     S.load(viewer)
- *     viewer.destroy()
+ * if comm.rank == 0:
+ *     print("Reading Matrices")             # <<<<<<<<<<<<<<
+ * 
+ * S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
  */
-  __pyx_tuple__19 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_overlap_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_s_Reading_Matrices); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
-  /* "Photoenergy.pyx":64
+  /* "Photoenergy.pyx":59
  * 
- *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')             # <<<<<<<<<<<<<<
- *     H_0.load(viewer)
- *     viewer.destroy()
+ * S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r',comm = comm)             # <<<<<<<<<<<<<<
+ * S.load(viewer)
+ * viewer.destroy()
  */
-  __pyx_tuple__20 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_H_0_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __pyx_tuple__20 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_overlap_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 59, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
 
-  /* "Photoenergy.pyx":70
+  /* "Photoenergy.pyx":64
  * 
- *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')             # <<<<<<<<<<<<<<
- *     S_TILE.load(viewer)
- *     viewer.destroy()
+ * H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r',comm = comm)             # <<<<<<<<<<<<<<
+ * H_0.load(viewer)
+ * viewer.destroy()
  */
-  __pyx_tuple__21 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_S_T_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_H_0_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 64, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
 
-  /* "Photoenergy.pyx":74
- *     viewer.destroy()
+  /* "Photoenergy.pyx":69
+ * rows,cols = H_0.getSize()
  * 
- *     if not os.path.exists("matrix_files/S_T.bin"):             # <<<<<<<<<<<<<<
- *         if comm.rank == 0:
- *             print("Computing S_T")
+ * if not os.path.exists("matrix_files/S_T.bin"):             # <<<<<<<<<<<<<<
+ *     if comm.rank == 0:
+ *         print("Exiting Program, please compute S_T before running")
  */
-  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_matrix_files_S_T_bin); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_matrix_files_S_T_bin); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 69, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
 
-  /* "Photoenergy.pyx":76
- *     if not os.path.exists("matrix_files/S_T.bin"):
- *         if comm.rank == 0:
- *             print("Computing S_T")             # <<<<<<<<<<<<<<
- *             os.system("python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py")
+  /* "Photoenergy.pyx":71
+ * if not os.path.exists("matrix_files/S_T.bin"):
+ *     if comm.rank == 0:
+ *         print("Exiting Program, please compute S_T before running")             # <<<<<<<<<<<<<<
+ *     comm.abort()
  * 
  */
-  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_Computing_S_T); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_Exiting_Program_please_compute_S); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 71, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__23);
   __Pyx_GIVEREF(__pyx_tuple__23);
 
   /* "Photoenergy.pyx":77
- *         if comm.rank == 0:
- *             print("Computing S_T")
- *             os.system("python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py")             # <<<<<<<<<<<<<<
  * 
- * 
+ * S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r',comm = comm)             # <<<<<<<<<<<<<<
+ * S_TILE.load(viewer)
+ * viewer.destroy()
  */
-  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_python_users_becker_dopl4670_Res); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_tuple__24 = PyTuple_Pack(2, __pyx_kp_s_matrix_files_S_T_bin, __pyx_n_s_r); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 77, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__24);
   __Pyx_GIVEREF(__pyx_tuple__24);
 
-  /* "Photoenergy.pyx":88
+  /* "Photoenergy.pyx":92
  * 
  * 
  * def photoAngularV2(E_range,theta_range,phi_range,PAD,PES):             # <<<<<<<<<<<<<<
  *     PES_vals = []
  *     E_vals = []
  */
-  __pyx_tuple__25 = PyTuple_Pack(42, __pyx_n_s_E_range, __pyx_n_s_theta_range, __pyx_n_s_phi_range, __pyx_n_s_PAD, __pyx_n_s_PES, __pyx_n_s_PES_vals, __pyx_n_s_E_vals, __pyx_n_s_theta_vals, __pyx_n_s_phi_vals, __pyx_n_s_pad_vals, __pyx_n_s_ksp_A, __pyx_n_s_ksp_B, __pyx_n_s_ksp_C, __pyx_n_s_ksp_D, __pyx_n_s_theta_grid, __pyx_n_s_phi_grid, __pyx_n_s_sph_harmonics, __pyx_n_s_i, __pyx_n_s_l, __pyx_n_s_E, __pyx_n_s_A, __pyx_n_s_B, __pyx_n_s_C, __pyx_n_s_D, __pyx_n_s_psi_final_prime, __pyx_n_s_z, __pyx_n_s_z_prime, __pyx_n_s_w, __pyx_n_s_w_prime, __pyx_n_s_v, __pyx_n_s_v_prime, __pyx_n_s_x, __pyx_n_s_Sv, __pyx_n_s_PES_val, __pyx_n_s_theta_val, __pyx_n_s_j, __pyx_n_s_phi_val, __pyx_n_s_y, __pyx_n_s_values, __pyx_n_s_spherical_vector, __pyx_n_s_Su, __pyx_n_s_value); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_tuple__25 = PyTuple_Pack(43, __pyx_n_s_E_range, __pyx_n_s_theta_range, __pyx_n_s_phi_range, __pyx_n_s_PAD, __pyx_n_s_PES, __pyx_n_s_PES_vals, __pyx_n_s_E_vals, __pyx_n_s_theta_vals, __pyx_n_s_phi_vals, __pyx_n_s_pad_vals, __pyx_n_s_ksp_A, __pyx_n_s_ksp_B, __pyx_n_s_ksp_C, __pyx_n_s_ksp_D, __pyx_n_s_theta_grid, __pyx_n_s_phi_grid, __pyx_n_s_sph_harmonics, __pyx_n_s_i, __pyx_n_s_l, __pyx_n_s_E, __pyx_n_s_A, __pyx_n_s_B, __pyx_n_s_C, __pyx_n_s_D, __pyx_n_s_psi_final_prime, __pyx_n_s_z, __pyx_n_s_z_prime, __pyx_n_s_w, __pyx_n_s_w_prime, __pyx_n_s_v, __pyx_n_s_v_prime, __pyx_n_s_x, __pyx_n_s_Sv, __pyx_n_s_PES_val, __pyx_n_s_theta_val, __pyx_n_s_j, __pyx_n_s_phi_val, __pyx_n_s_y, __pyx_n_s_values, __pyx_n_s_spherical_vector, __pyx_n_s_global_indices, __pyx_n_s_Su, __pyx_n_s_value); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__25);
   __Pyx_GIVEREF(__pyx_tuple__25);
-  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(5, 0, 0, 42, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Photoenergy_pyx, __pyx_n_s_photoAngularV2, 88, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(5, 0, 0, 43, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Photoenergy_pyx, __pyx_n_s_photoAngularV2, 92, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -7672,7 +7870,7 @@ if (!__Pyx_RefNanny) {
  * import json
  * from scipy.special import sph_harm             # <<<<<<<<<<<<<<
  * import os
- * 
+ * import time
  */
   __pyx_t_3 = PyList_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 6, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -7692,7 +7890,7 @@ if (!__Pyx_RefNanny) {
  * import json
  * from scipy.special import sph_harm
  * import os             # <<<<<<<<<<<<<<
- * 
+ * import time
  * 
  */
   __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_n_s_os, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
@@ -7700,1569 +7898,1765 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_os, __pyx_t_2) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "Photoenergy.pyx":10
+  /* "Photoenergy.pyx":8
+ * from scipy.special import sph_harm
+ * import os
+ * import time             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __pyx_t_2 = __Pyx_ImportDottedModule(__pyx_n_s_time, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_time, __pyx_t_2) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":11
  * 
  * 
  * comm = PETSc.COMM_WORLD             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_COMM_WORLD); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 10, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_COMM_WORLD); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_comm, __pyx_t_3) < 0) __PYX_ERR(0, 10, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_comm, __pyx_t_3) < 0) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "Photoenergy.pyx":13
+  /* "Photoenergy.pyx":14
  * 
  * 
  * def q_nk(n,k):             # <<<<<<<<<<<<<<
  *         return ((2*k-1)*np.pi)/4
  * 
  */
-  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_11Photoenergy_1q_nk, 0, __pyx_n_s_q_nk, NULL, __pyx_n_s_Photoenergy, __pyx_d, ((PyObject *)__pyx_codeobj__10)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_11Photoenergy_1q_nk, 0, __pyx_n_s_q_nk, NULL, __pyx_n_s_Photoenergy, __pyx_d, ((PyObject *)__pyx_codeobj__10)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_q_nk, __pyx_t_3) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_q_nk, __pyx_t_3) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "Photoenergy.pyx":17
+ *         return ((2*k-1)*np.pi)/4
  * 
- * 
- * LOAD_EXT = True             # <<<<<<<<<<<<<<
- * 
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     print("Reading Input File")
  * 
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_LOAD_EXT, Py_True) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
-
-  /* "Photoenergy.pyx":20
- * 
- * 
- * if LOAD_EXT:             # <<<<<<<<<<<<<<
- * 
- *     if comm.rank == 0:
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_LOAD_EXT); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 20, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 20, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rank); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_4 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_2, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 17, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_4) {
 
-    /* "Photoenergy.pyx":22
- * if LOAD_EXT:
+    /* "Photoenergy.pyx":18
  * 
- *     if comm.rank == 0:             # <<<<<<<<<<<<<<
- *         print("Reading Input File")
+ * if comm.rank == 0:
+ *     print("Reading Input File")             # <<<<<<<<<<<<<<
  * 
+ * with open('input.json', 'r') as file:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rank); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_2, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 22, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (__pyx_t_4) {
-
-      /* "Photoenergy.pyx":23
- * 
- *     if comm.rank == 0:
- *         print("Reading Input File")             # <<<<<<<<<<<<<<
- * 
- *     with open('input.json', 'r') as file:
- */
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-      /* "Photoenergy.pyx":22
- * if LOAD_EXT:
- * 
- *     if comm.rank == 0:             # <<<<<<<<<<<<<<
- *         print("Reading Input File")
- * 
- */
-    }
-
-    /* "Photoenergy.pyx":25
- *         print("Reading Input File")
- * 
- *     with open('input.json', 'r') as file:             # <<<<<<<<<<<<<<
- *             input_par = json.load(file)
- *     order = input_par["splines"]["order"]
- */
-    /*with:*/ {
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L4_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 25, __pyx_L4_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __pyx_t_5;
-      __pyx_t_5 = 0;
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      /*try:*/ {
-        {
-          __Pyx_PyThreadState_declare
-          __Pyx_PyThreadState_assign
-          __Pyx_ExceptionSave(&__pyx_t_6, &__pyx_t_7, &__pyx_t_8);
-          __Pyx_XGOTREF(__pyx_t_6);
-          __Pyx_XGOTREF(__pyx_t_7);
-          __Pyx_XGOTREF(__pyx_t_8);
-          /*try:*/ {
-            if (PyDict_SetItem(__pyx_d, __pyx_n_s_file, __pyx_t_3) < 0) __PYX_ERR(0, 25, __pyx_L8_error)
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-            /* "Photoenergy.pyx":26
- * 
- *     with open('input.json', 'r') as file:
- *             input_par = json.load(file)             # <<<<<<<<<<<<<<
- *     order = input_par["splines"]["order"]
- *     lmax = input_par["lm"]["lmax"]
- */
-            __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_json); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 26, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_load); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_2);
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-            __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 26, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 26, __pyx_L8_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (PyDict_SetItem(__pyx_d, __pyx_n_s_input_par, __pyx_t_5) < 0) __PYX_ERR(0, 26, __pyx_L8_error)
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-            /* "Photoenergy.pyx":25
- *         print("Reading Input File")
- * 
- *     with open('input.json', 'r') as file:             # <<<<<<<<<<<<<<
- *             input_par = json.load(file)
- *     order = input_par["splines"]["order"]
- */
-          }
-          __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          goto __pyx_L13_try_end;
-          __pyx_L8_error:;
-          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-          /*except:*/ {
-            __Pyx_AddTraceback("Photoenergy", __pyx_clineno, __pyx_lineno, __pyx_filename);
-            if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_3, &__pyx_t_2) < 0) __PYX_ERR(0, 25, __pyx_L10_except_error)
-            __Pyx_XGOTREF(__pyx_t_5);
-            __Pyx_XGOTREF(__pyx_t_3);
-            __Pyx_XGOTREF(__pyx_t_2);
-            __pyx_t_9 = PyTuple_Pack(3, __pyx_t_5, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 25, __pyx_L10_except_error)
-            __Pyx_GOTREF(__pyx_t_9);
-            __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_9, NULL);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 25, __pyx_L10_except_error)
-            __Pyx_GOTREF(__pyx_t_10);
-            __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_10);
-            __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-            if (__pyx_t_4 < 0) __PYX_ERR(0, 25, __pyx_L10_except_error)
-            __pyx_t_11 = (!__pyx_t_4);
-            if (unlikely(__pyx_t_11)) {
-              __Pyx_GIVEREF(__pyx_t_5);
-              __Pyx_GIVEREF(__pyx_t_3);
-              __Pyx_XGIVEREF(__pyx_t_2);
-              __Pyx_ErrRestoreWithState(__pyx_t_5, __pyx_t_3, __pyx_t_2);
-              __pyx_t_5 = 0; __pyx_t_3 = 0; __pyx_t_2 = 0; 
-              __PYX_ERR(0, 25, __pyx_L10_except_error)
-            }
-            __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-            __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-            __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-            goto __pyx_L9_exception_handled;
-          }
-          __pyx_L10_except_error:;
-          __Pyx_XGIVEREF(__pyx_t_6);
-          __Pyx_XGIVEREF(__pyx_t_7);
-          __Pyx_XGIVEREF(__pyx_t_8);
-          __Pyx_ExceptionReset(__pyx_t_6, __pyx_t_7, __pyx_t_8);
-          goto __pyx_L1_error;
-          __pyx_L9_exception_handled:;
-          __Pyx_XGIVEREF(__pyx_t_6);
-          __Pyx_XGIVEREF(__pyx_t_7);
-          __Pyx_XGIVEREF(__pyx_t_8);
-          __Pyx_ExceptionReset(__pyx_t_6, __pyx_t_7, __pyx_t_8);
-          __pyx_L13_try_end:;
-        }
-      }
-      /*finally:*/ {
-        /*normal exit:*/{
-          if (__pyx_t_1) {
-            __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, NULL);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 25, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_8);
-            __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-          }
-          goto __pyx_L7;
-        }
-        __pyx_L7:;
-      }
-      goto __pyx_L17;
-      __pyx_L4_error:;
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      goto __pyx_L1_error;
-      __pyx_L17:;
-    }
-
-    /* "Photoenergy.pyx":27
- *     with open('input.json', 'r') as file:
- *             input_par = json.load(file)
- *     order = input_par["splines"]["order"]             # <<<<<<<<<<<<<<
- *     lmax = input_par["lm"]["lmax"]
- *     N_knots = input_par["splines"]["N_knots"]
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_input_par); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_s_splines); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 27, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_order); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_order, __pyx_t_2) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "Photoenergy.pyx":28
- *             input_par = json.load(file)
- *     order = input_par["splines"]["order"]
- *     lmax = input_par["lm"]["lmax"]             # <<<<<<<<<<<<<<
- *     N_knots = input_par["splines"]["N_knots"]
- *     n_basis = N_knots - order - 2
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_input_par); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_s_lm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 28, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_lmax); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 28, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_lmax, __pyx_t_2) < 0) __PYX_ERR(0, 28, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "Photoenergy.pyx":29
- *     order = input_par["splines"]["order"]
- *     lmax = input_par["lm"]["lmax"]
- *     N_knots = input_par["splines"]["N_knots"]             # <<<<<<<<<<<<<<
- *     n_basis = N_knots - order - 2
- *     total_size = n_basis * (lmax+1)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_input_par); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_s_splines); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 29, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_N_knots); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_N_knots, __pyx_t_2) < 0) __PYX_ERR(0, 29, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "Photoenergy.pyx":30
- *     lmax = input_par["lm"]["lmax"]
- *     N_knots = input_par["splines"]["N_knots"]
- *     n_basis = N_knots - order - 2             # <<<<<<<<<<<<<<
- *     total_size = n_basis * (lmax+1)
- *     l_values = np.repeat(np.arange(lmax+1),n_basis)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_N_knots); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_order); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = PyNumber_Subtract(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 30, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyInt_SubtractObjC(__pyx_t_5, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_n_basis, __pyx_t_3) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-    /* "Photoenergy.pyx":31
- *     N_knots = input_par["splines"]["N_knots"]
- *     n_basis = N_knots - order - 2
- *     total_size = n_basis * (lmax+1)             # <<<<<<<<<<<<<<
- *     l_values = np.repeat(np.arange(lmax+1),n_basis)
+    /* "Photoenergy.pyx":17
+ *         return ((2*k-1)*np.pi)/4
  * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 31, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_lmax); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 31, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 31, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 31, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_total_size, __pyx_t_5) < 0) __PYX_ERR(0, 31, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-    /* "Photoenergy.pyx":32
- *     n_basis = N_knots - order - 2
- *     total_size = n_basis * (lmax+1)
- *     l_values = np.repeat(np.arange(lmax+1),n_basis)             # <<<<<<<<<<<<<<
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     print("Reading Input File")
  * 
- *     PES = input_par["PES"][0]
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_repeat); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_arange); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_lmax); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5)) __PYX_ERR(0, 32, __pyx_L1_error);
-    __Pyx_GIVEREF(__pyx_t_9);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_9)) __PYX_ERR(0, 32, __pyx_L1_error);
-    __pyx_t_5 = 0;
-    __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_l_values, __pyx_t_9) < 0) __PYX_ERR(0, 32, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":34
- *     l_values = np.repeat(np.arange(lmax+1),n_basis)
- * 
- *     PES = input_par["PES"][0]             # <<<<<<<<<<<<<<
- *     PAD = input_par["PAD"][0]
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_input_par); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 34, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_PES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 34, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 34, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_PES, __pyx_t_9) < 0) __PYX_ERR(0, 34, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":35
- * 
- *     PES = input_par["PES"][0]
- *     PAD = input_par["PAD"][0]             # <<<<<<<<<<<<<<
- * 
- *     if PES:
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_input_par); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 35, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_PAD); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 35, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_PAD, __pyx_t_9) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":37
- *     PAD = input_par["PAD"][0]
- * 
- *     if PES:             # <<<<<<<<<<<<<<
- *         E_min,E_max = input_par["PES"][1],input_par["PES"][2]
- *     if PAD:
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_PES); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 37, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 37, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (__pyx_t_11) {
-
-      /* "Photoenergy.pyx":38
- * 
- *     if PES:
- *         E_min,E_max = input_par["PES"][1],input_par["PES"][2]             # <<<<<<<<<<<<<<
- *     if PAD:
- *         E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]
- */
-      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_input_par); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 38, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_PES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 38, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_input_par); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_PES); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 38, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_min, __pyx_t_9) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_max, __pyx_t_3) < 0) __PYX_ERR(0, 38, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-      /* "Photoenergy.pyx":37
- *     PAD = input_par["PAD"][0]
- * 
- *     if PES:             # <<<<<<<<<<<<<<
- *         E_min,E_max = input_par["PES"][1],input_par["PES"][2]
- *     if PAD:
- */
-    }
-
-    /* "Photoenergy.pyx":39
- *     if PES:
- *         E_min,E_max = input_par["PES"][1],input_par["PES"][2]
- *     if PAD:             # <<<<<<<<<<<<<<
- *         E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_PAD); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 39, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (__pyx_t_11) {
-
-      /* "Photoenergy.pyx":40
- *         E_min,E_max = input_par["PES"][1],input_par["PES"][2]
- *     if PAD:
- *         E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]             # <<<<<<<<<<<<<<
- * 
- * 
- */
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_input_par); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_9 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_PAD); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 40, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 40, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_input_par); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 40, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_PAD); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 40, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 40, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_min, __pyx_t_3) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_max, __pyx_t_9) < 0) __PYX_ERR(0, 40, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-      /* "Photoenergy.pyx":39
- *     if PES:
- *         E_min,E_max = input_par["PES"][1],input_par["PES"][2]
- *     if PAD:             # <<<<<<<<<<<<<<
- *         E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]
- * 
- */
-    }
-
-    /* "Photoenergy.pyx":43
- * 
- * 
- *     if comm.rank == 0:             # <<<<<<<<<<<<<<
- *         print("Reading Final State")
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_comm); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 43, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_rank); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 43, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_11 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_3, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 43, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (__pyx_t_11) {
-
-      /* "Photoenergy.pyx":44
- * 
- *     if comm.rank == 0:
- *         print("Reading Final State")             # <<<<<<<<<<<<<<
- * 
- * 
- */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-      /* "Photoenergy.pyx":43
- * 
- * 
- *     if comm.rank == 0:             # <<<<<<<<<<<<<<
- *         print("Reading Final State")
- * 
- */
-    }
-
-    /* "Photoenergy.pyx":47
- * 
- * 
- *     with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
- *         data = f["psi_final"][:]
- *         real_part = data[:,0]
- */
-    /*with:*/ {
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_h5py); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 47, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_File); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 47, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 47, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_1 = __Pyx_PyObject_LookupSpecial(__pyx_t_3, __pyx_n_s_exit); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 47, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_9 = __Pyx_PyObject_LookupSpecial(__pyx_t_3, __pyx_n_s_enter); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 47, __pyx_L21_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L21_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_9 = __pyx_t_2;
-      __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      /*try:*/ {
-        {
-          __Pyx_PyThreadState_declare
-          __Pyx_PyThreadState_assign
-          __Pyx_ExceptionSave(&__pyx_t_8, &__pyx_t_7, &__pyx_t_6);
-          __Pyx_XGOTREF(__pyx_t_8);
-          __Pyx_XGOTREF(__pyx_t_7);
-          __Pyx_XGOTREF(__pyx_t_6);
-          /*try:*/ {
-            if (PyDict_SetItem(__pyx_d, __pyx_n_s_f, __pyx_t_9) < 0) __PYX_ERR(0, 47, __pyx_L25_error)
-            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-            /* "Photoenergy.pyx":48
- * 
- *     with h5py.File('TDSE.h5', 'r') as f:
- *         data = f["psi_final"][:]             # <<<<<<<<<<<<<<
- *         real_part = data[:,0]
- *         imaginary_part = data[:,1]
- */
-            __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_f); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 48, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_9);
-            __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 48, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __pyx_t_9 = __Pyx_PyObject_GetSlice(__pyx_t_3, 0, 0, NULL, NULL, &__pyx_slice__2, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 48, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_9);
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (PyDict_SetItem(__pyx_d, __pyx_n_s_data, __pyx_t_9) < 0) __PYX_ERR(0, 48, __pyx_L25_error)
-            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-            /* "Photoenergy.pyx":49
- *     with h5py.File('TDSE.h5', 'r') as f:
- *         data = f["psi_final"][:]
- *         real_part = data[:,0]             # <<<<<<<<<<<<<<
- *         imaginary_part = data[:,1]
- * 
- */
-            __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_data); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 49, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_9);
-            __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_9, __pyx_tuple__16); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 49, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            if (PyDict_SetItem(__pyx_d, __pyx_n_s_real_part, __pyx_t_3) < 0) __PYX_ERR(0, 49, __pyx_L25_error)
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-            /* "Photoenergy.pyx":50
- *         data = f["psi_final"][:]
- *         real_part = data[:,0]
- *         imaginary_part = data[:,1]             # <<<<<<<<<<<<<<
- * 
- *         wavefunction = real_part + 1j*imaginary_part
- */
-            __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_data); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_tuple__17); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 50, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_9);
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (PyDict_SetItem(__pyx_d, __pyx_n_s_imaginary_part, __pyx_t_9) < 0) __PYX_ERR(0, 50, __pyx_L25_error)
-            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-            /* "Photoenergy.pyx":52
- *         imaginary_part = data[:,1]
- * 
- *         wavefunction = real_part + 1j*imaginary_part             # <<<<<<<<<<<<<<
- *     psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)
- * 
- */
-            __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_real_part); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 52, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_9);
-            __pyx_t_3 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_imaginary_part); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_2);
-            __pyx_t_5 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 52, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_5);
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __pyx_t_2 = PyNumber_Add(__pyx_t_9, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L25_error)
-            __Pyx_GOTREF(__pyx_t_2);
-            __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-            __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            if (PyDict_SetItem(__pyx_d, __pyx_n_s_wavefunction, __pyx_t_2) < 0) __PYX_ERR(0, 52, __pyx_L25_error)
-            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-            /* "Photoenergy.pyx":47
- * 
- * 
- *     with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
- *         data = f["psi_final"][:]
- *         real_part = data[:,0]
- */
-          }
-          __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-          goto __pyx_L30_try_end;
-          __pyx_L25_error:;
-          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-          __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-          /*except:*/ {
-            __Pyx_AddTraceback("Photoenergy", __pyx_clineno, __pyx_lineno, __pyx_filename);
-            if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_5, &__pyx_t_9) < 0) __PYX_ERR(0, 47, __pyx_L27_except_error)
-            __Pyx_XGOTREF(__pyx_t_2);
-            __Pyx_XGOTREF(__pyx_t_5);
-            __Pyx_XGOTREF(__pyx_t_9);
-            __pyx_t_3 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 47, __pyx_L27_except_error)
-            __Pyx_GOTREF(__pyx_t_3);
-            __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 47, __pyx_L27_except_error)
-            __Pyx_GOTREF(__pyx_t_10);
-            __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_10);
-            __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-            if (__pyx_t_11 < 0) __PYX_ERR(0, 47, __pyx_L27_except_error)
-            __pyx_t_4 = (!__pyx_t_11);
-            if (unlikely(__pyx_t_4)) {
-              __Pyx_GIVEREF(__pyx_t_2);
-              __Pyx_GIVEREF(__pyx_t_5);
-              __Pyx_XGIVEREF(__pyx_t_9);
-              __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_5, __pyx_t_9);
-              __pyx_t_2 = 0; __pyx_t_5 = 0; __pyx_t_9 = 0; 
-              __PYX_ERR(0, 47, __pyx_L27_except_error)
-            }
-            __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-            __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-            __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-            goto __pyx_L26_exception_handled;
-          }
-          __pyx_L27_except_error:;
-          __Pyx_XGIVEREF(__pyx_t_8);
-          __Pyx_XGIVEREF(__pyx_t_7);
-          __Pyx_XGIVEREF(__pyx_t_6);
-          __Pyx_ExceptionReset(__pyx_t_8, __pyx_t_7, __pyx_t_6);
-          goto __pyx_L1_error;
-          __pyx_L26_exception_handled:;
-          __Pyx_XGIVEREF(__pyx_t_8);
-          __Pyx_XGIVEREF(__pyx_t_7);
-          __Pyx_XGIVEREF(__pyx_t_6);
-          __Pyx_ExceptionReset(__pyx_t_8, __pyx_t_7, __pyx_t_6);
-          __pyx_L30_try_end:;
-        }
-      }
-      /*finally:*/ {
-        /*normal exit:*/{
-          if (__pyx_t_1) {
-            __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, NULL);
-            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 47, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_6);
-            __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          }
-          goto __pyx_L24;
-        }
-        __pyx_L24:;
-      }
-      goto __pyx_L34;
-      __pyx_L21_error:;
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      goto __pyx_L1_error;
-      __pyx_L34:;
-    }
-
-    /* "Photoenergy.pyx":53
- * 
- *         wavefunction = real_part + 1j*imaginary_part
- *     psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)             # <<<<<<<<<<<<<<
- * 
- *     if comm.rank == 0:
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_Vec); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_createWithArray); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_9);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_9)) __PYX_ERR(0, 53, __pyx_L1_error);
-    __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_total_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_size, __pyx_t_3) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_comm, __pyx_t_3) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_psi_final, __pyx_t_3) < 0) __PYX_ERR(0, 53, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-    /* "Photoenergy.pyx":55
- *     psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)
- * 
- *     if comm.rank == 0:             # <<<<<<<<<<<<<<
- *         print("Reading Matrices")
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_rank); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 55, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_4 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_9, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 55, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (__pyx_t_4) {
-
-      /* "Photoenergy.pyx":56
- * 
- *     if comm.rank == 0:
- *         print("Reading Matrices")             # <<<<<<<<<<<<<<
- * 
- *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- */
-      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 56, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-      /* "Photoenergy.pyx":55
- *     psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)
- * 
- *     if comm.rank == 0:             # <<<<<<<<<<<<<<
- *         print("Reading Matrices")
- * 
- */
-    }
-
-    /* "Photoenergy.pyx":58
- *         print("Reading Matrices")
- * 
- *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
- *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
- *     S.load(viewer)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_Mat); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_createAIJ); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_12 = PyObject_Length(__pyx_t_9); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_12 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = PyList_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GIVEREF(__pyx_t_9);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 0, __pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error);
-    __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_5, 1, __pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error);
-    __pyx_t_9 = 0;
-    __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error);
-    __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_order); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_13 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_9, 2, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_t_13, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_nnz, __pyx_t_9) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_comm); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_comm, __pyx_t_9) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_S, __pyx_t_9) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":59
- * 
- *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')             # <<<<<<<<<<<<<<
- *     S.load(viewer)
- *     viewer.destroy()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 59, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_Viewer); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 59, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_createBinary); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 59, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_viewer, __pyx_t_9) < 0) __PYX_ERR(0, 59, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "Photoenergy.pyx":60
- *     S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
- *     S.load(viewer)             # <<<<<<<<<<<<<<
- *     viewer.destroy()
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_S); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 60, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_load); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 60, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_viewer); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 60, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "Photoenergy.pyx":61
- *     viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r')
- *     S.load(viewer)
- *     viewer.destroy()             # <<<<<<<<<<<<<<
- * 
- *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_viewer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_destroy); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 61, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "Photoenergy.pyx":63
- *     viewer.destroy()
- * 
- *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
- *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
- *     H_0.load(viewer)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Mat); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_createAIJ); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_12 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_12 = PyObject_Length(__pyx_t_5); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = PyList_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_3, 0, __pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error);
-    __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_3, 1, __pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error);
-    __pyx_t_2 = 0;
-    __pyx_t_5 = 0;
-    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GIVEREF(__pyx_t_3);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error);
-    __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_order); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_13 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_2, 2, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_13, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_nnz, __pyx_t_2) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_comm, __pyx_t_2) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_H_0, __pyx_t_2) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "Photoenergy.pyx":64
- * 
- *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')             # <<<<<<<<<<<<<<
- *     H_0.load(viewer)
- *     viewer.destroy()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Viewer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_createBinary); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_viewer, __pyx_t_2) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "Photoenergy.pyx":65
- *     H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
- *     H_0.load(viewer)             # <<<<<<<<<<<<<<
- *     viewer.destroy()
- *     rows,cols = H_0.getSize()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_H_0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_load); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 65, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_viewer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 65, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-    /* "Photoenergy.pyx":66
- *     viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r')
- *     H_0.load(viewer)
- *     viewer.destroy()             # <<<<<<<<<<<<<<
- *     rows,cols = H_0.getSize()
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_viewer); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_destroy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-    /* "Photoenergy.pyx":67
- *     H_0.load(viewer)
- *     viewer.destroy()
- *     rows,cols = H_0.getSize()             # <<<<<<<<<<<<<<
- * 
- *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_H_0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 67, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_getSize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 67, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 67, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if ((likely(PyTuple_CheckExact(__pyx_t_5))) || (PyList_CheckExact(__pyx_t_5))) {
-      PyObject* sequence = __pyx_t_5;
-      Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-      if (unlikely(size != 2)) {
-        if (size > 2) __Pyx_RaiseTooManyValuesError(2);
-        else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 67, __pyx_L1_error)
-      }
-      #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-      if (likely(PyTuple_CheckExact(sequence))) {
-        __pyx_t_2 = PyTuple_GET_ITEM(sequence, 0); 
-        __pyx_t_3 = PyTuple_GET_ITEM(sequence, 1); 
-      } else {
-        __pyx_t_2 = PyList_GET_ITEM(sequence, 0); 
-        __pyx_t_3 = PyList_GET_ITEM(sequence, 1); 
-      }
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      #else
-      __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 67, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 67, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      #endif
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    } else {
-      Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 67, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_14 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_9);
-      index = 0; __pyx_t_2 = __pyx_t_14(__pyx_t_9); if (unlikely(!__pyx_t_2)) goto __pyx_L36_unpacking_failed;
-      __Pyx_GOTREF(__pyx_t_2);
-      index = 1; __pyx_t_3 = __pyx_t_14(__pyx_t_9); if (unlikely(!__pyx_t_3)) goto __pyx_L36_unpacking_failed;
-      __Pyx_GOTREF(__pyx_t_3);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_14(__pyx_t_9), 2) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
-      __pyx_t_14 = NULL;
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      goto __pyx_L37_unpacking_done;
-      __pyx_L36_unpacking_failed:;
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_14 = NULL;
-      if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 67, __pyx_L1_error)
-      __pyx_L37_unpacking_done:;
-    }
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_rows, __pyx_t_2) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_cols, __pyx_t_3) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-    /* "Photoenergy.pyx":69
- *     rows,cols = H_0.getSize()
- * 
- *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
- *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')
- *     S_TILE.load(viewer)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_Mat); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_createAIJ); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_lmax); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyNumber_Multiply(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_lmax); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_13 = __Pyx_PyInt_AddObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyNumber_Multiply(__pyx_t_9, __pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __pyx_t_13 = PyList_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_GIVEREF(__pyx_t_2);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_13, 0, __pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error);
-    __Pyx_GIVEREF(__pyx_t_5);
-    if (__Pyx_PyList_SET_ITEM(__pyx_t_13, 1, __pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error);
-    __pyx_t_2 = 0;
-    __pyx_t_5 = 0;
-    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_GIVEREF(__pyx_t_13);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_13)) __PYX_ERR(0, 69, __pyx_L1_error);
-    __pyx_t_13 = 0;
-    __pyx_t_13 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_order); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_15 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_9, 2, 0, 0); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_t_15, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_9);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = PyNumber_Multiply(__pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_nnz, __pyx_t_15) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_comm); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_comm, __pyx_t_15) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_S_TILE, __pyx_t_15) < 0) __PYX_ERR(0, 69, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-
-    /* "Photoenergy.pyx":70
- * 
- *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')             # <<<<<<<<<<<<<<
- *     S_TILE.load(viewer)
- *     viewer.destroy()
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 70, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_Viewer); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 70, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = __Pyx_PyObject_CallNoArg(__pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 70, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_createBinary); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 70, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 70, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_viewer, __pyx_t_15) < 0) __PYX_ERR(0, 70, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-
-    /* "Photoenergy.pyx":71
- *     S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
- *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')
- *     S_TILE.load(viewer)             # <<<<<<<<<<<<<<
- *     viewer.destroy()
- * 
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_S_TILE); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 71, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_load); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 71, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_viewer); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 71, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_13, __pyx_t_15); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 71, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-    /* "Photoenergy.pyx":72
- *     viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r')
- *     S_TILE.load(viewer)
- *     viewer.destroy()             # <<<<<<<<<<<<<<
- * 
- *     if not os.path.exists("matrix_files/S_T.bin"):
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_viewer); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_destroy); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_15); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 72, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-    /* "Photoenergy.pyx":74
- *     viewer.destroy()
- * 
- *     if not os.path.exists("matrix_files/S_T.bin"):             # <<<<<<<<<<<<<<
- *         if comm.rank == 0:
- *             print("Computing S_T")
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_os); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 74, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_path); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 74, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_exists); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 74, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 74, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_15);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_15); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 74, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-    __pyx_t_11 = (!__pyx_t_4);
-    if (__pyx_t_11) {
-
-      /* "Photoenergy.pyx":75
- * 
- *     if not os.path.exists("matrix_files/S_T.bin"):
- *         if comm.rank == 0:             # <<<<<<<<<<<<<<
- *             print("Computing S_T")
- *             os.system("python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py")
- */
-      __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_comm); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 75, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_15);
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_rank); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 75, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-      __pyx_t_11 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_5, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 75, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (__pyx_t_11) {
-
-        /* "Photoenergy.pyx":76
- *     if not os.path.exists("matrix_files/S_T.bin"):
- *         if comm.rank == 0:
- *             print("Computing S_T")             # <<<<<<<<<<<<<<
- *             os.system("python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py")
- * 
- */
-        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 76, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-        /* "Photoenergy.pyx":77
- *         if comm.rank == 0:
- *             print("Computing S_T")
- *             os.system("python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py")             # <<<<<<<<<<<<<<
- * 
- * 
- */
-        __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_os); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 77, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_system); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 77, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_15);
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 77, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-        /* "Photoenergy.pyx":75
- * 
- *     if not os.path.exists("matrix_files/S_T.bin"):
- *         if comm.rank == 0:             # <<<<<<<<<<<<<<
- *             print("Computing S_T")
- *             os.system("python /users/becker/dopl4670/Research/TDSE/Analysis/EnergySpectrum/ComputeS_T.py")
- */
-      }
-
-      /* "Photoenergy.pyx":74
- *     viewer.destroy()
- * 
- *     if not os.path.exists("matrix_files/S_T.bin"):             # <<<<<<<<<<<<<<
- *         if comm.rank == 0:
- *             print("Computing S_T")
- */
-    }
-
-    /* "Photoenergy.pyx":20
- * 
- * 
- * if LOAD_EXT:             # <<<<<<<<<<<<<<
- * 
- *     if comm.rank == 0:
  */
   }
 
-  /* "Photoenergy.pyx":80
+  /* "Photoenergy.pyx":20
+ *     print("Reading Input File")
+ * 
+ * with open('input.json', 'r') as file:             # <<<<<<<<<<<<<<
+ *         input_par = json.load(file)
+ * order = input_par["splines"]["order"]
+ */
+  /*with:*/ {
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 20, __pyx_L3_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 20, __pyx_L3_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __pyx_t_5;
+    __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    /*try:*/ {
+      {
+        __Pyx_PyThreadState_declare
+        __Pyx_PyThreadState_assign
+        __Pyx_ExceptionSave(&__pyx_t_6, &__pyx_t_7, &__pyx_t_8);
+        __Pyx_XGOTREF(__pyx_t_6);
+        __Pyx_XGOTREF(__pyx_t_7);
+        __Pyx_XGOTREF(__pyx_t_8);
+        /*try:*/ {
+          if (PyDict_SetItem(__pyx_d, __pyx_n_s_file, __pyx_t_3) < 0) __PYX_ERR(0, 20, __pyx_L7_error)
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+          /* "Photoenergy.pyx":21
+ * 
+ * with open('input.json', 'r') as file:
+ *         input_par = json.load(file)             # <<<<<<<<<<<<<<
+ * order = input_par["splines"]["order"]
+ * lmax = input_par["lm"]["lmax"]
+ */
+          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_json); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_load); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 21, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_file); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 21, __pyx_L7_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          if (PyDict_SetItem(__pyx_d, __pyx_n_s_input_par, __pyx_t_5) < 0) __PYX_ERR(0, 21, __pyx_L7_error)
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+          /* "Photoenergy.pyx":20
+ *     print("Reading Input File")
+ * 
+ * with open('input.json', 'r') as file:             # <<<<<<<<<<<<<<
+ *         input_par = json.load(file)
+ * order = input_par["splines"]["order"]
+ */
+        }
+        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+        goto __pyx_L12_try_end;
+        __pyx_L7_error:;
+        __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+        /*except:*/ {
+          __Pyx_AddTraceback("Photoenergy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+          if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_3, &__pyx_t_2) < 0) __PYX_ERR(0, 20, __pyx_L9_except_error)
+          __Pyx_XGOTREF(__pyx_t_5);
+          __Pyx_XGOTREF(__pyx_t_3);
+          __Pyx_XGOTREF(__pyx_t_2);
+          __pyx_t_9 = PyTuple_Pack(3, __pyx_t_5, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 20, __pyx_L9_except_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_9, NULL);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 20, __pyx_L9_except_error)
+          __Pyx_GOTREF(__pyx_t_10);
+          __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_10);
+          __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+          if (__pyx_t_4 < 0) __PYX_ERR(0, 20, __pyx_L9_except_error)
+          __pyx_t_11 = (!__pyx_t_4);
+          if (unlikely(__pyx_t_11)) {
+            __Pyx_GIVEREF(__pyx_t_5);
+            __Pyx_GIVEREF(__pyx_t_3);
+            __Pyx_XGIVEREF(__pyx_t_2);
+            __Pyx_ErrRestoreWithState(__pyx_t_5, __pyx_t_3, __pyx_t_2);
+            __pyx_t_5 = 0; __pyx_t_3 = 0; __pyx_t_2 = 0; 
+            __PYX_ERR(0, 20, __pyx_L9_except_error)
+          }
+          __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          goto __pyx_L8_exception_handled;
+        }
+        __pyx_L9_except_error:;
+        __Pyx_XGIVEREF(__pyx_t_6);
+        __Pyx_XGIVEREF(__pyx_t_7);
+        __Pyx_XGIVEREF(__pyx_t_8);
+        __Pyx_ExceptionReset(__pyx_t_6, __pyx_t_7, __pyx_t_8);
+        goto __pyx_L1_error;
+        __pyx_L8_exception_handled:;
+        __Pyx_XGIVEREF(__pyx_t_6);
+        __Pyx_XGIVEREF(__pyx_t_7);
+        __Pyx_XGIVEREF(__pyx_t_8);
+        __Pyx_ExceptionReset(__pyx_t_6, __pyx_t_7, __pyx_t_8);
+        __pyx_L12_try_end:;
+      }
+    }
+    /*finally:*/ {
+      /*normal exit:*/{
+        if (__pyx_t_1) {
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, NULL);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 20, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_8);
+          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+        }
+        goto __pyx_L6;
+      }
+      __pyx_L6:;
+    }
+    goto __pyx_L16;
+    __pyx_L3_error:;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    goto __pyx_L1_error;
+    __pyx_L16:;
+  }
+
+  /* "Photoenergy.pyx":22
+ * with open('input.json', 'r') as file:
+ *         input_par = json.load(file)
+ * order = input_par["splines"]["order"]             # <<<<<<<<<<<<<<
+ * lmax = input_par["lm"]["lmax"]
+ * N_knots = input_par["splines"]["N_knots"]
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_input_par); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_s_splines); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_order); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 22, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_order, __pyx_t_2) < 0) __PYX_ERR(0, 22, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":23
+ *         input_par = json.load(file)
+ * order = input_par["splines"]["order"]
+ * lmax = input_par["lm"]["lmax"]             # <<<<<<<<<<<<<<
+ * N_knots = input_par["splines"]["N_knots"]
+ * n_basis = N_knots - order - 2
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_input_par); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_s_lm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_lmax); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_lmax, __pyx_t_2) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":24
+ * order = input_par["splines"]["order"]
+ * lmax = input_par["lm"]["lmax"]
+ * N_knots = input_par["splines"]["N_knots"]             # <<<<<<<<<<<<<<
+ * n_basis = N_knots - order - 2
+ * total_size = n_basis * (lmax+1)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_input_par); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_2, __pyx_n_s_splines); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_N_knots); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_N_knots, __pyx_t_2) < 0) __PYX_ERR(0, 24, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":25
+ * lmax = input_par["lm"]["lmax"]
+ * N_knots = input_par["splines"]["N_knots"]
+ * n_basis = N_knots - order - 2             # <<<<<<<<<<<<<<
+ * total_size = n_basis * (lmax+1)
+ * l_values = np.repeat(np.arange(lmax+1),n_basis)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_N_knots); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_order); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = PyNumber_Subtract(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyInt_SubtractObjC(__pyx_t_5, __pyx_int_2, 2, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_n_basis, __pyx_t_3) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "Photoenergy.pyx":26
+ * N_knots = input_par["splines"]["N_knots"]
+ * n_basis = N_knots - order - 2
+ * total_size = n_basis * (lmax+1)             # <<<<<<<<<<<<<<
+ * l_values = np.repeat(np.arange(lmax+1),n_basis)
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_lmax); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_total_size, __pyx_t_5) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "Photoenergy.pyx":27
+ * n_basis = N_knots - order - 2
+ * total_size = n_basis * (lmax+1)
+ * l_values = np.repeat(np.arange(lmax+1),n_basis)             # <<<<<<<<<<<<<<
+ * 
+ * PES = input_par["PES"][0]
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_repeat); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_arange); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_lmax); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = __Pyx_PyInt_AddObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_5);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5)) __PYX_ERR(0, 27, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_9)) __PYX_ERR(0, 27, __pyx_L1_error);
+  __pyx_t_5 = 0;
+  __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_l_values, __pyx_t_9) < 0) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+  /* "Photoenergy.pyx":29
+ * l_values = np.repeat(np.arange(lmax+1),n_basis)
+ * 
+ * PES = input_par["PES"][0]             # <<<<<<<<<<<<<<
+ * PAD = input_par["PAD"][0]
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_input_par); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_PES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PES, __pyx_t_9) < 0) __PYX_ERR(0, 29, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+  /* "Photoenergy.pyx":30
+ * 
+ * PES = input_par["PES"][0]
+ * PAD = input_par["PAD"][0]             # <<<<<<<<<<<<<<
+ * 
+ * if PES:
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_input_par); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_PAD); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_3, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_PAD, __pyx_t_9) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+  /* "Photoenergy.pyx":32
+ * PAD = input_par["PAD"][0]
+ * 
+ * if PES:             # <<<<<<<<<<<<<<
+ *     E_min,E_max = input_par["PES"][1],input_par["PES"][2]
+ * if PAD:
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_PES); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 32, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (__pyx_t_11) {
+
+    /* "Photoenergy.pyx":33
+ * 
+ * if PES:
+ *     E_min,E_max = input_par["PES"][1],input_par["PES"][2]             # <<<<<<<<<<<<<<
+ * if PAD:
+ *     E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_input_par); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_PES); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_3, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_input_par); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_PES); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 33, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_min, __pyx_t_9) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_max, __pyx_t_3) < 0) __PYX_ERR(0, 33, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "Photoenergy.pyx":32
+ * PAD = input_par["PAD"][0]
+ * 
+ * if PES:             # <<<<<<<<<<<<<<
+ *     E_min,E_max = input_par["PES"][1],input_par["PES"][2]
+ * if PAD:
+ */
+  }
+
+  /* "Photoenergy.pyx":34
+ * if PES:
+ *     E_min,E_max = input_par["PES"][1],input_par["PES"][2]
+ * if PAD:             # <<<<<<<<<<<<<<
+ *     E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_PAD); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 34, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 34, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (__pyx_t_11) {
+
+    /* "Photoenergy.pyx":35
+ *     E_min,E_max = input_par["PES"][1],input_par["PES"][2]
+ * if PAD:
+ *     E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_input_par); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_9 = __Pyx_PyObject_Dict_GetItem(__pyx_t_3, __pyx_n_s_PAD); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 35, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_9, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 35, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_input_par); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 35, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_PAD); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_9 = __Pyx_GetItemInt(__pyx_t_2, 2, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 35, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_min, __pyx_t_3) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_max, __pyx_t_9) < 0) __PYX_ERR(0, 35, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":34
+ * if PES:
+ *     E_min,E_max = input_par["PES"][1],input_par["PES"][2]
+ * if PAD:             # <<<<<<<<<<<<<<
+ *     E_min,E_max = input_par["PAD"][1],input_par["PAD"][2]
+ * 
+ */
+  }
+
+  /* "Photoenergy.pyx":38
+ * 
+ * 
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     print("Reading Final State")
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_comm); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_rank); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 38, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_11 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_3, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 38, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (__pyx_t_11) {
+
+    /* "Photoenergy.pyx":39
+ * 
+ * if comm.rank == 0:
+ *     print("Reading Final State")             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "Photoenergy.pyx":38
+ * 
+ * 
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     print("Reading Final State")
+ * 
+ */
+  }
+
+  /* "Photoenergy.pyx":42
+ * 
+ * 
+ * with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
+ *     data = f["psi_final"][:]
+ *     real_part = data[:,0]
+ */
+  /*with:*/ {
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_h5py); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_File); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 42, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_1 = __Pyx_PyObject_LookupSpecial(__pyx_t_3, __pyx_n_s_exit); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_9 = __Pyx_PyObject_LookupSpecial(__pyx_t_3, __pyx_n_s_enter); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 42, __pyx_L20_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 42, __pyx_L20_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_9 = __pyx_t_2;
+    __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    /*try:*/ {
+      {
+        __Pyx_PyThreadState_declare
+        __Pyx_PyThreadState_assign
+        __Pyx_ExceptionSave(&__pyx_t_8, &__pyx_t_7, &__pyx_t_6);
+        __Pyx_XGOTREF(__pyx_t_8);
+        __Pyx_XGOTREF(__pyx_t_7);
+        __Pyx_XGOTREF(__pyx_t_6);
+        /*try:*/ {
+          if (PyDict_SetItem(__pyx_d, __pyx_n_s_f, __pyx_t_9) < 0) __PYX_ERR(0, 42, __pyx_L24_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+          /* "Photoenergy.pyx":43
+ * 
+ * with h5py.File('TDSE.h5', 'r') as f:
+ *     data = f["psi_final"][:]             # <<<<<<<<<<<<<<
+ *     real_part = data[:,0]
+ *     imaginary_part = data[:,1]
+ */
+          __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_f); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 43, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_9, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 43, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __pyx_t_9 = __Pyx_PyObject_GetSlice(__pyx_t_3, 0, 0, NULL, NULL, &__pyx_slice__2, 0, 0, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 43, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          if (PyDict_SetItem(__pyx_d, __pyx_n_s_data, __pyx_t_9) < 0) __PYX_ERR(0, 43, __pyx_L24_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+          /* "Photoenergy.pyx":44
+ * with h5py.File('TDSE.h5', 'r') as f:
+ *     data = f["psi_final"][:]
+ *     real_part = data[:,0]             # <<<<<<<<<<<<<<
+ *     imaginary_part = data[:,1]
+ * 
+ */
+          __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_data); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 44, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_3 = __Pyx_PyObject_GetItem(__pyx_t_9, __pyx_tuple__16); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 44, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          if (PyDict_SetItem(__pyx_d, __pyx_n_s_real_part, __pyx_t_3) < 0) __PYX_ERR(0, 44, __pyx_L24_error)
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+          /* "Photoenergy.pyx":45
+ *     data = f["psi_final"][:]
+ *     real_part = data[:,0]
+ *     imaginary_part = data[:,1]             # <<<<<<<<<<<<<<
+ * 
+ *     wavefunction = real_part + 1j*imaginary_part
+ */
+          __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_data); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 45, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __pyx_t_9 = __Pyx_PyObject_GetItem(__pyx_t_3, __pyx_tuple__17); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 45, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          if (PyDict_SetItem(__pyx_d, __pyx_n_s_imaginary_part, __pyx_t_9) < 0) __PYX_ERR(0, 45, __pyx_L24_error)
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+          /* "Photoenergy.pyx":47
+ *     imaginary_part = data[:,1]
+ * 
+ *     wavefunction = real_part + 1j*imaginary_part             # <<<<<<<<<<<<<<
+ * #psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)
+ * psi_final= PETSc.Vec().createMPI(total_size,comm = comm)
+ */
+          __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_real_part); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 47, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_9);
+          __pyx_t_3 = PyComplex_FromDoubles(0.0, 1.0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 47, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_imaginary_part); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __pyx_t_5 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 47, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __pyx_t_2 = PyNumber_Add(__pyx_t_9, __pyx_t_5); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 47, __pyx_L24_error)
+          __Pyx_GOTREF(__pyx_t_2);
+          __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          if (PyDict_SetItem(__pyx_d, __pyx_n_s_wavefunction, __pyx_t_2) < 0) __PYX_ERR(0, 47, __pyx_L24_error)
+          __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+          /* "Photoenergy.pyx":42
+ * 
+ * 
+ * with h5py.File('TDSE.h5', 'r') as f:             # <<<<<<<<<<<<<<
+ *     data = f["psi_final"][:]
+ *     real_part = data[:,0]
+ */
+        }
+        __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+        goto __pyx_L29_try_end;
+        __pyx_L24_error:;
+        __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+        /*except:*/ {
+          __Pyx_AddTraceback("Photoenergy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+          if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_5, &__pyx_t_9) < 0) __PYX_ERR(0, 42, __pyx_L26_except_error)
+          __Pyx_XGOTREF(__pyx_t_2);
+          __Pyx_XGOTREF(__pyx_t_5);
+          __Pyx_XGOTREF(__pyx_t_9);
+          __pyx_t_3 = PyTuple_Pack(3, __pyx_t_2, __pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L26_except_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_3, NULL);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 42, __pyx_L26_except_error)
+          __Pyx_GOTREF(__pyx_t_10);
+          __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_10);
+          __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+          if (__pyx_t_11 < 0) __PYX_ERR(0, 42, __pyx_L26_except_error)
+          __pyx_t_4 = (!__pyx_t_11);
+          if (unlikely(__pyx_t_4)) {
+            __Pyx_GIVEREF(__pyx_t_2);
+            __Pyx_GIVEREF(__pyx_t_5);
+            __Pyx_XGIVEREF(__pyx_t_9);
+            __Pyx_ErrRestoreWithState(__pyx_t_2, __pyx_t_5, __pyx_t_9);
+            __pyx_t_2 = 0; __pyx_t_5 = 0; __pyx_t_9 = 0; 
+            __PYX_ERR(0, 42, __pyx_L26_except_error)
+          }
+          __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+          __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+          goto __pyx_L25_exception_handled;
+        }
+        __pyx_L26_except_error:;
+        __Pyx_XGIVEREF(__pyx_t_8);
+        __Pyx_XGIVEREF(__pyx_t_7);
+        __Pyx_XGIVEREF(__pyx_t_6);
+        __Pyx_ExceptionReset(__pyx_t_8, __pyx_t_7, __pyx_t_6);
+        goto __pyx_L1_error;
+        __pyx_L25_exception_handled:;
+        __Pyx_XGIVEREF(__pyx_t_8);
+        __Pyx_XGIVEREF(__pyx_t_7);
+        __Pyx_XGIVEREF(__pyx_t_6);
+        __Pyx_ExceptionReset(__pyx_t_8, __pyx_t_7, __pyx_t_6);
+        __pyx_L29_try_end:;
+      }
+    }
+    /*finally:*/ {
+      /*normal exit:*/{
+        if (__pyx_t_1) {
+          __pyx_t_6 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, NULL);
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 42, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_6);
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        }
+        goto __pyx_L23;
+      }
+      __pyx_L23:;
+    }
+    goto __pyx_L33;
+    __pyx_L20_error:;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    goto __pyx_L1_error;
+    __pyx_L33:;
+  }
+
+  /* "Photoenergy.pyx":49
+ *     wavefunction = real_part + 1j*imaginary_part
+ * #psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)
+ * psi_final= PETSc.Vec().createMPI(total_size,comm = comm)             # <<<<<<<<<<<<<<
+ * global_indices = np.arange(total_size)
+ * global_indices = global_indices.astype("int32")
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_Vec); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_createMPI); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_total_size); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_9)) __PYX_ERR(0, 49, __pyx_L1_error);
+  __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_comm, __pyx_t_3) < 0) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_psi_final, __pyx_t_3) < 0) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "Photoenergy.pyx":50
+ * #psi_final = PETSc.Vec().createWithArray(wavefunction,size = total_size,comm = comm)
+ * psi_final= PETSc.Vec().createMPI(total_size,comm = comm)
+ * global_indices = np.arange(total_size)             # <<<<<<<<<<<<<<
+ * global_indices = global_indices.astype("int32")
+ * psi_final.setValues(global_indices,wavefunction)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_arange); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_total_size); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_global_indices, __pyx_t_2) < 0) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":51
+ * psi_final= PETSc.Vec().createMPI(total_size,comm = comm)
+ * global_indices = np.arange(total_size)
+ * global_indices = global_indices.astype("int32")             # <<<<<<<<<<<<<<
+ * psi_final.setValues(global_indices,wavefunction)
+ * psi_final.assemble()
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_global_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_astype); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_global_indices, __pyx_t_2) < 0) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":52
+ * global_indices = np.arange(total_size)
+ * global_indices = global_indices.astype("int32")
+ * psi_final.setValues(global_indices,wavefunction)             # <<<<<<<<<<<<<<
+ * psi_final.assemble()
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_setValues); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_global_indices); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_GIVEREF(__pyx_t_2);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_t_9)) __PYX_ERR(0, 52, __pyx_L1_error);
+  __pyx_t_2 = 0;
+  __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+  /* "Photoenergy.pyx":53
+ * global_indices = global_indices.astype("int32")
+ * psi_final.setValues(global_indices,wavefunction)
+ * psi_final.assemble()             # <<<<<<<<<<<<<<
+ * 
+ * if comm.rank == 0:
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_psi_final); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_assemble); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+  /* "Photoenergy.pyx":55
+ * psi_final.assemble()
+ * 
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     print("Reading Matrices")
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_comm); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_rank); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_4 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_5, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 55, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (__pyx_t_4) {
+
+    /* "Photoenergy.pyx":56
+ * 
+ * if comm.rank == 0:
+ *     print("Reading Matrices")             # <<<<<<<<<<<<<<
+ * 
+ * S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+ */
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 56, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+    /* "Photoenergy.pyx":55
+ * psi_final.assemble()
+ * 
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     print("Reading Matrices")
+ * 
+ */
+  }
+
+  /* "Photoenergy.pyx":58
+ *     print("Reading Matrices")
+ * 
+ * S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
+ * viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r',comm = comm)
+ * S.load(viewer)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_Mat); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_createAIJ); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_12 = PyObject_Length(__pyx_t_5); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_12 = PyObject_Length(__pyx_t_3); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_5);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 0, __pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_3);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_2, 1, __pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error);
+  __pyx_t_5 = 0;
+  __pyx_t_3 = 0;
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_2);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error);
+  __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_order); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_13 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_5, 2, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_13, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_nnz, __pyx_t_5) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_comm); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_comm, __pyx_t_5) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_S, __pyx_t_5) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "Photoenergy.pyx":59
+ * 
+ * S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r',comm = comm)             # <<<<<<<<<<<<<<
+ * S.load(viewer)
+ * viewer.destroy()
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_Viewer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_createBinary); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_comm); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_comm, __pyx_t_3) < 0) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__20, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_viewer, __pyx_t_3) < 0) __PYX_ERR(0, 59, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+  /* "Photoenergy.pyx":60
+ * S = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r',comm = comm)
+ * S.load(viewer)             # <<<<<<<<<<<<<<
+ * viewer.destroy()
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_S); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_load); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_viewer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":61
+ * viewer = PETSc.Viewer().createBinary('matrix_files/overlap.bin', 'r',comm = comm)
+ * S.load(viewer)
+ * viewer.destroy()             # <<<<<<<<<<<<<<
+ * 
+ * H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_viewer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_destroy); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":63
+ * viewer.destroy()
+ * 
+ * H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
+ * viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r',comm = comm)
+ * H_0.load(viewer)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Mat); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_createAIJ); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_12 = PyObject_Length(__pyx_t_2); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_wavefunction); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_12 = PyObject_Length(__pyx_t_5); if (unlikely(__pyx_t_12 == ((Py_ssize_t)-1))) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = PyInt_FromSsize_t(__pyx_t_12); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = PyList_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_GIVEREF(__pyx_t_2);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_9, 0, __pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_5);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_9, 1, __pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error);
+  __pyx_t_2 = 0;
+  __pyx_t_5 = 0;
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_9)) __PYX_ERR(0, 63, __pyx_L1_error);
+  __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_order); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_13 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_2, 2, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyInt_AddObjC(__pyx_t_13, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_nnz, __pyx_t_2) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_t_9, __pyx_n_s_comm, __pyx_t_2) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_H_0, __pyx_t_2) < 0) __PYX_ERR(0, 63, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":64
+ * 
+ * H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r',comm = comm)             # <<<<<<<<<<<<<<
+ * H_0.load(viewer)
+ * viewer.destroy()
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_Viewer); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_createBinary); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_comm); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_comm, __pyx_t_5) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_tuple__21, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_viewer, __pyx_t_5) < 0) __PYX_ERR(0, 64, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "Photoenergy.pyx":65
+ * H_0 = PETSc.Mat().createAIJ([len(wavefunction),len(wavefunction)],nnz =(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r',comm = comm)
+ * H_0.load(viewer)             # <<<<<<<<<<<<<<
+ * viewer.destroy()
+ * rows,cols = H_0.getSize()
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_H_0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_load); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_viewer); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_9 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+  /* "Photoenergy.pyx":66
+ * viewer = PETSc.Viewer().createBinary('matrix_files/H_0.bin', 'r',comm = comm)
+ * H_0.load(viewer)
+ * viewer.destroy()             # <<<<<<<<<<<<<<
+ * rows,cols = H_0.getSize()
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_viewer); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_destroy); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 66, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+  /* "Photoenergy.pyx":67
+ * H_0.load(viewer)
+ * viewer.destroy()
+ * rows,cols = H_0.getSize()             # <<<<<<<<<<<<<<
+ * 
+ * if not os.path.exists("matrix_files/S_T.bin"):
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_H_0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_getSize); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if ((likely(PyTuple_CheckExact(__pyx_t_9))) || (PyList_CheckExact(__pyx_t_9))) {
+    PyObject* sequence = __pyx_t_9;
+    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+    if (unlikely(size != 2)) {
+      if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+      __PYX_ERR(0, 67, __pyx_L1_error)
+    }
+    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    if (likely(PyTuple_CheckExact(sequence))) {
+      __pyx_t_5 = PyTuple_GET_ITEM(sequence, 0); 
+      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1); 
+    } else {
+      __pyx_t_5 = PyList_GET_ITEM(sequence, 0); 
+      __pyx_t_2 = PyList_GET_ITEM(sequence, 1); 
+    }
+    __Pyx_INCREF(__pyx_t_5);
+    __Pyx_INCREF(__pyx_t_2);
+    #else
+    __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 67, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 67, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    #endif
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  } else {
+    Py_ssize_t index = -1;
+    __pyx_t_3 = PyObject_GetIter(__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 67, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_14 = __Pyx_PyObject_GetIterNextFunc(__pyx_t_3);
+    index = 0; __pyx_t_5 = __pyx_t_14(__pyx_t_3); if (unlikely(!__pyx_t_5)) goto __pyx_L35_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_5);
+    index = 1; __pyx_t_2 = __pyx_t_14(__pyx_t_3); if (unlikely(!__pyx_t_2)) goto __pyx_L35_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_2);
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_14(__pyx_t_3), 2) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
+    __pyx_t_14 = NULL;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    goto __pyx_L36_unpacking_done;
+    __pyx_L35_unpacking_failed:;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_14 = NULL;
+    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+    __PYX_ERR(0, 67, __pyx_L1_error)
+    __pyx_L36_unpacking_done:;
+  }
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_rows, __pyx_t_5) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cols, __pyx_t_2) < 0) __PYX_ERR(0, 67, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "Photoenergy.pyx":69
+ * rows,cols = H_0.getSize()
+ * 
+ * if not os.path.exists("matrix_files/S_T.bin"):             # <<<<<<<<<<<<<<
+ *     if comm.rank == 0:
+ *         print("Exiting Program, please compute S_T before running")
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_os); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_path); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_exists); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 69, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_11 = (!__pyx_t_4);
+  if (__pyx_t_11) {
+
+    /* "Photoenergy.pyx":70
+ * 
+ * if not os.path.exists("matrix_files/S_T.bin"):
+ *     if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *         print("Exiting Program, please compute S_T before running")
+ *     comm.abort()
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_comm); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_rank); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_11 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_9, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 70, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    if (__pyx_t_11) {
+
+      /* "Photoenergy.pyx":71
+ * if not os.path.exists("matrix_files/S_T.bin"):
+ *     if comm.rank == 0:
+ *         print("Exiting Program, please compute S_T before running")             # <<<<<<<<<<<<<<
+ *     comm.abort()
+ * 
+ */
+      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 71, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+      /* "Photoenergy.pyx":70
+ * 
+ * if not os.path.exists("matrix_files/S_T.bin"):
+ *     if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *         print("Exiting Program, please compute S_T before running")
+ *     comm.abort()
+ */
+    }
+
+    /* "Photoenergy.pyx":72
+ *     if comm.rank == 0:
+ *         print("Exiting Program, please compute S_T before running")
+ *     comm.abort()             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_comm); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 72, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_abort); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 72, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 72, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+    /* "Photoenergy.pyx":69
+ * rows,cols = H_0.getSize()
+ * 
+ * if not os.path.exists("matrix_files/S_T.bin"):             # <<<<<<<<<<<<<<
+ *     if comm.rank == 0:
+ *         print("Exiting Program, please compute S_T before running")
+ */
+  }
+
+  /* "Photoenergy.pyx":76
+ * 
+ * 
+ * S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)             # <<<<<<<<<<<<<<
+ * viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r',comm = comm)
+ * S_TILE.load(viewer)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_Mat); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_createAIJ); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_lmax); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_5, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = PyNumber_Multiply(__pyx_t_9, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_lmax); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_13 = __Pyx_PyInt_AddObjC(__pyx_t_9, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = PyNumber_Multiply(__pyx_t_3, __pyx_t_13); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  __pyx_t_13 = PyList_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_GIVEREF(__pyx_t_5);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_13, 0, __pyx_t_5)) __PYX_ERR(0, 76, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_13, 1, __pyx_t_9)) __PYX_ERR(0, 76, __pyx_L1_error);
+  __pyx_t_5 = 0;
+  __pyx_t_9 = 0;
+  __pyx_t_9 = PyTuple_New(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_GIVEREF(__pyx_t_13);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_13)) __PYX_ERR(0, 76, __pyx_L1_error);
+  __pyx_t_13 = 0;
+  __pyx_t_13 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_n_basis); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_order); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_15 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_3, 2, 0, 0); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_t_15, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __pyx_t_15 = PyNumber_Multiply(__pyx_t_5, __pyx_t_3); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_nnz, __pyx_t_15) < 0) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_comm); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  if (PyDict_SetItem(__pyx_t_13, __pyx_n_s_comm, __pyx_t_15) < 0) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, __pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_S_TILE, __pyx_t_15) < 0) __PYX_ERR(0, 76, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+
+  /* "Photoenergy.pyx":77
+ * 
+ * S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r',comm = comm)             # <<<<<<<<<<<<<<
+ * S_TILE.load(viewer)
+ * viewer.destroy()
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_PETSc); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_Viewer); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __pyx_t_15 = __Pyx_PyObject_CallNoArg(__pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_createBinary); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __pyx_t_15 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_comm); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  if (PyDict_SetItem(__pyx_t_15, __pyx_n_s_comm, __pyx_t_9) < 0) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_tuple__24, __pyx_t_15); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_viewer, __pyx_t_9) < 0) __PYX_ERR(0, 77, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+  /* "Photoenergy.pyx":78
+ * S_TILE = PETSc.Mat().createAIJ([n_basis*(lmax+1),n_basis*(lmax+1)],nnz =n_basis*(2*order + 1),comm = comm)
+ * viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r',comm = comm)
+ * S_TILE.load(viewer)             # <<<<<<<<<<<<<<
+ * viewer.destroy()
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_S_TILE); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_load); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_viewer); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_13 = __Pyx_PyObject_CallOneArg(__pyx_t_15, __pyx_t_9); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 78, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+
+  /* "Photoenergy.pyx":79
+ * viewer = PETSc.Viewer().createBinary('matrix_files/S_T.bin', 'r',comm = comm)
+ * S_TILE.load(viewer)
+ * viewer.destroy()             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_viewer); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_destroy); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  __pyx_t_13 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+
+  /* "Photoenergy.pyx":84
  * 
  * 
  * gamma = 0.001             # <<<<<<<<<<<<<<
  * 
  * E_range = np.arange(E_min,E_max+2*gamma,2*gamma)
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gamma, __pyx_float_0_001) < 0) __PYX_ERR(0, 80, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gamma, __pyx_float_0_001) < 0) __PYX_ERR(0, 84, __pyx_L1_error)
 
-  /* "Photoenergy.pyx":82
+  /* "Photoenergy.pyx":86
  * gamma = 0.001
  * 
  * E_range = np.arange(E_min,E_max+2*gamma,2*gamma)             # <<<<<<<<<<<<<<
  * dphi = 0.01
  * phi_range = np.array([0,np.pi])
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_arange); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_np); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_arange); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_E_min); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_E_max); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_15);
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_E_min); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_E_max); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_gamma); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gamma); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_2, 2, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_9 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_3, 2, 0, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Add(__pyx_t_13, __pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_gamma); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_13 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_9, 2, 0, 0); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_5)) __PYX_ERR(0, 82, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_3)) __PYX_ERR(0, 82, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_13);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_13)) __PYX_ERR(0, 82, __pyx_L1_error);
-  __pyx_t_5 = 0;
-  __pyx_t_3 = 0;
-  __pyx_t_13 = 0;
-  __pyx_t_13 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_9, NULL); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = PyNumber_Add(__pyx_t_15, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_gamma); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_15 = __Pyx_PyInt_MultiplyCObj(__pyx_int_2, __pyx_t_3, 2, 0, 0); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GIVEREF(__pyx_t_13);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_13)) __PYX_ERR(0, 86, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_2);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_15);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_t_15)) __PYX_ERR(0, 86, __pyx_L1_error);
+  __pyx_t_13 = 0;
+  __pyx_t_2 = 0;
+  __pyx_t_15 = 0;
+  __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_9, __pyx_t_3, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_range, __pyx_t_13) < 0) __PYX_ERR(0, 82, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_E_range, __pyx_t_15) < 0) __PYX_ERR(0, 86, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
 
-  /* "Photoenergy.pyx":83
+  /* "Photoenergy.pyx":87
  * 
  * E_range = np.arange(E_min,E_max+2*gamma,2*gamma)
  * dphi = 0.01             # <<<<<<<<<<<<<<
  * phi_range = np.array([0,np.pi])
  * theta_range = np.arange(0,np.pi+dphi,dphi)
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_dphi, __pyx_float_0_01) < 0) __PYX_ERR(0, 83, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_dphi, __pyx_float_0_01) < 0) __PYX_ERR(0, 87, __pyx_L1_error)
 
-  /* "Photoenergy.pyx":84
+  /* "Photoenergy.pyx":88
  * E_range = np.arange(E_min,E_max+2*gamma,2*gamma)
  * dphi = 0.01
  * phi_range = np.array([0,np.pi])             # <<<<<<<<<<<<<<
  * theta_range = np.arange(0,np.pi+dphi,dphi)
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_np); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 84, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_array); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 84, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_np); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 84, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_pi); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 84, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_np); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 88, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_15);
-  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-  __pyx_t_13 = PyList_New(2); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 84, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_array); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_np); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_pi); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __pyx_t_15 = PyList_New(2); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
   __Pyx_INCREF(__pyx_int_0);
   __Pyx_GIVEREF(__pyx_int_0);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_13, 0, __pyx_int_0)) __PYX_ERR(0, 84, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_15);
-  if (__Pyx_PyList_SET_ITEM(__pyx_t_13, 1, __pyx_t_15)) __PYX_ERR(0, 84, __pyx_L1_error);
-  __pyx_t_15 = 0;
-  __pyx_t_15 = __Pyx_PyObject_CallOneArg(__pyx_t_9, __pyx_t_13); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 84, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_phi_range, __pyx_t_15) < 0) __PYX_ERR(0, 84, __pyx_L1_error)
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_15, 0, __pyx_int_0)) __PYX_ERR(0, 88, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyList_SET_ITEM(__pyx_t_15, 1, __pyx_t_9)) __PYX_ERR(0, 88, __pyx_L1_error);
+  __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_15); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_phi_range, __pyx_t_9) < 0) __PYX_ERR(0, 88, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-  /* "Photoenergy.pyx":85
+  /* "Photoenergy.pyx":89
  * dphi = 0.01
  * phi_range = np.array([0,np.pi])
  * theta_range = np.arange(0,np.pi+dphi,dphi)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_np); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 85, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_arange); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 85, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_np); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 85, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_pi); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_dphi); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_arange); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_15);
-  __pyx_t_3 = PyNumber_Add(__pyx_t_9, __pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_np); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_pi); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_dphi); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 85, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  __pyx_t_9 = PyTuple_New(3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_dphi); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 89, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_dphi); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = PyTuple_New(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_int_0);
   __Pyx_GIVEREF(__pyx_int_0);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_int_0)) __PYX_ERR(0, 85, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_3)) __PYX_ERR(0, 85, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_15);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_9, 2, __pyx_t_15)) __PYX_ERR(0, 85, __pyx_L1_error);
-  __pyx_t_3 = 0;
-  __pyx_t_15 = 0;
-  __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_13, __pyx_t_9, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 85, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_theta_range, __pyx_t_15) < 0) __PYX_ERR(0, 85, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_int_0)) __PYX_ERR(0, 89, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_2);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_t_2)) __PYX_ERR(0, 89, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_t_9)) __PYX_ERR(0, 89, __pyx_L1_error);
+  __pyx_t_2 = 0;
+  __pyx_t_9 = 0;
+  __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_3, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_theta_range, __pyx_t_9) < 0) __PYX_ERR(0, 89, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-  /* "Photoenergy.pyx":88
+  /* "Photoenergy.pyx":92
  * 
  * 
  * def photoAngularV2(E_range,theta_range,phi_range,PAD,PES):             # <<<<<<<<<<<<<<
  *     PES_vals = []
  *     E_vals = []
  */
-  __pyx_t_15 = __Pyx_CyFunction_New(&__pyx_mdef_11Photoenergy_3photoAngularV2, 0, __pyx_n_s_photoAngularV2, NULL, __pyx_n_s_Photoenergy, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 88, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_photoAngularV2, __pyx_t_15) < 0) __PYX_ERR(0, 88, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+  __pyx_t_9 = __Pyx_CyFunction_New(&__pyx_mdef_11Photoenergy_3photoAngularV2, 0, __pyx_n_s_photoAngularV2, NULL, __pyx_n_s_Photoenergy, __pyx_d, ((PyObject *)__pyx_codeobj__26)); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 92, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_photoAngularV2, __pyx_t_9) < 0) __PYX_ERR(0, 92, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-  /* "Photoenergy.pyx":214
+  /* "Photoenergy.pyx":222
+ *     return
  * 
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     start = time.time()
+ * photoAngularV2(E_range,theta_range,phi_range,PAD,PES)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_comm); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_n_s_rank); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+  __pyx_t_11 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_3, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 222, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (__pyx_t_11) {
+
+    /* "Photoenergy.pyx":223
  * 
+ * if comm.rank == 0:
+ *     start = time.time()             # <<<<<<<<<<<<<<
+ * photoAngularV2(E_range,theta_range,phi_range,PAD,PES)
+ * if comm.rank == 0:
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 223, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_time); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 223, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 223, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_start, __pyx_t_3) < 0) __PYX_ERR(0, 223, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "Photoenergy.pyx":222
+ *     return
+ * 
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     start = time.time()
+ * photoAngularV2(E_range,theta_range,phi_range,PAD,PES)
+ */
+  }
+
+  /* "Photoenergy.pyx":224
+ * if comm.rank == 0:
+ *     start = time.time()
  * photoAngularV2(E_range,theta_range,phi_range,PAD,PES)             # <<<<<<<<<<<<<<
+ * if comm.rank == 0:
+ *     end = time.time()
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_photoAngularV2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_E_range); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_9);
+  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_theta_range); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_15);
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_phi_range); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_PAD); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_13);
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_PES); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_16 = PyTuple_New(5); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_16);
+  __Pyx_GIVEREF(__pyx_t_9);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_t_9)) __PYX_ERR(0, 224, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_15);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 1, __pyx_t_15)) __PYX_ERR(0, 224, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_2);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 2, __pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_13);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 3, __pyx_t_13)) __PYX_ERR(0, 224, __pyx_L1_error);
+  __Pyx_GIVEREF(__pyx_t_5);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 4, __pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error);
+  __pyx_t_9 = 0;
+  __pyx_t_15 = 0;
+  __pyx_t_2 = 0;
+  __pyx_t_13 = 0;
+  __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_16, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "Photoenergy.pyx":225
+ *     start = time.time()
+ * photoAngularV2(E_range,theta_range,phi_range,PAD,PES)
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     end = time.time()
+ *     print(f"Time to compute PES:{end-start}")
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_comm); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_t_16 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_rank); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 225, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_16);
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_11 = (__Pyx_PyInt_BoolEqObjC(__pyx_t_16, __pyx_int_0, 0, 0)); if (unlikely((__pyx_t_11 < 0))) __PYX_ERR(0, 225, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+  if (__pyx_t_11) {
+
+    /* "Photoenergy.pyx":226
+ * photoAngularV2(E_range,theta_range,phi_range,PAD,PES)
+ * if comm.rank == 0:
+ *     end = time.time()             # <<<<<<<<<<<<<<
+ *     print(f"Time to compute PES:{end-start}")
+ * 
+ */
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_time); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_n_s_time); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __pyx_t_16 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_end, __pyx_t_16) < 0) __PYX_ERR(0, 226, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+
+    /* "Photoenergy.pyx":227
+ * if comm.rank == 0:
+ *     end = time.time()
+ *     print(f"Time to compute PES:{end-start}")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_15, __pyx_n_s_photoAngularV2); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 214, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_15);
-  __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_E_range); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 214, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_9);
-  __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_n_s_theta_range); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 214, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_13);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_phi_range); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 214, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_PAD); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 214, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_PES); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_16 = PyTuple_New(5); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 214, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_16);
-  __Pyx_GIVEREF(__pyx_t_9);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_t_9)) __PYX_ERR(0, 214, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_13);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 1, __pyx_t_13)) __PYX_ERR(0, 214, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_3);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 2, __pyx_t_3)) __PYX_ERR(0, 214, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_5);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 3, __pyx_t_5)) __PYX_ERR(0, 214, __pyx_L1_error);
-  __Pyx_GIVEREF(__pyx_t_2);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_16, 4, __pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error);
-  __pyx_t_9 = 0;
-  __pyx_t_13 = 0;
-  __pyx_t_3 = 0;
-  __pyx_t_5 = 0;
-  __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_16, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-  __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_n_s_end); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 227, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_16);
+    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 227, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_3 = PyNumber_Subtract(__pyx_t_16, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_3, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 227, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_Time_to_compute_PES, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 227, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+    /* "Photoenergy.pyx":225
+ *     start = time.time()
+ * photoAngularV2(E_range,theta_range,phi_range,PAD,PES)
+ * if comm.rank == 0:             # <<<<<<<<<<<<<<
+ *     end = time.time()
+ *     print(f"Time to compute PES:{end-start}")
+ */
+  }
 
   /* "Photoenergy.pyx":1
  * import numpy as np             # <<<<<<<<<<<<<<
  * from petsc4py import PETSc
  * import h5py
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_5 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_5) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /*--- Wrapped vars code ---*/
 

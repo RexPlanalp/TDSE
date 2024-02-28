@@ -2,8 +2,8 @@
 #SBATCH --job-name PAD
 #SBATCH -p jila
 #SBATCH --nodes 1
-#SBATCH --ntasks 1
-#SBATCH --mem=32G
+#SBATCH --ntasks 2
+#SBATCH --mem=16G
 #SBATCH -o run.log 
 #SBATCH -t 0-03:00:00
 

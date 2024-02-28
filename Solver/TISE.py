@@ -16,22 +16,37 @@ class tise:
         self.nmax = input_par["lm"]["nmax"]
         self.lmax = input_par["lm"]["lmax"]
 
-        CAP = input_par["box"]["CAP"]
-        if CAP:
-            self.region = input_par["box"]["region"]
-            self.cap = True
 
-            self.R0 = int(self.region*input_par["box"]["xmax"])
-            self.eta = input_par["box"]["eta"]
-            self.n = input_par["box"]["n"]
-        else:
-            self.cap = False
+        self.ECS = input_par["box"]["ECS"]
+        self.region = input_par["box"]["region"]
+        self.R0 = int(self.region*input_par["box"]["xmax"])
+        self.potential = input_par["box"]["pot"]
+        if comm.rank == 0:
+            if self.ECS:
+                print(f"Applying ECS Boundary at{self.R0}")
+
+        if self.potential == "H":
+            def H(x):
+                return (-1/np.sqrt(x**2 + 1E-25))
+            self.pot_func = H
+        elif self.potential == "He":
+            def He(x):
+                return (-1/np.sqrt(x**2 + 1E-25)) + -1.0*np.exp(-2.0329*x)/np.sqrt(x**2 + 1E-25)  - 0.3953*np.exp(-6.1805*x)
+            self.pot_func = He
+
+        
+        
             
         
 
     def _createH_l(self,basisInstance,l):
-        def _H_element(x,i,j):
-            return basis_funcs[i](x) * (-1/2) * basis_funcs[j](x,2) + basis_funcs[i](x) * basis_funcs[j](x) * l*(l+1)/(2*np.sqrt(x**4 + 1E-25 )) + basis_funcs[i](x) * basis_funcs[j](x)* (-1/np.sqrt(x**2 + 1E-25))
+
+        if self.ECS:
+            def _H_element(x,i,j):
+                return basis_funcs[i](x,1) * (1/2) * basis_funcs[j](x,1)/self.q(x) + basis_funcs[i](x) * basis_funcs[j](x) * l*(l+1)/(2*np.sqrt(self.R(x)**4 + 1E-25 ))*self.q(x) + basis_funcs[i](x) * basis_funcs[j](x)* self.pot_func(self.R(x))*self.q(x)
+        else:
+            def _H_element(x,i,j):
+                return basis_funcs[i](x,1) * (1/2) * basis_funcs[j](x,1) + basis_funcs[i](x) * basis_funcs[j](x) * l*(l+1)/(2*np.sqrt(x**4 + 1E-25 )) + basis_funcs[i](x) * basis_funcs[j](x)* self.pot_func(x)
 
         n_basis = basisInstance.n_basis
         basis_funcs = basisInstance.basis_funcs
@@ -50,7 +65,8 @@ class tise:
                     if H_element == 0:
                         continue
 
-                    FFH_R.setValue(i,j,H_element)      
+                    FFH_R.setValue(i,j,H_element)  
+        comm.barrier()    
         FFH_R.assemble()
         self.FFH_R_list.append(FFH_R)
         return None
@@ -86,8 +102,7 @@ class tise:
         n_basis,_ = self.S_R.getSize()
         ViewHDF5 = PETSc.Viewer().createHDF5("Hydrogen.h5", mode=PETSc.Viewer.Mode.WRITE, comm= PETSc.COMM_WORLD)
             
-        #if (self.lmax >= self.nmax):
-            #self.nmax = self.lmax +1
+        
         
 
         
@@ -102,6 +117,10 @@ class tise:
                 num_of_energies = self.nmax - i
             
             H = self.FFH_R_list[i]
+            #if comm.rank == 0:
+                #print(f"Solving System for l = {l}")
+                #test1,test2 = H.getRow(0)
+                #print(len(test1),len(test2))
             
 
             E = SLEPc.EPS().create()
@@ -172,36 +191,15 @@ class tise:
         ViewHDF5.destroy()    
         return None
     
-    def addComplexPot(self,basisInstance,gridInstance):
-        if not self.cap:
-            return
-        basis_funcs = basisInstance.basis_funcs
-        n_basis = basisInstance.n_basis
-        order = basisInstance.order
+    def R(self,x):
+        x_copy = np.copy(x).astype("complex")
+        mask = x>self.R0
+        x_copy[mask] = x_copy[mask] * np.exp(1j*np.pi/4)
+        return x_copy
 
-        xmax = gridInstance.rmax
-        if comm.rank == 0:
-            print("Adding Complex Potential")
-        def _polyCAP(x):
-            pot = np.log(1-np.cos((np.pi/2)*(1-x/(xmax))))
-            return 1j*pot
-        def _linearCAP(x):
-            return -1j*0.1*(x/xmax)
-        def _tanhCAP(x):
-            return -100j * (1+np.tanh((x-xmax)))
-        def _H_CAP(x,i,j):
-            return basis_funcs[i](x) * basis_funcs[j](x) * _tanhCAP(x)
-        H_CAP = PETSc.Mat().createAIJ([n_basis,n_basis],comm = PETSc.COMM_WORLD,nnz = 2*order +1)
-        rowstart,rowend = H_CAP.getOwnershipRange()
-        for i in range(rowstart,rowend):
-            for j in range(n_basis):
-                    H_cap_element = basisInstance.integrate(_H_CAP,i,j)
-                    if H_cap_element == 0:
-                        continue
-                    H_CAP.setValue(i,j,H_cap_element)      
-        H_CAP.assemble()
+    def q(self,x):
+        ones = np.ones_like(x)
+        mask = x>self.R0
+        ones[mask] = ones[mask] * np.exp(1j*np.pi/4)
+        return ones
 
-        for l in range(self.lmax+1):
-            FFH_R_l = self.FFH_R_list[l]
-            FFH_R_l.axpy(1,H_CAP)
-        return 
