@@ -30,8 +30,10 @@ if __name__ == "__main__":
     with open('input.json', 'r') as file:
             input_par = json.load(file)
     
-    lm_dict = lm_to_block(input_par["lm"]["lmax"])
-    n_blocks = total_lm_blocks(input_par["lm"]["lmax"])
+    lmax = input_par["lm"]["lmax"]
+    lm_map = lm_to_block(lmax)
+    block_map = {value: key for key, value in lm_map.items()}
+
 
     if comm.rank == 0:
         start = time.time()
@@ -90,9 +92,14 @@ if __name__ == "__main__":
 
         # If we dont have the bound states, nor do we have the total matrices then we need to run all of this
         if not (os.path.exists("Hydrogen.h5") and os.path.exists("matrix_files/H_0.bin") and os.path.exists("matrix_files/overlap.bin")):
+            
+            
             tiseInstance.createAllH(basisInstance)
+            
             tiseInstance.createS_R(basisInstance)
+            
             tiseInstance.solveEigensystem()
+            
             tiseInstance.addComplexPot(basisInstance,gridInstance)
 
         if comm.rank == 0:
@@ -105,6 +112,10 @@ if __name__ == "__main__":
             laserstart = time.time()
     
         laserInstance = laser()
+        laserInstance.createEnvelope()
+        laserInstance.createCarrierX()
+        laserInstance.createCarrierY()
+        laserInstance.createAmplitude()
         laserInstance.createPulse(gridInstance)
         laserInstance.plotPulse(True)
 
@@ -117,8 +128,8 @@ if __name__ == "__main__":
 
         if comm.rank == 0:
             psistart = time.time()
-        psiInstance = psi(n_blocks,lm_dict)
-        psiInstance.createInitial(basisInstance)
+        psiInstance = psi()
+        psiInstance.createInitial(basisInstance,lm_map)
         if comm.rank == 0:
             psiend = time.time()
             print("Total Time to Create Initial Psi:",psiend-psistart)
@@ -129,17 +140,18 @@ if __name__ == "__main__":
         if comm.rank == 0:
             hamstart = time.time()
         
-        hamiltonianInstance = hamiltonian(n_blocks,lm_dict)
+        hamiltonianInstance = hamiltonian()
 
         if laserInstance.gauge == "velocity":
-            hamiltonianInstance.H_MIX(basisInstance,gridInstance)
-            hamiltonianInstance.H_ANG(basisInstance,gridInstance)
-            hamiltonianInstance.PartialAngularVelocity(gridInstance)
-        elif laserInstance.gauge == "length":
-            hamiltonianInstance.H_LENGTH(basisInstance,gridInstance)
-            hamiltonianInstance.PartialAngularLength(gridInstance)
+            hamiltonianInstance.H_INV_R(basisInstance)
+            hamiltonianInstance.H_DER_R(basisInstance)
 
-        hamiltonianInstance.H_ATOM(tiseInstance,basisInstance,gridInstance)
+            hamiltonianInstance.H_INT_1(basisInstance,gridInstance,block_map)
+            hamiltonianInstance.H_INT_2(basisInstance,gridInstance,block_map)
+            
+    
+
+        hamiltonianInstance.H_ATOM(tiseInstance,basisInstance,gridInstance,block_map)
         hamiltonianInstance.S(tiseInstance,basisInstance)
         hamiltonianInstance.PartialAtomic(gridInstance)
         
