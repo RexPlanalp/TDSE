@@ -74,6 +74,7 @@ class tise:
     def createAllH(self,basisInstance):
         for l in range(self.lmax+1):
             self._createH_l(basisInstance,l)
+            comm.barrier()
         return None
     
     def createS_R(self,basisInstance):

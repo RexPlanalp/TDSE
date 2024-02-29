@@ -42,6 +42,7 @@ class hamiltonian:
                     H_mix_lm.setValue(i,j,self.clm(i-1,self.m))
                 elif j == i+1:
                     H_mix_lm.setValue(i,j,self.clm(j-1,self.m))
+        comm.barrier()
         H_mix_lm.assemble()
 
         H_mix_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*degree+1)
@@ -51,6 +52,7 @@ class hamiltonian:
             for j in range(n_basis):
                         H_element = basisInstance.integrate(H_mix_R_element,i,j)
                         H_mix_R.setValue(i,j,H_element)
+        comm.barrier()
         H_mix_R.assemble()
 
         total = kronV5(H_mix_lm,H_mix_R,2*(2*order+1))
