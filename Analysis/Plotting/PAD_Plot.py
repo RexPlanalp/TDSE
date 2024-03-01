@@ -53,10 +53,8 @@ pad_momentum = pad_vals/np.sqrt(2*E_vals)
 
 
 if ANGULAR:
-    #plt.figure(figsize=(10, 5)) 
-    #plt.xlim([-1,1])
-    #plt.ylim([0,1])
-    plt.scatter(pz_vals,px_vals,c=pad_momentum, cmap="binary", norm=mcolors.LogNorm(vmin=10**(-11.13), vmax=10**(-5.13)))
+    #plt.scatter(pz_vals,px_vals,c=pad_momentum, cmap="binary", norm=mcolors.LogNorm(vmin=10**(-11.13), vmax=10**(-5.13)))
+    plt.scatter(pz_vals,px_vals,c=pad_momentum, cmap="binary", norm=mcolors.LogNorm(vmin=10**(-10), vmax=10**(-3)))
     plt.colorbar()
     plt.savefig("PAD.png")
 
