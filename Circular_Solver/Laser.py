@@ -85,6 +85,7 @@ class laser:
     def plotPulse(self,bool):
         if bool:
             plt.figure()
-            plt.plot(self.pulse_array)
+            plt.plot(self.pulse_array[0])
+            plt.plot(self.pulse_array[1])
             plt.savefig("images/pulse.png")
             plt.clf()
