@@ -285,5 +285,45 @@ class hamiltonian:
     
 
 
+    def H_ATOM(self,tiseInstance,basisInstance,gridInstance,block_map):
+        H_list = tiseInstance.FFH_R_list
+        
+        n_block = basisInstance.n_blocks
+        n_basis = basisInstance.n_basis
+        order = basisInstance.order
+        
+        ra,ca = n_block,n_block
+        rb,cb = n_basis,n_basis
+
+        H_atom = PETSc.Mat().createAIJ([ra*rb,ca*cb],comm = PETSc.COMM_WORLD,nnz =2*order+1)
+        H_atom.assemble()
+        
+        for l in range(self.lmax + 1):
+            partial_I = PETSc.Mat().createAIJ([n_block,n_block],comm = PETSc.COMM_WORLD,nnz = 1)
+            istart,iend = partial_I.getOwnershipRange()
+            start_index = int(np.sum([2*n +1 for n in range(l)]))
+            end_index = int(start_index + 2*l +1)
+            index_range = range(start_index,end_index)
+
+            for i in range(istart,iend):
+                if i in index_range:
+                    partial_I.setValue(i,i,1)
+            comm.barrier()
+            partial_I.assemble()
+
+            partial_H = kronV6(partial_I,H_list[l],2*order +1)
+            H_atom.axpy(1,partial_H)
+
+            H_list[l].destroy()
+            partial_I.destroy()
+        
+        viewer = PETSc.Viewer().createBinary("matrix_files/H_0.bin","w")
+        H_atom.view(viewer)
+        viewer.destroy()
+        self.H_atom = H_atom
+        return None
+
+
+
    
         
