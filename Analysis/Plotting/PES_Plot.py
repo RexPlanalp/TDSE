@@ -10,7 +10,7 @@ gamma = 0.001
 E_range = np.arange(E_min,E_max+2*gamma,2*gamma)
 PES = np.load("PES.npy")
 
-plt.ylim([1E-15,1E0])
+plt.ylim([1E-12,1E0])
 plt.semilogy(np.real(PES),color = "k")
 
 plt.savefig("PES.png")

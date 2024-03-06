@@ -5,7 +5,7 @@
 #SBATCH --ntasks 1
 #SBATCH --mem=64G
 #SBATCH -o run.log 
-#SBATCH -t 0-04:00:00
+#SBATCH -t 0-10:00:00
 
 
 REPO_DIR="/users/becker/dopl4670/Research/TDSE/Circular_Analysis/Circular_EnergySpectrum"

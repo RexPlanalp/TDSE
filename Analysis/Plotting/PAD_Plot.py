@@ -8,7 +8,7 @@ ANGULAR = "ANGULAR" in sys.argv
 RECT = "RECT" in sys.argv
 
 # Use an existing colormap
-base_cmap = plt.cm.viridis
+base_cmap = plt.cm.plasma
 
 
 # Create a new colormap from the existing colormap
@@ -41,12 +41,12 @@ pad_vals = PAD[3,:]
 
 pad_vals = np.real(pad_vals)
 x_vals = E_vals * np.sin(theta_vals) * np.cos(phi_vals)
-y_vals = E_vals * np.sin(theta_vals) * np.sin(theta_vals)
+y_vals = E_vals * np.sin(theta_vals) * np.sin(phi_vals)
 z_vals = E_vals * np.cos(theta_vals)
 
 # Momentum Transform
 px_vals = np.sqrt(2*E_vals) * np.sin(theta_vals) * np.cos(phi_vals)
-py_vals = np.sqrt(2*E_vals) * np.sin(theta_vals) * np.sin(theta_vals)
+py_vals = np.sqrt(2*E_vals) * np.sin(theta_vals) * np.sin(phi_vals)
 pz_vals = np.sqrt(2*E_vals) * np.cos(theta_vals)
 pad_momentum = pad_vals/np.sqrt(2*E_vals)
 
@@ -54,12 +54,14 @@ pad_momentum = pad_vals/np.sqrt(2*E_vals)
 
 if ANGULAR:
     #plt.scatter(pz_vals,px_vals,c=pad_momentum, cmap="binary", norm=mcolors.LogNorm(vmin=10**(-11.13), vmax=10**(-5.13)))
-    plt.scatter(pz_vals,px_vals,c=pad_momentum, cmap="binary", norm=mcolors.LogNorm(vmin=10**(-10), vmax=10**(-3)))
+    #plt.scatter(px_vals,py_vals,c=pad_momentum/pad_momentum.max(), cmap=cmap_with_transparency, norm=mcolors.LogNorm(vmin=10**(-0.3), vmax=10**(0)))
+    plt.scatter(px_vals,py_vals,c=pad_momentum/np.max(pad_momentum),cmap="binary", norm=mcolors.LogNorm(vmin = 10**(-1.5),vmax = 10**(0)))
     plt.colorbar()
     plt.savefig("PAD.png")
 
 if RECT:
-    plt.scatter(E_vals,theta_vals,c=pad_vals, cmap="binary", norm=mcolors.LogNorm(vmin=10**(-11.13), vmax=10**(-5.13)))
+    #plt.scatter(E_vals,theta_vals,c=pad_vals, cmap="binary", norm=mcolors.LogNorm(vmin=10**(-11.13), vmax=10**(-5.13)))
+    plt.scatter(E_vals,phi_vals,c=pad_vals, cmap="binary", norm=mcolors.LogNorm())
     plt.savefig("E.png")
 
     
