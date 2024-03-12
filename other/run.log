@@ -1,0 +1,30 @@
+Prolog created tmpdir: /scratch/dopl4670.3059301
+node78
+/users/becker/dopl4670/Research/TDSE/other
+--------------------------------------------------------------------------
+No OpenFabrics connection schemes reported that they were able to be
+used on a specific port.  As such, the openib BTL (OpenFabrics
+support) will be disabled for this port.
+
+  Local host:           node78
+  Local device:         bnxt_re0
+  Local port:           1
+  CPCs attempted:       rdmacm, udcm
+--------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/users/becker/dopl4670/Research/TDSE/Circular/Circular_Analysis/Circular_EnergySpectrum/Circular_Population/Population.py", line 71, in <module>
+    checkCircularNorm()
+  File "/users/becker/dopl4670/Research/TDSE/Circular/Circular_Analysis/Circular_EnergySpectrum/Circular_Population/Population.py", line 19, in checkCircularNorm
+    with open('input.json', 'r') as file:
+FileNotFoundError: [Errno 2] No such file or directory: 'input.json'
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpiexec detected that one or more processes exited with non-zero status, thus causing
+the job to be terminated. The first process to do so was:
+
+  Process name: [[20929,1],0]
+  Exit code:    1
+--------------------------------------------------------------------------

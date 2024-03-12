@@ -55,7 +55,7 @@ pad_momentum = pad_vals/np.sqrt(2*E_vals)
 if ANGULAR:
     #plt.scatter(pz_vals,px_vals,c=pad_momentum, cmap="binary", norm=mcolors.LogNorm(vmin=10**(-11.13), vmax=10**(-5.13)))
     #plt.scatter(px_vals,py_vals,c=pad_momentum/pad_momentum.max(), cmap=cmap_with_transparency, norm=mcolors.LogNorm(vmin=10**(-0.3), vmax=10**(0)))
-    plt.scatter(px_vals,py_vals,c=pad_momentum/np.max(pad_momentum),cmap="binary", norm=mcolors.LogNorm(vmin = 10**(-1.5),vmax = 10**(0)))
+    plt.scatter(px_vals,py_vals,c=pad_momentum/np.max(pad_momentum),cmap="binary", norm=mcolors.LogNorm(vmin = 10**(-1),vmax = 10**0))
     plt.colorbar()
     plt.savefig("PAD.png")
 
