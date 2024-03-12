@@ -55,15 +55,17 @@ class laser:
         if self.gauge == "length":
             self.pulse_array = E_x,E_y
         else:
-            A_x = []
-            A_y = []
-            for i,t_val in enumerate(t):
-                A_x_val = -np.trapz(E_x[:i],dx = dt)
-                A_y_val = -np.trapz(E_y[:i],dx = dt)
-                A_x.append(A_x_val)
-                A_y.append(A_y_val)
-            A_x = np.array(A_x)
-            A_y = np.array(A_y)
+            #A_x = []
+            #A_y = []
+            #for i,t_val in enumerate(t):
+                #A_x_val = -np.trapz(E_x[:i],dx = dt)
+                #A_y_val = -np.trapz(E_y[:i],dx = dt)
+                #A_x.append(A_x_val)
+                #A_y.append(A_y_val)
+            #A_x = np.array(A_x)
+            #A_y = np.array(A_y)
+            A_x = self.E_0/self.w * self.env_func(t) * self.carrier_funcX(t) / np.sqrt(2)
+            A_y = self.E_0 /self.w* self.env_func(t) * self.carrier_funcY(t) / np.sqrt(2)
             self.pulse_array = A_x,A_y
 
      
