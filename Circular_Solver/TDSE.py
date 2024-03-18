@@ -116,8 +116,8 @@ if __name__ == "__main__":
         laserInstance.createCarrierX()
         laserInstance.createCarrierY()
         laserInstance.createAmplitude()
-        laserInstance.createPulse(gridInstance)
-        laserInstance.plotPulse(True)
+        laserInstance.createPulse()
+        laserInstance.plotPulse(True,gridInstance)
 
         if comm.rank == 0:
             laserend = time.time()

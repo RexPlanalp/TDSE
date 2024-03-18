@@ -16,7 +16,6 @@ class propagator:
 
         ksp = PETSc.KSP().create(comm = comm)
 
-        A_x,A_y = laserInstance.pulse_array
         
         H_int_1 = hamiltonianInstance.H_int_1
         H_int_2 = hamiltonianInstance.H_int_2
@@ -24,7 +23,7 @@ class propagator:
         ksp.setTolerances(rtol = self.tol)
         
 
-        for i,t in enumerate(t):
+        for i,t_i in enumerate(t):
             if PETSc.COMM_WORLD.rank == 0:
                 print(i,L-1)
 
@@ -32,8 +31,8 @@ class propagator:
             
 
 
-            A = A_x + 1j * A_y 
-            Atilde = A_x - 1j * A_y
+            A = laserInstance.A_funcX(t_i+dt/2) + 1j * laserInstance.A_funcY(t_i+dt/2)
+            Atilde = laserInstance.A_funcX(t_i+dt/2) - 1j * laserInstance.A_funcY(t_i+dt/2)
             
 
 
@@ -61,9 +60,6 @@ class propagator:
             ksp.setOperators(partial_L_copy)
 
             
-            #ksp.setType(PETSc.KSP.Type.BICG)
-            #pc = ksp.getPC()
-            #pc.setType(PETSc.PC.Type.BJACOBI)
             
             
 

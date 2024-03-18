@@ -45,40 +45,19 @@ class laser:
         self.E_0 = E_0
         return 
     
-    def createPulse(self,gridInstance):
-        t = gridInstance.t
-        dt = gridInstance.dt
-
-        E_x = self.E_0 * self.env_func(t) * self.carrier_funcX(t) / np.sqrt(2)
-        E_y = self.E_0 * self.env_func(t) * self.carrier_funcY(t) / np.sqrt(2)
-
-        if self.gauge == "length":
-            self.pulse_array = E_x,E_y
-        else:
+    def createPulse(self):
+        def A_funcX(t):
             A_x = self.E_0/self.w * self.env_func(t) * self.carrier_funcX(t) / np.sqrt(2)
+        def A_funcY(t):
             A_y = self.E_0 /self.w* self.env_func(t) * self.carrier_funcY(t) / np.sqrt(2)
-            self.pulse_array = A_x,A_y
+        self.A_funcX = A_funcX
+        self.A_funcY = A_funcY
 
-     
-        
-
-        
-    
-
-
-
-            
-
-        
-            
-
-
-    
-
-    def plotPulse(self,bool):
+    def plotPulse(self,bool,gridInstance):
         if bool:
+            t = gridInstance.t
             plt.figure()
-            plt.plot(self.pulse_array[0])
-            plt.plot(self.pulse_array[1])
+            plt.plot(t,self.A_funcX(t),label = "X")
+            plt.plot(t,self.A_funcY(t),label = "Y")
             plt.savefig("images/pulse.png")
             plt.clf()
