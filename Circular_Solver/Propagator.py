@@ -34,28 +34,21 @@ class propagator:
             A = laserInstance.A_funcX(t_i+dt/2) + 1j * laserInstance.A_funcY(t_i+dt/2)
             Atilde = laserInstance.A_funcX(t_i+dt/2) - 1j * laserInstance.A_funcY(t_i+dt/2)
             
-
-
-            
-
             partial_L_copy = hamiltonianInstance.partial_L.copy()
             partial_R_copy = hamiltonianInstance.partial_R.copy()
             
-            partial_L_copy.axpy(Atilde[i],H_int_1,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
-            partial_L_copy.axpy(A[i],H_int_2,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_L_copy.axpy(Atilde,H_int_1,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_L_copy.axpy(A,H_int_2,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
 
             
-            partial_R_copy.axpy(-Atilde[i],H_int_1,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
-            partial_R_copy.axpy(-A[i],H_int_2,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_R_copy.axpy(-Atilde,H_int_1,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
+            partial_R_copy.axpy(-A,H_int_2,structure =petsc4py.PETSc.Mat.Structure.DIFFERENT_NONZERO_PATTERN)
             
             
             known = partial_R_copy.createVecRight() 
             solution = partial_L_copy.createVecRight()
 
             partial_R_copy.mult(psi_initial,known)
-
-
-
 
             ksp.setOperators(partial_L_copy)
 
