@@ -96,14 +96,14 @@ if ASYM:
 
     plt.scatter(E_vals,phi_vals,c=asymmetry_vals, cmap="bwr",vmin = -1,vmax = 1)
     plt.xlim([0,0.7349968763])
-    plt.axvline(0.304)
+    plt.axvline(0.192)
     plt.colorbar()
     plt.savefig("images/A_rect.png")
 
     plt.clf()
 
     tol = 0.001
-    E = 0.304
+    E = 0.192
     mask = np.abs(E_vals - E) < tol
     x, y = phi_vals[mask], asymmetry_vals[mask]
     sorted_indices = np.argsort(x)
