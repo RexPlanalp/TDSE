@@ -12,7 +12,7 @@
 #SBATCH --exclude=node83
 
 
-REPO_DIR="/users/becker/dopl4670/Research/TDSE_refactored/Circular_TDSE"
+REPO_DIR="/users/becker/dopl4670/Research/TDSE/Circular_TDSE"
                                                                
 hostname
 pwd

@@ -7,8 +7,12 @@
 #SBATCH -o run.log 
 #SBATCH -t 0-03:00:00
 
+#SBATCH --exclude=node82
+#SBATCH --exclude=node81
+#SBATCH --exclude=node80
 
-REPO_DIR="/users/becker/dopl4670/Research/TDSE_refactored/Analysis_Refactored"
+
+REPO_DIR="/users/becker/dopl4670/Research/TDSE/Analysis"
                                                              
 
 hostname

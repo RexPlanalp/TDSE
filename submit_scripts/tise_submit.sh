@@ -11,7 +11,7 @@
 #SBATCH --exclude=node72
 #SBATCH --exclude=node82
 
-REPO_DIR="/users/becker/dopl4670/Research/TDSE_refactored/TISE"
+REPO_DIR="/users/becker/dopl4670/Research/TDSE/TISE"
                                                                
 hostname
 pwd
