@@ -11,7 +11,7 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-sys.path.append('/users/becker/dopl4670/Research/TDSE_refactored/Common')
+sys.path.append('/users/becker/dopl4670/Research/TDSE/Common')
 from Sim import *
  
 if rank == 0:   

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 N = 10
 w = 0.057
-I = 0.52e14
+I = 0.26e14
 E = 0.48
 
 def findPhotons(w,E,I):
