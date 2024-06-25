@@ -2,7 +2,7 @@ import sys
 import os
 import time
 
-sys.path.append('/users/becker/dopl4670/Research/TDSE_refactored/Common')
+sys.path.append('/users/becker/dopl4670/Research/TDSE/Common')
 from Sim import *
 from Basis import *
 from Atomic import *

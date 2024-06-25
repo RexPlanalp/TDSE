@@ -5,7 +5,7 @@ import time
 os.environ['PETSC_VIEWER_STDOUT_WORLD'] = "/dev/null"
 
 from TISE import *
-sys.path.append('/users/becker/dopl4670/Research/TDSE_refactored/Common')
+sys.path.append('/users/becker/dopl4670/Research/TDSE/Common')
 from Sim import *
 from Basis import *
 from Atomic import *
