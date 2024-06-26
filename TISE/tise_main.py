@@ -55,15 +55,13 @@ if rank == 0:
     print(f"Constructing Atomic Matrices: EMBED={EMBED}")
     print("\n")
 atomicInstance = atomic(simInstance,basisInstance)
-atomicInstance.createK(simInstance,basisInstance)
-atomicInstance.initializeV(simInstance)
 atomicInstance.createS(simInstance,basisInstance)
-atomicInstance.createA(simInstance,basisInstance)
+
 
 
 if EMBED:
     atomicInstance.embedS(simInstance)
-    atomicInstance.initializeH_atom(simInstance)
+   
 
 
 if rank == 0:
@@ -77,7 +75,7 @@ if rank == 0:
     print(f"Solving TISE:EMBED={EMBED}")
     print("\n")
 tiseInstance = tise()
-tiseInstance.solveEigensystem(simInstance,basisInstance,atomicInstance,EMBED,SOLVE)
+tiseInstance.solveEigensystem(simInstance,basisInstance,atomicInstance,EMBED)
 if rank == 0:
     TISE_end = time.time()
     print(f"Finished Solving TISE in {TISE_end-TISE_start} seconds")

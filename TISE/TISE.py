@@ -1,6 +1,4 @@
 import numpy as np
-import json
-import sys
 
 from petsc4py import PETSc
 from slepc4py import SLEPc
@@ -11,11 +9,6 @@ rank = comm.rank
 class tise:
     def __init__(self):
         None
-
-    
-
-    
-    
     def _EVSolver(self,H,S,num_of_energies):
         E = SLEPc.EPS().create()
         E.setOperators(H,S)
@@ -27,57 +20,95 @@ class tise:
         nconv = E.getConverged()
         return E,nconv
 
-    
-    def solveEigensystem(self,simInstance,basisInstance,atomicInstance,EMBED,SOLVE):
-        ViewTISE = PETSc.Viewer().createHDF5(f"{atomicInstance.pot_func.__name__}.h5", mode=PETSc.Viewer.Mode.WRITE, comm= comm)
 
-        K = atomicInstance.K
+    def solveEigensystem(self,simInstance,basisInstance,atomicInstance,EMBED):
+        n_block = simInstance.n_block
+        n_basis = simInstance.splines["n_basis"]
+        order = simInstance.splines["order"]
+        kron = simInstance.kron
+        lmax = simInstance.lm["lmax"]
+        nmax = simInstance.lm["nmax"]
 
-        for l in range(simInstance.lm["lmax"]+1):
+        polarization = simInstance.laser["polarization"]
 
-            if rank == 0:
-                print(f"Working on subsysem for l = {l}")
-
-            atomicInstance.createV_l(simInstance,basisInstance,l)
-            V =  atomicInstance.V
-            H_l = K + V
-
-            if EMBED:
-                atomicInstance.embedH_l(simInstance,H_l,l)
-
-            if SOLVE:
-                num_of_energies = simInstance.lm["nmax"] - l +1
-                if num_of_energies > 0:
-                
-          
-
-                    E,nconv = self._EVSolver(H_l,atomicInstance.S,num_of_energies)
-
-                    for i in range(nconv):
-                        eigenvalue = E.getEigenvalue(i) 
-                        if np.real(eigenvalue) > 0:
-                            continue
-                        eigen_vector = H_l.getVecLeft()  
-                        E.getEigenvector(i, eigen_vector)  
-                            
-                        Sv = atomicInstance.S.createVecRight()
-                        atomicInstance.S.mult(eigen_vector, Sv)
-                        norm = eigen_vector.dot(Sv)
-
-                        eigen_vector.scale(1/np.sqrt(norm))
-                        eigen_vector.setName(f"Psi_{i+1+l}_{l}")
-                        ViewTISE.view(eigen_vector)
-                        
-                        energy = PETSc.Vec().createMPI(1, comm=PETSc.COMM_WORLD)
-                        energy.setValue(0,np.real(eigenvalue))
-                        energy.setName(f"E_{i+1+l}_{l}")
-                        energy.assemblyBegin()
-                        energy.assemblyEnd()
-                        ViewTISE.view(energy)
-                    H_l.destroy()
-
-            ViewTISE.destroy() 
 
         if EMBED:
-            atomicInstance.saveH_atom()   
+            H_atom = PETSc.Mat().createAIJ([n_block*n_basis,n_block*n_basis],comm = comm,nnz = 2*(order-1)+1)
+            H_atom.assemble()
+
+
+        ViewTISE = PETSc.Viewer().createHDF5(f"{atomicInstance.pot_func.__name__}.h5", mode=PETSc.Viewer.Mode.WRITE, comm= comm)
+        
+        K = atomicInstance.createK(simInstance,basisInstance)
+
+        for l in range(lmax+1):
+            V_l = atomicInstance.createV_l(simInstance,basisInstance,l)
+            H_l = K + V_l
+            
+            if polarization == "linear":
+                partial_I = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 1)
+                istart,iend = partial_I.getOwnershipRange()
+                if l in range(istart,iend):
+                    partial_I.setValue(l,l,1)
+                comm.barrier()
+                partial_I.assemble()
+            elif polarization == "elliptical":
+                partial_I = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 1)
+                istart,iend = partial_I.getOwnershipRange()
+                start_index = int(np.sum([2*n +1 for n in range(l)]))
+                end_index = int(start_index + 2*l +1)
+                index_range = range(start_index,end_index)
+
+                for i in range(istart,iend):
+                    if i in index_range:
+                        partial_I.setValue(i,i,1)
+                comm.barrier()
+                partial_I.assemble()
+
+            partial_H = kron(partial_I,H_l,comm,2*(order-1) +1)
+            H_atom.axpy(1,partial_H)
+            partial_I.destroy()
+
+
+            num_of_energies = nmax - l +1
+
+            if rank == 0:
+                if num_of_energies > 0 and EMBED:
+                    print(f"Solving and Embedding for l = {l}")
+                elif EMBED:
+                    print(f"Embedding for l = {l}")
+
+            if num_of_energies > 0:
+
+                E,nconv = self._EVSolver(H_l,atomicInstance.S,num_of_energies)
+
+                for i in range(nconv):
+                    eigenvalue = E.getEigenvalue(i) 
+                    if np.real(eigenvalue) > 0:
+                        continue
+                    eigen_vector = H_l.getVecLeft()  
+                    E.getEigenvector(i, eigen_vector)  
+                            
+                    Sv = atomicInstance.S.createVecRight()
+                    atomicInstance.S.mult(eigen_vector, Sv)
+                    norm = eigen_vector.dot(Sv)
+
+                    eigen_vector.scale(1/np.sqrt(norm))
+                    eigen_vector.setName(f"Psi_{i+1+l}_{l}")
+                    ViewTISE.view(eigen_vector)
+                        
+                    energy = PETSc.Vec().createMPI(1, comm=PETSc.COMM_WORLD)
+                    energy.setValue(0,np.real(eigenvalue))
+                    energy.setName(f"E_{i+1+l}_{l}")
+                    energy.assemblyBegin()
+                    energy.assemblyEnd()
+                    ViewTISE.view(energy)
+            H_l.destroy()
+        
+
+        if EMBED:
+            H_viewer = PETSc.Viewer().createBinary("TISE_files/H.bin","w")
+            H_atom.view(H_viewer)
+            H_viewer.destroy()
+        ViewTISE.destroy()    
         return None
