@@ -7,7 +7,7 @@ rank = comm.rank
 
 
 class atomic:
-    def __init__(self,simInstance,basisInstance):
+    def __init__(self,simInstance):
         def H(x):
             return (-1/(x+1E-25))          
         def He(x):
@@ -58,7 +58,7 @@ class atomic:
        
 
         def _V_element(x,i,j,knots,order):
-            return (B(i, order, x, knots) * B(j, order,x, knots) * l*(l+1)/(2*np.sqrt(x**4 + 1E-25 )) + B(i, order, x, knots) * B(j, order, x, knots)* self.pot_func(x))
+            return (B(i, order, x, knots) * B(j, order,x, knots) * l*(l+1)/(2*x**2 + 1E-25) + B(i, order, x, knots) * B(j, order, x, knots)* self.pot_func(x))
 
         V = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*(order-1) +1)
         istart,iend = V.getOwnershipRange()

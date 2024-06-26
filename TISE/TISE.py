@@ -16,6 +16,7 @@ class tise:
         E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
         E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
         E.setType(SLEPc.EPS.Type.KRYLOVSCHUR)
+        E.setTolerances(tol=1e-5)
         E.solve()
         nconv = E.getConverged()
         return E,nconv
@@ -81,7 +82,8 @@ class tise:
             if num_of_energies > 0:
 
                 E,nconv = self._EVSolver(H_l,atomicInstance.S,num_of_energies)
-
+                if rank == 0:
+                    print(f"l = {l}, Requested:{num_of_energies}, Converged:{nconv}")
                 for i in range(nconv):
                     eigenvalue = E.getEigenvalue(i) 
                     if np.real(eigenvalue) > 0:

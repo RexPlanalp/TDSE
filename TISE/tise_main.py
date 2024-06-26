@@ -54,7 +54,7 @@ if rank == 0:
     atomic_start = time.time()
     print(f"Constructing Atomic Matrices: EMBED={EMBED}")
     print("\n")
-atomicInstance = atomic(simInstance,basisInstance)
+atomicInstance = atomic(simInstance)
 atomicInstance.createS(simInstance,basisInstance)
 
 
