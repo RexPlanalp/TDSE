@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-#SBATCH --job-name TISE
+#SBATCH --job-name LINEAR_TDSE
 #SBATCH -p jila
 #SBATCH --nodes 1
 #SBATCH --ntasks 32

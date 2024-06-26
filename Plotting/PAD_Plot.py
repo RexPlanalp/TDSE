@@ -45,22 +45,22 @@ pz_vals = np.sqrt(2*E_vals) * np.cos(theta_vals)
 pad_momentum = pad_vals/np.sqrt(2*E_vals)
 
 max_mom = np.max(np.real(pad_momentum))
-min_mom = np.max(np.real(pad_momentum))*10**-2
+min_mom = np.max(np.real(pad_momentum))*10**-6
 
 max_E = np.max(pad_vals)
 min_E = np.max(pad_vals)*10**-2
 
 if ANGULAR:
-    #plt.scatter(px_vals, py_vals, c=pad_momentum, cmap=blue_red1)
-    plt.scatter(px_vals, py_vals, c=pad_momentum, cmap=blue_red1,norm=mcolors.LogNorm(vmin=min_mom,vmax=max_mom))
+    #plt.scatter(px_vals, py_vals, c=pad_momentum, cmap="hot_r")
+    plt.scatter(px_vals, pz_vals, c=pad_momentum, cmap="hot_r",norm=mcolors.LogNorm(vmin=min_mom,vmax=max_mom))
     plt.gca().set_aspect('equal', adjustable='box')
     plt.colorbar()
     plt.savefig("images/PAD.png")
 
     plt.clf()
 
-    #plt.scatter(E_vals,phi_vals,c=pad_vals, cmap=blue_red1)
-    plt.scatter(E_vals,phi_vals,c=pad_vals, cmap=blue_red1,norm = mcolors.LogNorm(vmin=min_E,vmax=max_E))
+    plt.scatter(E_vals,phi_vals,c=pad_vals, cmap=blue_red1)
+    #plt.scatter(E_vals,phi_vals,c=pad_vals, cmap=blue_red1,norm = mcolors.LogNorm(vmin=min_E,vmax=max_E))
     plt.colorbar()
     plt.savefig("images/E.png")
 

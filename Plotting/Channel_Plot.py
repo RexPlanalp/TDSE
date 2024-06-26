@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 N = 10
 w = 0.057
-I = 0.26e14
-E = 0.48
+I = 2.0e14
+E = 0.192
 
 def findPhotons(w,E,I):
     tau = 2*np.pi/w

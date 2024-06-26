@@ -12,7 +12,7 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-sys.path.append('/users/becker/dopl4670/Research/TDSE_refactored/Common')
+sys.path.append('/users/becker/dopl4670/Research/TDSE/Common')
 from Sim import *
 from Basis import *
 from Atomic import *
@@ -73,7 +73,7 @@ for E in E_range:
         probability = subvec.dot(Sv)
         coeff_dict[(l,m)].append(np.real(probability))
 if rank == 0:
-    with open("PES_files/coeff_dict.json", "wb") as fp:
+    with open("PES_files/partial_pes.json", "wb") as fp:
         pickle.dump(coeff_dict , fp)
 IS.destroy()  
 

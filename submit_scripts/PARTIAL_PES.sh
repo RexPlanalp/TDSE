@@ -14,6 +14,6 @@ REPO_DIR="/users/becker/dopl4670/Research/TDSE/Analysis"
 hostname
 pwd
 
-mpiexec -n $SLURM_NTASKS python $REPO_DIR/Parallel_Coeff.py >> results.log
+mpiexec -n $SLURM_NTASKS python $REPO_DIR/Parallel_Partial.py >> results.log
 
 
