@@ -37,7 +37,7 @@ class basis:
         N_middle = N_knots - 2 * (order-2)
         
         indices = np.linspace(0, 1, N_middle)
-        knots_middle = rmax * indices**2
+        knots_middle = rmax * indices**1.2
         
         knots_start = [0] * (order-2)
         knots_end = [rmax] * (order-2)
@@ -52,10 +52,11 @@ class basis:
         N_knots = n_basis + order 
         N_middle = N_knots - 2 * (order-2)
         
-        N_core = N_middle // 4  
-        N_outer = N_middle - N_core  
 
-        core = 300
+        N_core = 100
+        N_outer = N_middle - N_core
+
+        core = 200
 
         core_knots = core*np.linspace(0,1,N_core)**2
         outer_knots = core + np.linspace(0,1,N_outer)*(rmax-core)
@@ -72,7 +73,7 @@ class basis:
 
     def createKnots(self,simInstance):
         R0_input = simInstance.box["R0_input"]
-        RS_input = simInstance.box["RS_input"]
+        
         
         if simInstance.splines["knot_spacing"] == "linear":
             self.knots = self._linearKnots(simInstance)
@@ -84,9 +85,7 @@ class basis:
         self.R0_index = np.argmin(np.abs(self.knots-R0_input))
         self.R0 = self.knots[self.R0_index]
 
-        self.RS_index = np.argmin(np.abs(self.knots-RS_input))
-        self.RS = self.knots[self.RS_index]
-
+    
         self.eta = simInstance.box["eta"]
         
     def integrate(self, func, i_fixed, j_fixed,order,knots):
