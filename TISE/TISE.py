@@ -16,7 +16,7 @@ class tise:
         E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
         E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
         E.setType(SLEPc.EPS.Type.KRYLOVSCHUR)
-        E.setTolerances(tol=1e-5)
+        E.setTolerances(1e-5,max_it=1000)
         E.solve()
         nconv = E.getConverged()
         return E,nconv
@@ -71,7 +71,7 @@ class tise:
             partial_I.destroy()
 
 
-            num_of_energies = nmax - l +1
+            num_of_energies = nmax - l 
 
             if rank == 0:
                 if num_of_energies > 0 and EMBED:
