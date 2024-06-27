@@ -19,7 +19,7 @@ basisInstance.createKnots(simInstance)
 
 potential = simInstance.box["pot"]
 with h5py.File(f'TISE_files/{potential}.h5', 'r') as f:
-    data = f[f"/Psi_{1}_{0}"][:]
+    data = f[f"/Psi_{3}_{1}"][:]
     real_part = data[:,0]
     imaginary_part = data[:,1]
     total = real_part + 1j*imaginary_part

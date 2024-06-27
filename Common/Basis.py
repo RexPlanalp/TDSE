@@ -67,6 +67,31 @@ class basis:
         knots_end = [rmax] * (order-2)
 
         return np.array(knots_start + knots_middle + knots_end)
+    
+    def _linlinKnots(self,simInstance):
+        n_basis = simInstance.splines["n_basis"]
+        order = simInstance.splines["order"]
+        rmax = simInstance.box["grid_size"]
+
+
+        N_knots = n_basis + order 
+        N_middle = N_knots - 2 * (order-2)
+            
+        N_core = 700
+        N_outer = N_middle - N_core
+
+        core = 150
+
+        core_knots = core*np.linspace(0,1,N_core)
+        outer_knots = core + np.linspace(0,1,N_outer)*(rmax-core)
+
+        knots_middle = core_knots.tolist() + outer_knots.tolist()
+
+        knots_start = [0] * (order-2)
+        knots_end = [rmax] * (order-2)
+
+        return np.array(knots_start + knots_middle + knots_end)
+
 
 
       
@@ -81,6 +106,8 @@ class basis:
             self.knots = self._quadraticKnots(simInstance)
         elif simInstance.splines["knot_spacing"] == "quadratic+linear":
             self.knots = self._piecewisequadpluslinKnots(simInstance)
+        elif simInstance.splines["knot_spacing"] == "linear+linear":
+            self.knots = self._linlinKnots(simInstance)
         
         self.R0_index = np.argmin(np.abs(self.knots-R0_input))
         self.R0 = self.knots[self.R0_index]
