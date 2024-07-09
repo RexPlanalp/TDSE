@@ -7,5 +7,7 @@ E_range = np.load("PES_files/E.npy")
 PES = np.load("PES_files/PES.npy")
 
 plt.semilogy(E_range,np.real(PES),color = "k")
+plt.xlabel("Energy (au)")
+plt.ylabel("Yield (Log scale)")
 
 plt.savefig("images/PES.png")

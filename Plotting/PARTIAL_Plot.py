@@ -3,7 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 import pickle
 
-with open("PES_files/coeff_dict.json", "rb") as fp:
+with open("PES_files/partial_pes.json", "rb") as fp:
     coeff_dict = pickle.load(fp)
 E_range = np.load("PES_files/E.npy")
 

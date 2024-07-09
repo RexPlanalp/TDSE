@@ -26,7 +26,7 @@ simInstance.spacialGrid()
 basisInstance = basis()
 basisInstance.createKnots(simInstance)
 
-atomicInstance = atomic(simInstance,basisInstance)
+atomicInstance = atomic(simInstance)
 atomicInstance.createS(simInstance,basisInstance)
 S = atomicInstance.S
 
