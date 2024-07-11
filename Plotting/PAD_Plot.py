@@ -101,13 +101,14 @@ if ASYM:
     plt.clf()
 
     tol = 0.001
-    E = 0.192
+    E = 0.48
     mask = np.abs(E_vals - E) < tol
     x, y = phi_vals[mask], asymmetry_vals[mask]
     sorted_indices = np.argsort(x)
     x, y = x[sorted_indices], y[sorted_indices]
 
     plt.plot(x,y)
+    np.save("TDSE_files/A_slice.npy",y)
     plt.savefig("images/A_slice.png")
     
 if PAD_SLICE:
