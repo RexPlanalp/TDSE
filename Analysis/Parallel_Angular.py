@@ -117,10 +117,18 @@ for E in local_E_range:
                 harmonics = sph_harm(m_list, l_list, phi_val, theta_val)
                 spherical_vector = np.tile(harmonics, (n_basis, 1)).T.flatten()
 
+                
+
                 scaled_vector = spherical_vector * wavefunction
                 scaled_vector = scaled_vector.reshape(n_block,n_basis)
-                total_sum = scaled_vector.sum(axis = 0)
-                value = total_sum.conj().dot(S_R.dot(total_sum))
+
+                # total_sum = scaled_vector.sum(axis = 0)
+                # value = total_sum.conj().dot(S_R.dot(total_sum))
+
+                top_lm = [(26,26),(25,25),(24,24)]
+                top_indices = [lm_dict[(l,m)] for l,m in top_lm]
+                partial_sum = scaled_vector[top_indices, :].sum(axis=0)
+                value = partial_sum.conj().dot(S_R.dot(partial_sum))
                 
                 E_vals.append(E)
                 theta_vals.append(theta_val)
