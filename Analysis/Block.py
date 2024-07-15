@@ -5,6 +5,7 @@ import sys
 import os
 from scipy.sparse import csr_matrix
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 
 from mpi4py import MPI
 from petsc4py import PETSc
@@ -36,6 +37,7 @@ order = simInstance.splines["order"]
 lmax = simInstance.lm["lmax"]
 n_block = simInstance.n_block
 pot = simInstance.box["pot"]
+lmax = simInstance.lm["lmax"]
     
 total_size = n_basis * n_block
 lm_dict,block_dict = simInstance.lm_dict,simInstance.block_dict
@@ -64,13 +66,12 @@ if True:
         wavefunction = real_part + 1j * imaginary_part
 
 lm_list = []
+pyramid = [[None for _ in range(2*lmax + 1)] for _ in range(lmax + 1)]
 
 CONT = True
 
 
 for (l,m),block_index in lm_dict.items():
-    if l != m:
-        continue
     print(f"Computing Probability of having l,m = {l,m}")
     wavefunction_block = wavefunction[block_index*n_basis:(block_index+1)*n_basis]
 
@@ -94,15 +95,16 @@ for (l,m),block_index in lm_dict.items():
                         inner_product = bound_state.conj().dot(S_R.dot(wavefunction_block))
                         wavefunction_block -= inner_product * bound_state
                         
-                    
     probability = wavefunction_block.conj().dot(S_R.dot(wavefunction_block))
-    lm_list.append(probability)
+
+    pyramid[l][m + lmax] = np.real(probability)
+    if l == m:
+        lm_list.append(np.real(probability))
 
 
-    
-
+##########
+plt.figure()
 l_array = [l for l,m in lm_dict.keys() if l == m]
-
 plt.bar(l_array,lm_list,color = "k")
 plt.yscale('log')
 if CONT:
@@ -110,8 +112,32 @@ if CONT:
 else:
     plt.title("Bound + Cont")
 plt.savefig("images/blocks.png")
+plt.clf()
+##########
+pyramid_array = np.array([[val if val is not None else 0 for val in row] for row in pyramid])
 
-print(np.argmax(lm_list))
+# Plotting the pyramid as a heatmap
+pyramid_array = np.array([[val if val is not None else 0 for val in row] for row in pyramid])
+
+# Plotting the pyramid as a heatmap
+fig, ax = plt.subplots(figsize=(10, 8))
+#cax = ax.imshow(pyramid_array[::-1], cmap='hot', interpolation='nearest')  # Reverse the array for upside-down pyramid
+cax = ax.imshow(pyramid_array[::-1], cmap='hot_r', interpolation='nearest')  # Reverse the array for upside-down pyramid
+ax.set_xlabel('m')
+ax.set_ylabel('l')
+
+fig.colorbar(cax, ax=ax)
+plt.title('Heatmap of Probabilities for l and m Values')
+plt.savefig("images/blocks_heatmap.png")
+plt.show()
+
+plt.savefig("images/pyramid.png")
+
+
+
+
+
+
 
         
     
