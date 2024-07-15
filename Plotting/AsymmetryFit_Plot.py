@@ -5,11 +5,8 @@ from scipy.optimize import curve_fit
 from scipy.special import sph_harm
 from scipy.special import gamma
 
-l_values = [25, 24, 23, 22, 21, 20, 19, 18, 17]
-m_values = [25, 24, 23, 22, 21, 20, 19, 18, 17]
-# l_values = [25, 24, 23]
-# m_values = [25, 24, 23]
-
+l_values = [26,25]
+m_values = [26,25]
 
 E = 0.48
 k = np.sqrt(2 * E)
@@ -17,7 +14,7 @@ k = np.sqrt(2 * E)
 theta = np.pi / 2
 phi = np.arange(0, 2 * np.pi+0.01, 0.01)
 
-phases = [(-1) ** l * np.exp(1j * np.angle(gamma(l + 1 - 1j / k))) for l in l_values]
+phases = [(-1j)**l * np.exp(1j * np.angle(gamma(l + 1 - 1j / k))) for l in l_values]
 
 def PES(phi, *amplitudes):
     PES_amplitude = sum(
@@ -44,14 +41,10 @@ def A(phi, *amplitudes):
 
 
 y_data = np.load("TDSE_files/A_slice.npy")
-# y_prediction = A(phi,*[0.08840796672327927,2*0.03697648072296346 ,2*0.02284982509729667])
-# plt.plot(phi,y_data)
-# plt.plot(phi,y_prediction)
-# plt.savefig("images/A_test.png")
 
-lower_bounds = [0]*9
-upper_bounds = [1]*9
-amplitudes = [1]*9
+lower_bounds = [0]*2
+upper_bounds = [1]*2
+amplitudes = [1]*2
 
 popt, pcov = curve_fit(A, phi, y_data,p0=amplitudes)
 print("Optimized parameters:", popt)
