@@ -26,13 +26,15 @@ if TOP:
         contributions.append(partial_spectrum[E_index])
 
     sorted_indices = np.argsort(contributions)
-    top3_indices = sorted_indices[-1:-4:-1]
+    top6_indices = sorted_indices[-1:-7:-1]
     
     plt.figure()
-    for index in top3_indices:
+    for index in top6_indices:
         l,m = list(partial_spectra.keys())[index]
         y = np.array(partial_spectra[(l, m)])
         plt.plot(E_range, np.real(y), label=f"l={l}, m={m}")
+
+        print(f"l,m: {l,m}, Value: {round(y[E_index],6)}")
     
     plt.axvline(E)
     plt.xlabel("Energy (E)")
