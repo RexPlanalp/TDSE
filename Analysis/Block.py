@@ -68,7 +68,7 @@ if True:
 lm_list = []
 pyramid = [[None for _ in range(2*lmax + 1)] for _ in range(lmax + 1)]
 
-CONT = True
+CONT = False
 
 
 for (l,m),block_index in lm_dict.items():
@@ -108,10 +108,15 @@ l_array = [l for l,m in lm_dict.keys() if l == m]
 plt.bar(l_array,lm_list,color = "k")
 plt.yscale('log')
 if CONT:
-    plt.title("Cont")
+    plt.title("Cont States")
+    
 else:
-    plt.title("Bound + Cont")
+    plt.title("Bound + Cont States")
+print("#######################")
+print("Total Probability",np.sum(lm_list))
 plt.savefig("images/blocks.png")
+plt.xlabel("Block")
+plt.ylabel("Probability")
 plt.clf()
 ##########
 pyramid_array = np.array([[val if val is not None else 0 for val in row] for row in pyramid])
@@ -131,7 +136,6 @@ plt.title('Heatmap of Probabilities for l and m Values')
 plt.savefig("images/blocks_heatmap.png")
 plt.show()
 
-plt.savefig("images/pyramid.png")
 
 
 
