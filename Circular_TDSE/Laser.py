@@ -43,10 +43,10 @@ class laser:
         w = simInstance.laser["w"]
         ell = simInstance.laser["ell"]
         def A_funcX(t):
-            A_x = self.E_0/w * self.env_func(t) * self.carrier_funcX(t) / np.sqrt(1+ell)
+            A_x = self.E_0/w * self.env_func(t) * self.carrier_funcX(t) / np.sqrt(1+np.abs(ell))
             return A_x
         def A_funcY(t):
-            A_y = ell*self.E_0 /w* self.env_func(t) * self.carrier_funcY(t) / np.sqrt(1+ell)
+            A_y = ell*self.E_0 /w* self.env_func(t) * self.carrier_funcY(t) / np.sqrt(1+np.abs(ell))
             return A_y
         self.A_funcX = A_funcX
         self.A_funcY = A_funcY
