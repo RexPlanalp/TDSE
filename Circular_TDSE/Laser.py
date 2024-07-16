@@ -74,6 +74,7 @@ class laser:
 
         np.save("TDSE_files/A_funcX.npy",self.A_funcX(t))
         np.save("TDSE_files/A_funcY.npy",self.A_funcY(t))
+        np.save("TDSE_files/t.npy",t)
 
 if __name__ == "__main__":
     laserInstance = laser()
