@@ -72,6 +72,9 @@ class laser:
         plt.savefig("images/polar_pulse.png")
         plt.clf()
 
+        np.save("TDSE_files/A_funcX.npy",self.A_funcX(t))
+        np.save("TDSE_files/A_funcY.npy",self.A_funcY(t))
+
 if __name__ == "__main__":
     laserInstance = laser()
     laserInstance.createEnvelope()
