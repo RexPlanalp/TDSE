@@ -17,7 +17,7 @@ if ALL:
     plt.savefig("images/partial.png")
 
 if TOP:
-    E = 0.192
+    E = 0.48
     E_index = np.argmin(np.abs(E_range - E))
 
     contributions = []
