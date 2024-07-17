@@ -51,7 +51,7 @@ max_E = np.max(pad_vals)
 min_E = np.max(pad_vals)*10**-2
 
 if ANGULAR:
-    plt.scatter(px_vals, py_vals, c=pad_momentum, cmap="hot_r")
+    plt.scatter(px_vals, py_vals, c=pad_vals, cmap="hot_r")
     #plt.scatter(px_vals, py_vals, c=pad_momentum, cmap="hot_r",norm=mcolors.LogNorm(vmin=min_mom,vmax=max_mom))
     plt.gca().set_aspect('equal', adjustable='box')
     plt.colorbar()
