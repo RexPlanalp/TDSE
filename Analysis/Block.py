@@ -68,7 +68,7 @@ if True:
 lm_list = []
 pyramid = [[None for _ in range(2*lmax + 1)] for _ in range(lmax + 1)]
 
-CONT = False
+CONT = True
 
 
 for (l,m),block_index in lm_dict.items():
@@ -127,11 +127,11 @@ pyramid_array = np.array([[val if val is not None else 0 for val in row] for row
 # Plotting the pyramid as a heatmap
 fig, ax = plt.subplots(figsize=(10, 8))
 #cax = ax.imshow(pyramid_array[::-1], cmap='hot', interpolation='nearest')  # Reverse the array for upside-down pyramid
-cax = ax.imshow(pyramid_array[::-1], cmap='hot_r', interpolation='nearest')  # Reverse the array for upside-down pyramid
+cax = ax.imshow(pyramid_array[::-1], cmap='inferno', interpolation='nearest')  # Reverse the array for upside-down pyramid
 ax.set_xlabel('m')
 ax.set_ylabel('l')
 
-fig.colorbar(cax, ax=ax)
+fig.colorbar(cax, ax=ax,shrink = 0.5)
 plt.title('Heatmap of Probabilities for l and m Values')
 plt.savefig("images/blocks_heatmap.png")
 plt.show()
