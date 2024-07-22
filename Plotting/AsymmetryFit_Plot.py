@@ -1,59 +1,63 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
 from scipy.optimize import curve_fit
 from scipy.special import sph_harm
 from scipy.special import gamma
 
-l_values = [26,25]
-m_values = [26,25]
+l_values = [26, 25]
+m_values = [26, 25]
 
-E = 0.48
+E = 0.544
 k = np.sqrt(2 * E)
 
 theta = np.pi / 2
-phi = np.arange(0, 2 * np.pi+0.01, 0.01)
+phi = np.arange(0, 2 * np.pi + 0.01, 0.01)
 
-phases = [(-1j)**l * np.exp(1j * np.angle(gamma(l + 1 - 1j / k))) for l in l_values]
-
-def PES(phi, *amplitudes):
+def PES(phi, theta, params):
+    n = len(params) // 2
+    amplitudes = params[:n]
+    phases = params[n:]
     PES_amplitude = sum(
-        amplitude * phase * sph_harm(m, l, phi, theta)
+        amplitude * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
         for amplitude, phase, m, l in zip(amplitudes, phases, m_values, l_values)
     )
     PES_vals = np.abs(PES_amplitude) ** 2
     return PES_vals
 
-def PES_opposite(phi, *amplitudes):
+def PES_opposite(phi, theta, params):
+    n = len(params) // 2
+    amplitudes = params[:n]
+    phases = params[n:]
     PES_amplitude_opposite = sum(
-        (-1) ** l * amplitude * phase * sph_harm(m, l, phi, theta)
+        (-1) ** l * amplitude * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
         for amplitude, phase, m, l in zip(amplitudes, phases, m_values, l_values)
     )
     PES_vals_opp = np.abs(PES_amplitude_opposite) ** 2
     return PES_vals_opp
 
-def A(phi, *amplitudes):
-    PES_vals = PES(phi, *amplitudes)
-    PES_vals_opp = PES_opposite(phi, *amplitudes)
+def A(phi, *params):
+    PES_vals = PES(phi, theta, params)
+    PES_vals_opp = PES_opposite(phi, theta, params)
     A = (PES_vals - PES_vals_opp) / (PES_vals + PES_vals_opp)
     return A
 
-
-
+# Assuming y_data is already available
 y_data = np.load("TDSE_files/A_slice.npy")
 
-lower_bounds = [0]*2
-upper_bounds = [1]*2
-amplitudes = [1]*2
+# Initial guesses and bounds for both amplitudes and phases
+n_params = 2 * len(l_values)
+initial_guess = [1.0] * n_params
+lower_bounds = [0.0] * len(l_values) + [-np.pi] * len(l_values)
+upper_bounds = [np.inf] * len(l_values) + [np.pi] * len(l_values)
 
-popt, pcov = curve_fit(A, phi, y_data,p0=amplitudes)
+# Optimize parameters
+popt, pcov = curve_fit(A, phi-0.01, y_data, p0=initial_guess, bounds=(lower_bounds, upper_bounds))
 print("Optimized parameters:", popt)
 
-plt.plot(phi, y_data, label="Data")
-plt.plot(phi, A(phi, *popt), label="Fit")
+plt.plot(phi, y_data, label="Simulation Result")
+plt.plot(phi, A(phi, *popt)+0.1, label="Model Fit+0.1")
+plt.xlabel('Phi')
+plt.ylabel('A')
+plt.legend()
 plt.savefig("images/A_fit.png")
-
-
-
-
-
+plt.show()

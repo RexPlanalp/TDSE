@@ -18,7 +18,7 @@ Up = I_profile/(4*w**2) # Pondermotive energy in atomic units
 ############################################################################################################################
 
 def findPhotons(E,Ip,Up,w):
-    n = (E-Ip-Up)/w
+    n = (E-Ip+Up)/w
     return n
 
 n = findPhotons(E,Ip,Up,w)
@@ -46,3 +46,27 @@ plt.savefig("images/z.png")
 plt.clf()
 
 ##########################################################################################################################################
+# total_potential = Up - Ip
+
+# offset = np.max(total_potential)
+# n = 25
+# print(round(n*w - offset,3))
+################################################################################################################################
+# w = 0.057  # Central Frequency of laser pulse in atomic units
+# import math
+# for I_max in np.arange(0.00001, 0.01 + 0.00001, 0.00001):
+#     Up = I_max / (4 * w**2)
+#     z = Up / w
+#     rounded_z = round(z)
+#     if math.isclose(z, rounded_z, rel_tol=1e-2):
+#         print(f"z value:{z}, and intensity in SI { I_max * 3.51E16:.3e}")
+
+I_max = (2.08e14 / 3.51E16)
+import math
+for w in np.arange(0.000005, 0.2 + 0.000005, 0.000005):
+    Up = I_max / (4 * w**2)
+    z = Up / w
+    rounded_z = round(z)
+    if math.isclose(z, rounded_z, rel_tol=1e-4) and z<10:
+        print(f"z value:{z}, and wavelength in SI { (0.057/w)*800}")
+       
