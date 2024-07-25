@@ -101,7 +101,7 @@ if ASYM:
     plt.clf()
 
     tol = 0.001
-    E = 0.544
+    E = float(sys.argv[2])
     mask = np.abs(E_vals - E) < tol
     x, y = phi_vals[mask], asymmetry_vals[mask]
     sorted_indices = np.argsort(x)

@@ -31,12 +31,17 @@ if TOP:
     top_indices = sorted_indices[-1:-(top+1):-1]
     
     plt.figure()
+    set = 0
     for i,index in enumerate(top_indices):
         l,m = list(partial_spectra.keys())[index]
         y = np.array(partial_spectra[(l, m)])
-        plt.plot(E_range, np.real(y), label=f"l={l}, m={m}")
+        plt.plot(E_range, np.abs(y), label=f"l={l}, m={m}")
 
-        print(f"Top {i+1}, l,m: {l,m}, Value: {round(y[E_index],8)}")
+        if i == 0:
+            set = round((np.abs(y[E_index])),8)
+
+        print(f"Top {i+1}, l,m: {l,m}, Value: {round((np.abs(y[E_index])),8)/set}")
+        
     
     plt.axvline(E)
     plt.xlabel("Energy (E)")

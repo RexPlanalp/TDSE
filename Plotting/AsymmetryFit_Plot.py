@@ -4,10 +4,10 @@ from scipy.optimize import curve_fit
 from scipy.special import sph_harm
 from scipy.special import gamma
 
-l_values = [26, 25]
-m_values = [26, 25]
+l_values = [25, 24]
+m_values = [25, 24]
 
-E = 0.544
+E = 0.48
 k = np.sqrt(2 * E)
 
 theta = np.pi / 2
@@ -50,12 +50,20 @@ initial_guess = [1.0] * n_params
 lower_bounds = [0.0] * len(l_values) + [-np.pi] * len(l_values)
 upper_bounds = [np.inf] * len(l_values) + [np.pi] * len(l_values)
 
+sigma = 0.01 * np.ones_like(y_data)
+
 # Optimize parameters
-popt, pcov = curve_fit(A, phi-0.01, y_data, p0=initial_guess, bounds=(lower_bounds, upper_bounds))
+popt, pcov = curve_fit(A, phi-0.01, y_data, p0=initial_guess, bounds=(lower_bounds, upper_bounds),sigma = sigma)
+
+popt[:len(l_values)] /= popt[0]
+
+popt[1] = 0.2
+
 print("Optimized parameters:", popt)
 
+
 plt.plot(phi, y_data, label="Simulation Result")
-plt.plot(phi, A(phi, *popt)+0.1, label="Model Fit+0.1")
+plt.plot(phi, A(phi, *popt), label="Model Fit+0.1")
 plt.xlabel('Phi')
 plt.ylabel('A')
 plt.legend()
