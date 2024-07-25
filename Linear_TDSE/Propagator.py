@@ -86,7 +86,7 @@ class propagator:
         integrate = basisInstance.integrate
 
         def _H_pot_der(x,i,j,knots,order):
-            return (B(i, order, x, knots)*dB(j, order, x, knots))
+            return (B(i, order, x, knots)*B(j, order, x, knots))
 
     def propagateCN(self,simInstance,psiInstance,laserInstance):
         n_block = simInstance.n_block
