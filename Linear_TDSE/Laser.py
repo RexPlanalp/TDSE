@@ -50,5 +50,8 @@ class laser:
         plt.savefig("images/pulse.png")
         plt.clf()
 
+        np.save("TDSE_files/A_func.npy",self.A_func(t))
+        np.save("TDSE_files/t.npy",t)
+
 if __name__ == "__main__":
     pass

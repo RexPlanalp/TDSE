@@ -99,6 +99,7 @@ if rank == 0:
 propagatorInstance = propagator()
 propagatorInstance.partialAtomic(simInstance)
 propagatorInstance.partialInteraction(simInstance,interactionInstance)
+propagatorInstance.constructHHG(simInstance,basisInstance)
 propagatorInstance.propagateCN(simInstance,psiInstance,laserInstance)
 if rank == 0:
     prop_end = time.time()

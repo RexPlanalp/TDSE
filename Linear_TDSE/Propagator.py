@@ -86,7 +86,30 @@ class propagator:
         integrate = basisInstance.integrate
 
         def _H_pot_der(x,i,j,knots,order):
-            return (B(i, order, x, knots)*B(j, order, x, knots))
+            return (B(i, order, x, knots)*B(j, order, x, knots)/(x**2+1E-25))
+        
+        H_hhg =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*(order-1)+1)
+        H_hhg.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
+        istart,iend = H_hhg.getOwnershipRange()
+        for i in range(istart,iend):
+            for j in range(n_basis):
+                    if np.abs(i-j)>=order:
+                        continue
+                    H_element = integrate(_H_pot_der,i,j,order,knots)
+                    H_hhg.setValue(i,j,H_element)
+        comm.barrier()
+        H_hhg.assemble()
+
+        I = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 1)
+        I.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
+        istart,iend = I.getOwnershipRange()
+        for i in range(istart,iend):
+            I.setValue(i,i,1)
+        comm.barrier()
+        I.assemble()
+
+        H_hhg_atom = kron(H_hhg,I,comm,2*(order-1)+1)
+        self.H_hhg = H_hhg_atom
 
     def propagateCN(self,simInstance,psiInstance,laserInstance):
         n_block = simInstance.n_block
@@ -116,25 +139,19 @@ class propagator:
         partial_angular = self.interaction_mat
 
         
-        if simInstance.HHG:
-            if os.path.exists('TISE_files/A.bin'):
-                A = PETSc.Mat().createAIJ([n_block*n_basis,n_block*n_basis],comm = PETSc.COMM_WORLD,nnz = 2*(order-1)+1)
-                A_viewer = PETSc.Viewer().createBinary('TISE_files/A.bin', 'r')
-                A.load(A_viewer)
-                A_viewer.destroy()
-                A.assemble()
-            a_list = []
+        a_list = []
+        right_vec = self.H_hhg.createVecRight()
+        self.H_hhg.mult(psi_initial,right_vec)
+        prod = psi_initial.dot(right_vec)
+        a_list.append(prod)
         
 
         for i in range(Nt-1):
             if PETSc.COMM_WORLD.rank == 0:
                 print(i, Nt-1)
 
-            if simInstance.HHG:
-                a = A.createVecRight()
-                A.mult(psi_initial, a)
-                prod = psi_initial.dot(a)
-                a_list.append(prod)
+            
+            
 
             pulse_val = laserInstance.A_func(i*dt + dt/2)
             
@@ -150,6 +167,12 @@ class propagator:
             ksp.setOperators(partial_L_copy)
             ksp.solve(known, solution)
             solution.copy(psi_initial)
+
+            right_vec = self.H_hhg.createVecRight()
+            self.H_hhg.mult(psi_initial,right_vec)
+            prod = psi_initial.dot(right_vec)
+            a_list.append(prod)
+           
 
             partial_L_copy.destroy()
             partial_R_copy.destroy()
@@ -182,9 +205,8 @@ class propagator:
         partial_L_copy.destroy()
         partial_R_copy.destroy()
         
-        if simInstance.HHG:
-            if rank == 0:
-                np.save("TDSE_files/HHG.npy",a_list)
+        
+        np.save("TDSE_files/HHG.npy",a_list)
 
         S_norm = S.createVecRight()
         S.mult(psi_initial,S_norm)

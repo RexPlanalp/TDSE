@@ -9,6 +9,8 @@
 
 #SBATCH --exclude=node70
 #SBATCH --exclude=node72
+#SBATCH --exclude=node82
+#SBATCH --exclude=node81
 
 
 REPO_DIR="/users/becker/dopl4670/Research/TDSE/Linear_TDSE"
