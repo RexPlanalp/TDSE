@@ -19,3 +19,6 @@ plt.xlabel("Energy (au)")
 plt.ylabel("Yield")
 plt.savefig("images/PES.png")
 plt.clf()
+
+I = np.trapz(np.real(PES),E_range)
+print(f"Total Ionization:{I}")
