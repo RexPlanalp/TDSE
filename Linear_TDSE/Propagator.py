@@ -85,31 +85,124 @@ class propagator:
         dB = basisInstance.dB
         integrate = basisInstance.integrate
 
-        def _H_pot_der(x,i,j,knots,order):
-            return (B(i, order, x, knots)*B(j, order, x, knots)/(x**2+1E-25))
+
+
+        def alm(l,m):
+            f1 = (l-m-1)*(l-m)
+            f2 = 2*(2*l -1)*(2*l +1)
+            return np.sqrt(f1/f2) *1/np.sqrt(2)
+        def blm(l,m):
+            f1 = (l+m+1)*(l+m+2)*(l+1)
+            f2 = (2*l +1)*(2*l+2)*(2*l+3)
+            return np.sqrt(f1/f2) * 1/np.sqrt(2)
         
-        H_hhg =  PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*(order-1)+1)
-        H_hhg.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
-        istart,iend = H_hhg.getOwnershipRange()
+        def clm(l,m):
+            f1 = (l+m-1)*(l+m)
+            f2 = 2*(2*l-1)*(2*l+1)
+            return np.sqrt(f1/f2) * 1/np.sqrt(2)
+
+        def dlm(l,m):
+            f1 = (l-m+1)*(l-m+2)*(l+1)
+            f2 = (2*l+1)*(2*l+2)*(2*l+3)
+            return np.sqrt(f1/f2) * 1/np.sqrt(2)
+        
+        def elm(l,m):
+            f1 = (l+m)*(l-m)
+            f2 = (2*l-1)*(2*l+1)  
+            return np.sqrt(f1/f2) 
+        def flm(l,m):
+            f1 = (l+m+1)*(l-m+1)
+            f2 = (2*l+1)*(2*l+3)   
+            return np.sqrt(f1/f2) 
+        def _H_hhg_R(x,i,j,knots,order):
+            return (B(i, order, x, knots)*B(j, order, x, knots)/(x**2 + 1E-25))
+        
+        H_hhg_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*(order-1)+1)
+        H_hhg_R.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
+        istart,iend = H_hhg_R.getOwnershipRange()
         for i in range(istart,iend):
             for j in range(n_basis):
-                    if np.abs(i-j)>=order:
-                        continue
-                    H_element = integrate(_H_pot_der,i,j,order,knots)
-                    H_hhg.setValue(i,j,H_element)
+                if np.abs(i-j)>=order:
+                    continue
+                H_element = integrate(_H_hhg_R,i,j,order,knots)
+                H_hhg_R.setValue(i,j,H_element)
         comm.barrier()
-        H_hhg.assemble()
+        H_hhg_R.assemble()
 
-        I = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 1)
-        I.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
-        istart,iend = I.getOwnershipRange()
+        H_hhg_lm_x = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 2)
+        istart,iend = H_hhg_lm_x.getOwnershipRange()
         for i in range(istart,iend):
-            I.setValue(i,i,1)
-        comm.barrier()
-        I.assemble()
+            l,m = block_dict[i]
+            for j in range(n_block):
+                lprime,mprime = block_dict[j]
 
-        H_hhg_atom = kron(H_hhg,I,comm,2*(order-1)+1)
-        self.H_hhg = H_hhg_atom
+                if l == lprime+1 and m == mprime-1:
+                    H_hhg_lm_x.setValue(i,j,alm(l,m))
+                elif l == lprime-1 and m == mprime-1:
+                    H_hhg_lm_x.setValue(i,j,blm(l,m))
+
+                elif l == lprime+1 and m == mprime+1:
+                    H_hhg_lm_x.setValue(i,j,-clm(l,m))
+                elif l == lprime-1 and m == mprime+1:
+                    H_hhg_lm_x.setValue(i,j,-dlm(l,m))
+
+        comm.barrier()
+        H_hhg_lm_x.assemble()
+
+        hhg_x = kron(H_hhg_lm_x,H_hhg_R,comm,2*(2*(order-1)+1))
+        self.hhg_x = hhg_x
+        H_hhg_lm_x.destroy()
+    
+        H_hhg_lm_y = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 2)
+        istart,iend = H_hhg_lm_y.getOwnershipRange()
+        for i in range(istart,iend):
+            l,m = block_dict[i]
+            for j in range(n_block):
+                lprime,mprime = block_dict[j]
+
+                if l == lprime+1 and m == mprime-1:
+                    H_hhg_lm_y.setValue(i,j,1j*alm(l,m))
+                elif l == lprime-1 and m == mprime-1:
+                    H_hhg_lm_y.setValue(i,j,1j*blm(l,m))
+
+                elif l == lprime+1 and m == mprime+1:
+                    H_hhg_lm_y.setValue(i,j,1j*clm(l,m))
+                elif l == lprime-1 and m == mprime+1:
+                    H_hhg_lm_y.setValue(i,j,1j*dlm(l,m))
+
+        comm.barrier()
+        H_hhg_lm_y.assemble()
+
+        hhg_y = kron(H_hhg_lm_y,H_hhg_R,comm,2*(2*(order-1)+1))
+        self.hhg_y = hhg_y
+        H_hhg_lm_y.destroy()
+
+        H_hhg_lm_z = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 2)
+        istart,iend = H_hhg_lm_z.getOwnershipRange()
+        for i in range(istart,iend):
+            l,m = block_dict[i]
+            for j in range(n_block):
+                lprime,mprime = block_dict[j]
+
+                if l == lprime+1 and m == mprime+1:
+                    H_hhg_lm_z.setValue(i,j,elm(l,m))
+                elif l == lprime-1 and m == mprime+1:
+                    H_hhg_lm_z.setValue(i,j,flm(l,m))
+
+                
+
+        comm.barrier()
+        H_hhg_lm_z.assemble()
+
+        hhg_z = kron(H_hhg_lm_z,H_hhg_R,comm,2*(2*(order-1)+1))
+        self.hhg_z = hhg_z
+        H_hhg_lm_z.destroy()
+        H_hhg_R.destroy()
+
+
+       
+        
+        return None
 
     def propagateCN(self,simInstance,psiInstance,laserInstance):
         n_block = simInstance.n_block
@@ -139,12 +232,29 @@ class propagator:
         partial_angular = self.interaction_mat
 
         
-        a_list = []
-        right_vec = self.H_hhg.createVecRight()
-        self.H_hhg.mult(psi_initial,right_vec)
-        prod = psi_initial.dot(right_vec)
-        a_list.append(prod)
-        
+        ax_list = []
+        ay_list = []
+        az_list = []
+
+        x_vec = self.hhg_x.createVecRight()
+        self.hhg_x.mult(psi_initial,x_vec)
+        prod = psi_initial.dot(x_vec)
+        ax_list.append(prod)
+
+        y_vec = self.hhg_y.createVecRight()
+        self.hhg_y.mult(psi_initial,y_vec)
+        prod = psi_initial.dot(y_vec)
+        ay_list.append(prod)
+
+        z_vec = self.hhg_z.createVecRight()
+        self.hhg_z.mult(psi_initial,z_vec)
+        prod = psi_initial.dot(z_vec)
+        az_list.append(prod)
+
+
+
+    
+       
 
         for i in range(Nt-1):
             if PETSc.COMM_WORLD.rank == 0:
@@ -168,10 +278,19 @@ class propagator:
             ksp.solve(known, solution)
             solution.copy(psi_initial)
 
-            right_vec = self.H_hhg.createVecRight()
-            self.H_hhg.mult(psi_initial,right_vec)
-            prod = psi_initial.dot(right_vec)
-            a_list.append(prod)
+            self.hhg_x.mult(psi_initial, x_vec)
+            prod = psi_initial.dot(x_vec)
+            ax_list.append(prod)
+
+            self.hhg_y.mult(psi_initial, y_vec)
+            prod = psi_initial.dot(y_vec)
+            ay_list.append(prod)
+
+            self.hhg_z.mult(psi_initial, z_vec)
+            prod = psi_initial.dot(z_vec)
+            az_list.append(prod)
+
+                
            
 
             partial_L_copy.destroy()
@@ -205,8 +324,8 @@ class propagator:
         partial_L_copy.destroy()
         partial_R_copy.destroy()
         
-        
-        np.save("TDSE_files/HHG.npy",a_list)
+        a_data = np.vstack([ax_list,ay_list,az_list])
+        np.save("TDSE_files/HHG.npy",a_data)
 
         S_norm = S.createVecRight()
         S.mult(psi_initial,S_norm)
