@@ -101,25 +101,14 @@ class propagator:
         partial_angular = self.interaction_mat
 
         
-        if simInstance.HHG:
-            if os.path.exists('TISE_files/A.bin'):
-                A = PETSc.Mat().createAIJ([n_block*n_basis,n_block*n_basis],comm = PETSc.COMM_WORLD,nnz = 2*(order-1)+1)
-                A_viewer = PETSc.Viewer().createBinary('TISE_files/A.bin', 'r')
-                A.load(A_viewer)
-                A_viewer.destroy()
-                A.assemble()
-            a_list = []
+        
         
 
         for i in range(Nt-1):
             if PETSc.COMM_WORLD.rank == 0:
                 print(i, Nt-1)
 
-            if simInstance.HHG:
-                a = A.createVecRight()
-                A.mult(psi_initial, a)
-                prod = psi_initial.dot(a)
-                a_list.append(prod)
+          
 
             pulse_val = laserInstance.A_func(i*dt + dt/2)
             
@@ -167,10 +156,6 @@ class propagator:
         partial_L_copy.destroy()
         partial_R_copy.destroy()
         
-        if simInstance.HHG:
-            if rank == 0:
-                np.save("TDSE_files/HHG.npy",a_list)
-
         S_norm = S.createVecRight()
         S.mult(psi_initial,S_norm)
         prod = psi_initial.dot(S_norm)
