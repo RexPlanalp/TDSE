@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 Ip = -0.5 # Ionization potential of species in atomic units
 N = 10 # Numbe08r of cycles of laser pulse 
-w = 0.0666 # Central Frequency of laser pulse in atomic units
+w = 0.057 # Central Frequency of laser pulse in atomic units
 I = 2e14 / 3.51E16 # Intensity of laser pulse in atomic units
-E = 0.392 # Energy in atomic units (usually at ATI peak)
+E = 0.48 # Energy in atomic units (usually at ATI peak)
 
 tau = 2*np.pi/w # Period of laser pulse in atomic units
 t = np.linspace(0,tau,1000) # Time array
@@ -46,27 +46,34 @@ plt.savefig("images/z.png")
 plt.clf()
 
 ##########################################################################################################################################
-# total_potential = Up - Ip
+nearest_integers = np.round(n).astype(int)
 
-# offset = np.max(total_potential)
-# n = 25
-# print(round(n*w - offset,3))
-################################################################################################################################
-# w = 0.057  # Central Frequency of laser pulse in atomic units
-# import math
-# for I_max in np.arange(0.00001, 0.01 + 0.00001, 0.00001):
-#     Up = I_max / (4 * w**2)
-#     z = Up / w
-#     rounded_z = round(z)
-#     if math.isclose(z, rounded_z, rel_tol=1e-2):
-#         print(f"z value:{z}, and intensity in SI { I_max * 3.51E16:.3e}")
+# Create a dictionary to store indices grouped by nearest integer
+grouped_indices = {}
+for i, ni in enumerate(nearest_integers):
+    if ni not in grouped_indices:
+        grouped_indices[ni] = []
+    grouped_indices[ni].append(i)
 
-# I_max = (2.08e14 / 3.51E16)
-# import math
-# for w in np.arange(0.000005, 0.2 + 0.000005, 0.000005):
-#     Up = I_max / (4 * w**2)
-#     z = Up / w
-#     rounded_z = round(z)
-#     if math.isclose(z, rounded_z, rel_tol=1e-4) and z<10:
-#         print(f"z value:{z}, and wavelength in SI { (0.057/w)*800}")
-       
+# Use the grouped indices to select elements from x and f
+x_groups = {key: t[grouped_indices[key]] for key in grouped_indices}
+n_groups = {key: n[grouped_indices[key]] for key in grouped_indices}
+I_groups = {key: I_profile[grouped_indices[key]] for key in grouped_indices}
+
+
+values = []
+for key in x_groups:
+    # Sort the groups by the x values
+    sorted_indices = np.argsort(x_groups[key])
+    x_sorted = x_groups[key][sorted_indices]
+    I_sorted = I_groups[key][sorted_indices]
+    
+    values.append(np.average(I_sorted))
+
+
+values = values[::-1]
+values /= np.max(values)
+
+
+    
+print(values)

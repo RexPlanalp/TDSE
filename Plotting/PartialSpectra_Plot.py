@@ -17,7 +17,7 @@ if ALL:
     plt.savefig("images/partial.png")
 
 if TOP:
-    E = 0.392
+    E = 0.304
     E_index = np.argmin(np.abs(E_range - E))
 
     contributions = []
@@ -25,13 +25,14 @@ if TOP:
         partial_spectrum = np.real(y)
         contributions.append(partial_spectrum[E_index])
 
-    top = 3
+    top = 25
 
     sorted_indices = np.argsort(contributions)
     top_indices = sorted_indices[-1:-(top+1):-1]
     
     plt.figure()
     set = 0
+    ratios = []
     for i,index in enumerate(top_indices):
         l,m = list(partial_spectra.keys())[index]
         y = np.array(partial_spectra[(l, m)])
@@ -40,14 +41,20 @@ if TOP:
         if i == 0:
             set = round((np.abs(y[E_index])),8)
 
-        print(f"Top {i+1}, l,m: {l,m}, Value: {round((np.abs(y[E_index])),8)/set}")
+        ratio = round((np.abs(y[E_index])),8)/set
+        print(f"Top {i+1}, l,m: {l,m}, Value: {ratio}")
+        ratios.append(ratio)
         
-    
+
     plt.axvline(E)
     plt.xlabel("Energy (E)")
     plt.ylabel("Contribution")
     plt.legend()
-
-   
     plt.savefig("images/top.png")
+    plt.clf()
+
+    plt.plot(range(len(ratios)),ratios)
+    plt.plot(-np.array(range(len(ratios))),ratios)
+    plt.savefig("images/ratios.png")
+    
    
