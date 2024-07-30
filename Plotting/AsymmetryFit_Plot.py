@@ -4,8 +4,8 @@ from scipy.optimize import curve_fit
 from scipy.special import sph_harm
 from scipy.special import gamma
 
-l_values = [25, 24]
-m_values = [25, 24]
+l_values = [25, 24, 23,22,21,26]
+m_values = [25, 24, 23,22,21,26]
 
 E = 0.48
 k = np.sqrt(2 * E)
@@ -56,8 +56,6 @@ sigma = 0.01 * np.ones_like(y_data)
 popt, pcov = curve_fit(A, phi-0.01, y_data, p0=initial_guess, bounds=(lower_bounds, upper_bounds),sigma = sigma)
 
 popt[:len(l_values)] /= popt[0]
-
-popt[1] = 0.2
 
 print("Optimized parameters:", popt)
 

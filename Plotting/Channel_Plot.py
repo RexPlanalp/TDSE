@@ -45,35 +45,70 @@ print(f"Max value of Up/w is {np.max(z)}")
 plt.savefig("images/z.png")
 plt.clf()
 
+def findKeldyshParameter(Ip,Up):
+    gamma = np.sqrt(-Ip/(2*np.max(Up)))
+    return gamma
+
+gamma = findKeldyshParameter(Ip,Up)
+print(f"Keldysh parameter is {gamma}")
+
+
 ##########################################################################################################################################
-nearest_integers = np.round(n).astype(int)
+# nearest_integers = np.round(n).astype(int)
 
-# Create a dictionary to store indices grouped by nearest integer
-grouped_indices = {}
-for i, ni in enumerate(nearest_integers):
-    if ni not in grouped_indices:
-        grouped_indices[ni] = []
-    grouped_indices[ni].append(i)
+# # Create a dictionary to store indices grouped by nearest integer
+# grouped_indices = {}
+# for i, ni in enumerate(nearest_integers):
+#     if ni not in grouped_indices:
+#         grouped_indices[ni] = []
+#     grouped_indices[ni].append(i)
 
-# Use the grouped indices to select elements from x and f
-x_groups = {key: t[grouped_indices[key]] for key in grouped_indices}
-n_groups = {key: n[grouped_indices[key]] for key in grouped_indices}
-I_groups = {key: I_profile[grouped_indices[key]] for key in grouped_indices}
+# # Use the grouped indices to select elements from x and f
+# x_groups = {key: t[grouped_indices[key]] for key in grouped_indices}
+# n_groups = {key: n[grouped_indices[key]] for key in grouped_indices}
+# I_groups = {key: I_profile[grouped_indices[key]] for key in grouped_indices}
 
 
-values = []
-for key in x_groups:
-    # Sort the groups by the x values
-    sorted_indices = np.argsort(x_groups[key])
-    x_sorted = x_groups[key][sorted_indices]
-    I_sorted = I_groups[key][sorted_indices]
+# values = []
+# for key in x_groups:
+#     # Sort the groups by the x values
+#     sorted_indices = np.argsort(x_groups[key])
+#     x_sorted = x_groups[key][sorted_indices]
+#     I_sorted = I_groups[key][sorted_indices]
     
-    values.append(np.average(I_sorted))
+#     values.append(np.average(I_sorted))
+# values = values[::-1]
+# values /= np.max(values)
+# print(values)
 
 
-values = values[::-1]
-values /= np.max(values)
+num_samples = 1000000
+probability_distribution = n / np.sum(n)
+plt.plot(t,probability_distribution)
+plt.savefig("test1.png")
+plt.clf()
+sampled_times = np.random.choice(t, size=num_samples, p=probability_distribution)
+
+result_dict = {}
+
+for time in sampled_times:
+    idx = np.where(t == time)
+    n_value = n[idx]
+    n_int = int(np.round(n_value))
+
+    if n_int in result_dict:
+        result_dict[n_int] += 1
+    else:
+        result_dict[n_int] = 1
 
 
-    
-print(values)
+x_array = []
+y_array = []
+for key,value in result_dict.items():
+    x_array.append(key)
+    y_array.append(value)
+x_array = np.array(x_array)
+y_array = np.array(y_array)
+y_array /= np.max(y_array)
+
+plt.savefig("test2.png")
