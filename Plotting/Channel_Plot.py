@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 Ip = -0.5 # Ionization potential of species in atomic units
 N = 10 # Numbe08r of cycles of laser pulse 
-w = 0.057 # Central Frequency of laser pulse in atomic units
+w = 0.085 # Central Frequency of laser pulse in atomic units
 I = 2e14 / 3.51E16 # Intensity of laser pulse in atomic units
-E = 0.48 # Energy in atomic units (usually at ATI peak)
+E = 0.072 # Energy in atomic units (usually at ATI peak)
 
 tau = 2*np.pi/w # Period of laser pulse in atomic units
 t = np.linspace(0,tau,1000) # Time array
@@ -82,33 +82,34 @@ print(f"Keldysh parameter is {gamma}")
 # print(values)
 
 
-num_samples = 1000000
-probability_distribution = n / np.sum(n)
-plt.plot(t,probability_distribution)
-plt.savefig("test1.png")
-plt.clf()
-sampled_times = np.random.choice(t, size=num_samples, p=probability_distribution)
+# num_samples = 1000000
+# probability_distribution = n / np.sum(n)
+# plt.plot(t,probability_distribution)
+# plt.savefig("test1.png")
+# plt.clf()
+# sampled_times = np.random.choice(t, size=num_samples, p=probability_distribution)
 
-result_dict = {}
+# result_dict = {}
 
-for time in sampled_times:
-    idx = np.where(t == time)
-    n_value = n[idx]
-    n_int = int(np.round(n_value))
+# for time in sampled_times:
+#     idx = np.where(t == time)
+#     n_value = n[idx]
+#     n_int = int(np.round(n_value))
 
-    if n_int in result_dict:
-        result_dict[n_int] += 1
-    else:
-        result_dict[n_int] = 1
+#     if n_int in result_dict:
+#         result_dict[n_int] += 1
+#     else:
+#         result_dict[n_int] = 1
 
 
-x_array = []
-y_array = []
-for key,value in result_dict.items():
-    x_array.append(key)
-    y_array.append(value)
-x_array = np.array(x_array)
-y_array = np.array(y_array)
-y_array /= np.max(y_array)
+# x_array = []
+# y_array = []
+# for key,value in result_dict.items():
+#     x_array.append(key)
+#     y_array.append(value)
+# x_array = np.array(x_array)
+# y_array = np.array(y_array)
+# y_array /= np.max(y_array)
 
-plt.savefig("test2.png")
+# plt.savefig("test2.png")
+
