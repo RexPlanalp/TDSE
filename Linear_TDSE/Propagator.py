@@ -85,38 +85,40 @@ class propagator:
         dB = basisInstance.dB
         integrate = basisInstance.integrate
 
+        def _H_hhg_R(x,i,j,knots,order):
+            return (B(i, order, x, knots)*B(j, order, x, knots)/(x**2 + 1E-25))
 
 
         def alm(l,m):
             f1 = (l-m-1)*(l-m)
-            f2 = 2*(2*l -1)*(2*l +1)
-            return np.sqrt(f1/f2) *1/np.sqrt(2)
+            f2 = 2*(2*l-1)*(2*l+1)
+            return np.sqrt(f1/f2)
+        
         def blm(l,m):
             f1 = (l+m+1)*(l+m+2)*(l+1)
-            f2 = (2*l +1)*(2*l+2)*(2*l+3)
-            return np.sqrt(f1/f2) * 1/np.sqrt(2)
+            f2 = (2*l+1)*(2*l+2)*(2*l+3)
+            return np.sqrt(f1/f2)
         
         def clm(l,m):
             f1 = (l+m-1)*(l+m)
             f2 = 2*(2*l-1)*(2*l+1)
-            return np.sqrt(f1/f2) * 1/np.sqrt(2)
+            return np.sqrt(f1/f2)
 
         def dlm(l,m):
             f1 = (l-m+1)*(l-m+2)*(l+1)
             f2 = (2*l+1)*(2*l+2)*(2*l+3)
-            return np.sqrt(f1/f2) * 1/np.sqrt(2)
-        
+
         def elm(l,m):
             f1 = (l+m)*(l-m)
-            f2 = (2*l-1)*(2*l+1)  
-            return np.sqrt(f1/f2) 
+            f2 = (2*l+1)*(2*l-1)
+            return np.sqrt(f1/f2)
+        
         def flm(l,m):
             f1 = (l+m+1)*(l-m+1)
-            f2 = (2*l+1)*(2*l+3)   
-            return np.sqrt(f1/f2) 
-        def _H_hhg_R(x,i,j,knots,order):
-            return (B(i, order, x, knots)*B(j, order, x, knots)/(x**2 + 1E-25))
-        
+            f2 = (2*l+1)*(2*l+3)
+            return np.sqrt(f1/f2)
+
+
         H_hhg_R = PETSc.Mat().createAIJ([n_basis,n_basis],comm = comm,nnz = 2*(order-1)+1)
         H_hhg_R.setOption(PETSc.Mat.Option.IGNORE_ZERO_ENTRIES,True)
         istart,iend = H_hhg_R.getOwnershipRange()
@@ -136,23 +138,20 @@ class propagator:
             for j in range(n_block):
                 lprime,mprime = block_dict[j]
 
-                if l == lprime+1 and m == mprime-1:
-                    H_hhg_lm_x.setValue(i,j,alm(l,m))
-                elif l == lprime-1 and m == mprime-1:
-                    H_hhg_lm_x.setValue(i,j,blm(l,m))
-
-                elif l == lprime+1 and m == mprime+1:
-                    H_hhg_lm_x.setValue(i,j,-clm(l,m))
-                elif l == lprime-1 and m == mprime+1:
-                    H_hhg_lm_x.setValue(i,j,-dlm(l,m))
-
+                if m == mprime-1 and l == lprime+1:
+                    H_hhg_lm_x.setValue(i,j,(1/np.sqrt(2))*alm(l,m))
+                elif m == mprime-1 and l == lprime-1:
+                    H_hhg_lm_x.setValue(i,j,-(1/np.sqrt(2))*blm(l,m))
+                elif m == mprime+1 and l == lprime+1:
+                    H_hhg_lm_x.setValue(i,j,-(1/np.sqrt(2))*clm(l,m))
+                elif m == mprime+1 and l == lprime-1:
+                    H_hhg_lm_x.setValue(i,j,(1/np.sqrt(2))*dlm(l,m))    
         comm.barrier()
         H_hhg_lm_x.assemble()
-
         hhg_x = kron(H_hhg_lm_x,H_hhg_R,comm,2*(2*(order-1)+1))
         self.hhg_x = hhg_x
         H_hhg_lm_x.destroy()
-    
+
         H_hhg_lm_y = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 2)
         istart,iend = H_hhg_lm_y.getOwnershipRange()
         for i in range(istart,iend):
@@ -160,22 +159,21 @@ class propagator:
             for j in range(n_block):
                 lprime,mprime = block_dict[j]
 
-                if l == lprime+1 and m == mprime-1:
-                    H_hhg_lm_y.setValue(i,j,1j*alm(l,m))
-                elif l == lprime-1 and m == mprime-1:
-                    H_hhg_lm_y.setValue(i,j,1j*blm(l,m))
-
-                elif l == lprime+1 and m == mprime+1:
-                    H_hhg_lm_y.setValue(i,j,1j*clm(l,m))
-                elif l == lprime-1 and m == mprime+1:
-                    H_hhg_lm_y.setValue(i,j,1j*dlm(l,m))
-
+                if m == mprime-1 and l == lprime+1:
+                    H_hhg_lm_y.setValue(i,j,(-1j/np.sqrt(2))*alm(l,m))
+                elif m == mprime-1 and l == lprime-1:
+                    H_hhg_lm_y.setValue(i,j,(1j/np.sqrt(2))*blm(l,m))
+                elif m == mprime+1 and l == lprime+1:
+                    H_hhg_lm_y.setValue(i,j,(-1j/np.sqrt(2))*clm(l,m))
+                elif m == mprime+1 and l == lprime-1:
+                    H_hhg_lm_y.setValue(i,j,(1j/np.sqrt(2))*dlm(l,m))    
         comm.barrier()
         H_hhg_lm_y.assemble()
-
         hhg_y = kron(H_hhg_lm_y,H_hhg_R,comm,2*(2*(order-1)+1))
         self.hhg_y = hhg_y
         H_hhg_lm_y.destroy()
+
+
 
         H_hhg_lm_z = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 2)
         istart,iend = H_hhg_lm_z.getOwnershipRange()
@@ -184,24 +182,18 @@ class propagator:
             for j in range(n_block):
                 lprime,mprime = block_dict[j]
 
-                if l == lprime+1 and m == mprime+1:
+                if m == mprime+1 and l == lprime+1:
                     H_hhg_lm_z.setValue(i,j,elm(l,m))
-                elif l == lprime-1 and m == mprime+1:
+                elif m == mprime-1 and l == lprime-1:
                     H_hhg_lm_z.setValue(i,j,flm(l,m))
-
                 
-
         comm.barrier()
         H_hhg_lm_z.assemble()
-
-        hhg_z = kron(H_hhg_lm_z,H_hhg_R,comm,2*(2*(order-1)+1))
-        self.hhg_z = hhg_z
+        hhg_y = kron(H_hhg_lm_z,H_hhg_R,comm,2*(2*(order-1)+1))
+        self.hhg_z = hhg_y
         H_hhg_lm_z.destroy()
+
         H_hhg_R.destroy()
-
-
-       
-        
         return None
 
     def propagateCN(self,simInstance,psiInstance,laserInstance):
@@ -278,13 +270,13 @@ class propagator:
             ksp.solve(known, solution)
             solution.copy(psi_initial)
 
-            self.hhg_x.mult(psi_initial, x_vec)
-            prod = psi_initial.dot(x_vec)
-            ax_list.append(prod)
+            # self.hhg_x.mult(psi_initial, x_vec)
+            # prod = psi_initial.dot(x_vec)
+            # ax_list.append(prod)
 
-            self.hhg_y.mult(psi_initial, y_vec)
-            prod = psi_initial.dot(y_vec)
-            ay_list.append(prod)
+            # self.hhg_y.mult(psi_initial, y_vec)
+            # prod = psi_initial.dot(y_vec)
+            # ay_list.append(prod)
 
             self.hhg_z.mult(psi_initial, z_vec)
             prod = psi_initial.dot(z_vec)
@@ -324,7 +316,8 @@ class propagator:
         partial_L_copy.destroy()
         partial_R_copy.destroy()
         
-        a_data = np.vstack([ax_list,ay_list,az_list])
+        #a_data = np.vstack([ax_list,ay_list,az_list])
+        a_data = az_list
         np.save("TDSE_files/HHG.npy",a_data)
 
         S_norm = S.createVecRight()

@@ -45,13 +45,13 @@ class laser:
         time_size = simInstance.time_size
         t = np.linspace(0,time_size,Nt)
 
-        plt.figure()
-        plt.plot(t,self.A_func(t),label = "Z")
-        plt.savefig("images/pulse.png")
-        plt.clf()
+        # plt.figure()
+        # plt.plot(t,self.A_func(t),label = "Z")
+        # plt.savefig("images/pulse.png")
+        # plt.clf()
 
-        np.save("TDSE_files/A_func.npy",self.A_func(t))
-        np.save("TDSE_files/t.npy",t)
+        # np.save("TDSE_files/A_func.npy",self.A_func(t))
+        # np.save("TDSE_files/t.npy",t)
 
 if __name__ == "__main__":
     pass
