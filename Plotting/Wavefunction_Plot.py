@@ -17,13 +17,29 @@ simInstance.spacialGrid()
 basisInstance = basis()
 basisInstance.createKnots(simInstance)
 
-potential = simInstance.box["pot"]
-with h5py.File(f'TISE_files/{potential}.h5', 'r') as f:
-    data = f[f"/Psi_{3}_{1}"][:]
-    real_part = data[:,0]
-    imaginary_part = data[:,1]
-    total = real_part + 1j*imaginary_part
 
+if "BOUND" in sys.argv:
+    potential = simInstance.box["pot"]
+    n = int(sys.argv[2])
+    l = int(sys.argv[3])
+
+    with h5py.File(f'TISE_files/{potential}.h5', 'r') as f:
+        data = f[f"/Psi_{n}_{l}"][:]
+        real_part = data[:,0]
+        imaginary_part = data[:,1]
+        total = real_part + 1j*imaginary_part
+
+if "TDSE" in sys.argv:
+    l = int(sys.argv[2])
+    m = int(sys.argv[3])
+    block = simInstance.lm_dict[(l,m)]
+    n_basis = simInstance.splines["n_basis"]
+    with h5py.File('TDSE_files/TDSE.h5', 'r') as f:
+        data = f["psi_final"][:]
+        real_part = data[:, 0]
+        imaginary_part = data[:, 1]
+        total = real_part + 1j * imaginary_part
+    total = total[block*n_basis:(block+1)*n_basis]
 
 wavefunction = 0
 x = np.linspace(0,10,1500)
