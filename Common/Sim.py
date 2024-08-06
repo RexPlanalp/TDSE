@@ -73,12 +73,12 @@ class Sim:
     #         self.lm_dict,self.block_dict = lm_dict,block_dict
 
     def lm_block_maps(self):
-        if self.laser["polarization"] == "linear":
+        if self.laser["polarization"] == "linear" and self.laser["ell"] == 0:
             delta_l = [1,-1]
             delta_m = [0]
             self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
 
-        elif self.laser["polarization"]  == "circular":
+        elif self.laser["polarization"]  == "circular" and (self.laser["ell"] == 1 or self.laser["ell"] == -1):
             if self.laser["ell"] == 1:
                 delta_l = [1,-1]
                 delta_m = [1]
@@ -87,7 +87,7 @@ class Sim:
                 delta_m = [-1]
             self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
 
-        elif self.laser["polarization"] == "elliptical":
+        elif self.laser["polarization"] == "elliptical" and not (self.laser["ell"] == 1 or self.laser["ell"] == -1):
             delta_l = [1,-1]
             delta_m = [1,-1,0]
             self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
