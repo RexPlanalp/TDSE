@@ -109,12 +109,12 @@ class propagator:
             f2 = (2*l+1)*(2*l+2)*(2*l+3)
 
         def elm(l,m):
-            f1 = (l+m-1)*(l-m-1)
+            f1 = (l+m)*(l-m)
             f2 = (2*l+1)*(2*l-1)
             return np.sqrt(f1/f2)
         
         def flm(l,m):
-            f1 = (l+m)*(l-m)
+            f1 = (l+m+1)*(l-m+1)
             f2 = (2*l+1)*(2*l+3)
             return np.sqrt(f1/f2)
 
