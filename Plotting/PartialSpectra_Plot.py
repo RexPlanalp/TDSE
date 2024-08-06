@@ -10,22 +10,27 @@ E_range = np.load("PES_files/E.npy")
 TOP = "TOP" in sys.argv
 ALL = "ALL" in sys.argv
 
+if TOP: 
+    E = float(sys.argv[2])
+    top = int(sys.argv[3])
+if ALL: 
+    MODE = sys.argv[2]
+    max = int(sys.argv[3])
+
 if ALL:
     for (l,m),y in partial_spectra.items():
-        #plt.semilogy(E_range,np.real(y),label = f"{l,m}")
-        plt.plot(E_range,np.real(y),label = f"{l,m}")
+        if l < max:
+            if MODE == "log":
+                plt.semilogy(E_range,np.real(y),label = f"{l,m}")
+            elif MODE == "real":
+                plt.plot(E_range,np.real(y),label = f"{l,m}")
     plt.savefig("images/partial.png")
-
 if TOP:
-    E = 0.072
     E_index = np.argmin(np.abs(E_range - E))
-
     contributions = []
     for (l, m), y in partial_spectra.items():
         partial_spectrum = np.real(y)
         contributions.append(partial_spectrum[E_index])
-
-    top = 3
 
     sorted_indices = np.argsort(contributions)
     top_indices = sorted_indices[-1:-(top+1):-1]
@@ -59,29 +64,5 @@ if TOP:
     plt.savefig("images/ratios.png")
     plt.clf()
 
-    #     # Define the stretched exponential function
-    # def stretched_exp(x, A, tau, beta):
-    #     return A * np.exp(-(x / tau)**beta)
-
-    # from scipy.optimize import curve_fit
-    # # Fit the model
-    # params, cov = curve_fit(stretched_exp, np.array(range(len(ratios))), ratios, p0=[1, 2, 0.5])
-
-    # # Generate points from the fitted model
-    # fit_y = stretched_exp(np.array(range(len(ratios))), *params)
-
-    # # Plot the data and the fitted function
-    # plt.figure()
-    # plt.scatter(np.array(range(len(ratios))), ratios, label='Data')
-    # plt.plot(np.array(range(len(ratios))), fit_y, label='Stretched Exponential Fit', color='red')
-    # plt.legend()
-    # plt.title('Fit to Stretched Exponential')
-    # plt.xlabel('x')
-    # plt.ylabel('Contributions')
-    # plt.show()
-    # plt.savefig("fit.png")
-
-    # # Print fitted parameters
-    # print("Fitted Parameters:", params)
-
+   
 
