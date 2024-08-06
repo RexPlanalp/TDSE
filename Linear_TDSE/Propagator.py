@@ -109,12 +109,12 @@ class propagator:
             f2 = (2*l+1)*(2*l+2)*(2*l+3)
 
         def elm(l,m):
-            f1 = (l+m)*(l-m)
+            f1 = (l+m-1)*(l-m-1)
             f2 = (2*l+1)*(2*l-1)
             return np.sqrt(f1/f2)
         
         def flm(l,m):
-            f1 = (l+m+1)*(l-m+1)
+            f1 = (l+m)*(l-m)
             f2 = (2*l+1)*(2*l+3)
             return np.sqrt(f1/f2)
 
@@ -182,9 +182,9 @@ class propagator:
             for j in range(n_block):
                 lprime,mprime = block_dict[j]
 
-                if m == mprime+1 and l == lprime+1:
+                if m == mprime and l == lprime+1:
                     H_hhg_lm_z.setValue(i,j,elm(l,m))
-                elif m == mprime-1 and l == lprime-1:
+                elif m == mprime and l == lprime-1:
                     H_hhg_lm_z.setValue(i,j,flm(l,m))
                 
         comm.barrier()
