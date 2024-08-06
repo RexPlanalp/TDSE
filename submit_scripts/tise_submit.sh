@@ -7,10 +7,11 @@
 #SBATCH -o run.log 
 #SBATCH -t 0-01:00:00
 
-#SBATCH --exclude=node70
-#SBATCH --exclude=node72
 #SBATCH --exclude=node82
 #SBATCH --exclude=node83
+#SBATCH --exclude=node70
+#SBATCH --exclude=node72
+
 
 REPO_DIR="/users/becker/dopl4670/Research/TDSE/TISE"
                                                                

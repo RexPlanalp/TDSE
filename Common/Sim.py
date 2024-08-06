@@ -1,5 +1,6 @@
 import json
 import numpy as np
+from collections import deque
 
 from petsc4py import PETSc
 comm = PETSc.COMM_WORLD
@@ -20,28 +21,78 @@ class Sim:
         with open(file_name, 'r') as file:
             input_par = json.load(file)
         return input_par
+    
+    def find_reachable_points(self,delta_l, delta_m):
+        def is_valid(l, m):
+            return 0 <= l <= self.lm["lmax"] and -l <= m <= l
+
+        queue = deque([(self.state[1], self.state[2])])
+        reachable_points = set([(self.state[1], self.state[2])])
+        
+        index_to_point = {}
+        point_to_index = {}
+        index = 0
+
+        while queue:
+            current_l, current_m = queue.popleft()
+            for dl in delta_l:
+                for dm in delta_m:
+                    new_l = current_l + dl
+                    new_m = current_m + dm
+                    if is_valid(new_l, new_m) and (new_l, new_m) not in reachable_points:
+                        reachable_points.add((new_l, new_m))
+                        queue.append((new_l, new_m))
+                        
+                        # Add to dictionaries
+                        index_to_point[index] = (new_l, new_m)
+                        point_to_index[(new_l, new_m)] = index
+                        index += 1
+
+        return point_to_index, index_to_point
+    # def lm_block_maps(self):
+    #     if self.laser["polarization"] == "linear":
+    #         lmax = self.lm["lmax"]
+    #         m_value = self.state[2]
+
+    #         lm_dict = {}
+    #         for l in range(lmax+1):
+    #             lm_dict[(l,m_value)] = l
+    #         block_dict = {value: key for key, value in lm_dict.items()}
+    #         self.lm_dict,self.block_dict = lm_dict,block_dict
+    #     elif self.laser["polarization"]  == "elliptical":
+    #         lmax = self.lm["lmax"]
+    #         def block_number(l, m):
+    #             sum_blocks = sum(2*i + 1 for i in range(l))
+    #             m_offset = m + l
+    #             return sum_blocks + m_offset
+    #         lm_dict = {}
+    #         for l in range(lmax+1):
+    #             for m in range(-l,l+1):
+    #                 lm_dict[(l,m)] = block_number(l,m)
+    #         block_dict = {value: key for key, value in lm_dict.items()}
+    #         self.lm_dict,self.block_dict = lm_dict,block_dict
+
     def lm_block_maps(self):
         if self.laser["polarization"] == "linear":
-            lmax = self.lm["lmax"]
-            m_value = self.state[2]
+            delta_l = [1,-1]
+            delta_m = [0]
+            self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
 
-            lm_dict = {}
-            for l in range(lmax+1):
-                lm_dict[(l,m_value)] = l
-            block_dict = {value: key for key, value in lm_dict.items()}
-            self.lm_dict,self.block_dict = lm_dict,block_dict
-        elif self.laser["polarization"]  == "elliptical":
-            lmax = self.lm["lmax"]
-            def block_number(l, m):
-                sum_blocks = sum(2*i + 1 for i in range(l))
-                m_offset = m + l
-                return sum_blocks + m_offset
-            lm_dict = {}
-            for l in range(lmax+1):
-                for m in range(-l,l+1):
-                    lm_dict[(l,m)] = block_number(l,m)
-            block_dict = {value: key for key, value in lm_dict.items()}
-            self.lm_dict,self.block_dict = lm_dict,block_dict
+        elif self.laser["polarization"]  == "circular":
+            if self.laser["ell"] == 1:
+                delta_l = [1,-1]
+                delta_m = [1]
+            elif self.laser["ell"] == -1:
+                delta_l = [1,-1]
+                delta_m = [-1]
+            self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
+
+        elif self.laser["polarization"] == "elliptical":
+            delta_l = [1,-1]
+            delta_m = [1,-1,0]
+            self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
+
+
     def calc_n_block(self):
         lmax = self.lm["lmax"]
 
