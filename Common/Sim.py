@@ -55,52 +55,44 @@ class Sim:
         
         return point_to_index, index_to_point
 
-    # def lm_block_maps(self):
-    #     if self.laser["polarization"] == "linear":
-    #         lmax = self.lm["lmax"]
-    #         m_value = self.state[2]
-
-    #         lm_dict = {}
-    #         for l in range(lmax+1):
-    #             lm_dict[(l,m_value)] = l
-    #         block_dict = {value: key for key, value in lm_dict.items()}
-    #         self.lm_dict,self.block_dict = lm_dict,block_dict
-    #     elif self.laser["polarization"]  == "elliptical":
-    #         lmax = self.lm["lmax"]
-    #         def block_number(l, m):
-    #             sum_blocks = sum(2*i + 1 for i in range(l))
-    #             m_offset = m + l
-    #             return sum_blocks + m_offset
-    #         lm_dict = {}
-    #         for l in range(lmax+1):
-    #             for m in range(-l,l+1):
-    #                 lm_dict[(l,m)] = block_number(l,m)
-    #         block_dict = {value: key for key, value in lm_dict.items()}
-    #         self.lm_dict,self.block_dict = lm_dict,block_dict
-
     def lm_block_maps(self):
-        if self.laser["polarization"] == "linear" and self.laser["ell"] == 0:
+
+        if self.laser["ell"] == 0:
+            assert self.laser["polarization"] == "linear"
             delta_l = [1,-1]
             delta_m = [0]
-            self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
-
-        elif self.laser["polarization"]  == "circular" and (self.laser["ell"] == 1 or self.laser["ell"] == -1):
+        
+        if self.laser["ell"] == 1 or self.laser["ell"] == -1:
+            assert self.laser["polarization"] == "circular" or self.laser["polarization"] == "circular+"
             if self.laser["ell"] == 1:
                 delta_l = [1,-1]
                 delta_m = [1]
             elif self.laser["ell"] == -1:
                 delta_l = [1,-1]
                 delta_m = [-1]
-            self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
+            elif self.laser["polarization"] == "circular+":
+                delta_l = [1,-1]
+                delta_m = [1,-1]
+        
+        if self.laser["ell"] != 0 and self.laser["ell"] != 1 and self.laser["ell"] != -1:
+            assert self.laser["polarization"] == "elliptical" or self.laser["polarization"] == "elliptical+"
 
-        elif self.laser["polarization"] == "elliptical" and not (self.laser["ell"] == 1 or self.laser["ell"] == -1):
-            delta_l = [1,-1]
-            delta_m = [1,-1,0]
-            self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
+            if self.laser["ell"] > 0:
+                delta_l = [1,-1]
+                delta_m = [1,0]
+            elif self.laser["ell"] < 0:
+                delta_l = [1,-1]
+                delta_m = [-1,0]
+            elif self.laser["polarization"] == "elliptical+":
+                delta_l = [1,-1]
+                delta_m = [1,-1,0]
+
+        self.lm_dict, self.block_dict = self.find_reachable_points(delta_l, delta_m)
 
 
     def calc_n_block(self):
         self.n_block = len(self.lm_dict)
+
 
     def timeGrid(self):
         self.tau = 2*np.pi/self.laser["w"]
