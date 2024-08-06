@@ -45,26 +45,20 @@ class tise:
         for l in range(lmax+1):
             V_l = atomicInstance.createV_l(simInstance,basisInstance,l)
             H_l = K + V_l
-            
-            if polarization == "linear":
-                partial_I = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 1)
-                istart,iend = partial_I.getOwnershipRange()
-                if l in range(istart,iend):
-                    partial_I.setValue(l,l,1)
-                comm.barrier()
-                partial_I.assemble()
-            elif polarization == "elliptical":
-                partial_I = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 1)
-                istart,iend = partial_I.getOwnershipRange()
-                start_index = int(np.sum([2*n +1 for n in range(l)]))
-                end_index = int(start_index + 2*l +1)
-                index_range = range(start_index,end_index)
 
-                for i in range(istart,iend):
-                    if i in index_range:
-                        partial_I.setValue(i,i,1)
-                comm.barrier()
-                partial_I.assemble()
+            l_indices = []
+            for key,value in simInstance.lm_dict.items():
+                if value == l:
+                    l_indices.append(key)
+            
+            
+            partial_I = PETSc.Mat().createAIJ([n_block,n_block],comm = comm,nnz = 1)
+            istart,iend = partial_I.getOwnershipRange()
+            if l in l_indices and l in range(istart,iend):
+                partial_I.setValue(l,l,1)
+            comm.barrier()
+            partial_I.assemble()
+
 
             partial_H = kron(partial_I,H_l,comm,2*(order-1) +1)
             H_atom.axpy(1,partial_H)

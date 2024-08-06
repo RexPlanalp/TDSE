@@ -22,16 +22,21 @@ class Sim:
             input_par = json.load(file)
         return input_par
     
-    def find_reachable_points(self,delta_l, delta_m):
+    def find_reachable_points(self, delta_l, delta_m):
         def is_valid(l, m):
             return 0 <= l <= self.lm["lmax"] and -l <= m <= l
 
         queue = deque([(self.state[1], self.state[2])])
         reachable_points = set([(self.state[1], self.state[2])])
-        
         index_to_point = {}
         point_to_index = {}
         index = 0
+
+        # Add initial state to dictionaries
+        initial_l, initial_m = self.state[1], self.state[2]
+        index_to_point[index] = (initial_l, initial_m)
+        point_to_index[(initial_l, initial_m)] = index
+        index += 1
 
         while queue:
             current_l, current_m = queue.popleft()
@@ -47,8 +52,9 @@ class Sim:
                         index_to_point[index] = (new_l, new_m)
                         point_to_index[(new_l, new_m)] = index
                         index += 1
-
+        
         return point_to_index, index_to_point
+
     # def lm_block_maps(self):
     #     if self.laser["polarization"] == "linear":
     #         lmax = self.lm["lmax"]
@@ -94,18 +100,8 @@ class Sim:
 
 
     def calc_n_block(self):
-        lmax = self.lm["lmax"]
+        self.n_block = len(self.lm_dict)
 
-        if self.laser["polarization"] == "linear":
-            n_block = lmax+1
-            self.n_block = n_block
-    
-        elif self.laser["polarization"] == "elliptical":
-            n_block = 0
-            for l in range(lmax+1):
-                manifold = 2*l+1
-                n_block += manifold
-            self.n_block = n_block
     def timeGrid(self):
         self.tau = 2*np.pi/self.laser["w"]
         self.time_size = self.box["N"]*self.tau
