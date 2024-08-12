@@ -100,8 +100,10 @@ class propagator:
 
         partial_angular = self.interaction_mat
 
-        
-        
+        if rank == 0:
+            norm_file = open("norms.txt","w")
+            norm_file.write(f"Norm of Inititial state: {np.real(prod)} \n")
+            norm_file.close()
         
 
         for i in range(Nt-1):
@@ -125,6 +127,16 @@ class propagator:
             ksp.solve(known, solution)
             solution.copy(psi_initial)
 
+            S_norm = S.createVecRight()
+            S.mult(psi_initial,S_norm)
+            prod = psi_initial.dot(S_norm)
+            S_norm.destroy()
+
+            if rank == 0:
+                norm_file = open("norms.txt","a")
+                norm_file.write(f"Norm of state at step {i}: {np.real(prod)} \n")
+                norm_file.close()
+                
             partial_L_copy.destroy()
             partial_R_copy.destroy()
             known.destroy()

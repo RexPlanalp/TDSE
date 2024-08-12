@@ -16,7 +16,7 @@ class tise:
         E.setProblemType(SLEPc.EPS.ProblemType.GNHEP)
         E.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
         E.setType(SLEPc.EPS.Type.KRYLOVSCHUR)
-        E.setTolerances(1e-5,max_it=1000)
+        E.setTolerances(1e-5,max_it=1650)
         E.solve()
         nconv = E.getConverged()
         return E,nconv
