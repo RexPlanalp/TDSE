@@ -100,8 +100,9 @@ class propagator:
 
         partial_angular = self.interaction_mat
 
+        norm_indices = np.linspace(0, Nt-2, 100, dtype=int)
         if rank == 0:
-            norm_file = open("norms.txt","w")
+            norm_file = open("TDSE_files/norms.txt","w")
             norm_file.write(f"Norm of Inititial state: {np.real(prod)} \n")
             norm_file.close()
         
@@ -132,11 +133,11 @@ class propagator:
             prod = psi_initial.dot(S_norm)
             S_norm.destroy()
 
-            if rank == 0:
-                norm_file = open("norms.txt","a")
+            if rank == 0 and i in norm_indices:
+                norm_file = open("TDSE_files/norms.txt","a")
                 norm_file.write(f"Norm of state at step {i}: {np.real(prod)} \n")
                 norm_file.close()
-                
+
             partial_L_copy.destroy()
             partial_R_copy.destroy()
             known.destroy()
