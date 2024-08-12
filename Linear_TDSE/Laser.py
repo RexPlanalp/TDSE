@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from petsc4py import PETSc
+comm = PETSc.COMM_WORLD
+rank = comm.rank
 
 
 class laser:
@@ -45,10 +48,12 @@ class laser:
         time_size = simInstance.time_size
         t = np.linspace(0,time_size,Nt)
 
-        plt.figure()
-        plt.plot(t,self.A_func(t),label = "Z")
-        plt.savefig("images/pulse.png")
-        plt.clf()
+        if rank == 0:
+            plt.figure()
+            plt.plot(t,self.A_func(t),label = "Z")
+            plt.savefig("images/pulse.png")
+            plt.clf()
+        comm.barrier()
 
 if __name__ == "__main__":
     pass

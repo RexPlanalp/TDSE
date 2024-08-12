@@ -133,10 +133,6 @@ class basis:
         knots = knots[:, np.newaxis] 
         
         if self.R0<np.max(knots):
-            #y = self.R(y)
-            #w = np.where(x < self.R0, w, w*np.exp(1j * np.pi* self.eta))
-            
-            
             y = self.R(y)
             knots = self.R(knots)
         
