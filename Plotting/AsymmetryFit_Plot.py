@@ -1,12 +1,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 from scipy.optimize import curve_fit
 from scipy.special import sph_harm
 from scipy.special import gamma
 
-l_values = [9,8]
-m_values = [9,8]
-E = 0.304
+l_values = np.array([25,24,23,22,21])
+m_values = np.array([25,24,23,22,21])
+
+E = float(sys.argv[1])
+
 
 
 
@@ -19,7 +22,7 @@ def PES(phi, theta, params):
     amplitudes = params[:n]
     phases = params[n:]
     PES_amplitude = sum(
-        amplitude * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
+        amplitude * (-1j)**l *np.exp(1j * phase) * sph_harm(m, l, phi, theta)
         for amplitude, phase, m, l in zip(amplitudes, phases, m_values, l_values)
     )
     PES_vals = np.abs(PES_amplitude) ** 2
@@ -30,7 +33,7 @@ def PES_opposite(phi, theta, params):
     amplitudes = params[:n]
     phases = params[n:]
     PES_amplitude_opposite = sum(
-        (-1) ** l * amplitude * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
+        (-1) ** l * amplitude * (-1j)**l * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
         for amplitude, phase, m, l in zip(amplitudes, phases, m_values, l_values)
     )
     PES_vals_opp = np.abs(PES_amplitude_opposite) ** 2
@@ -55,6 +58,15 @@ sigma = 0.01 * np.ones_like(y_data)
 # Run the fitting algorithm and normalize relative weights
 popt, pcov = curve_fit(A, phi-0.01, y_data, p0=initial_guess, bounds=(lower_bounds, upper_bounds),sigma = sigma)
 popt[:len(l_values)] /= popt[0]
+
+
+# popt[0] = 1.0
+# popt[1] = 0.8141614906832297
+# popt[2] = 0.21953416149068322
+# popt[3] = 0.06271739130434782
+# popt[4] = 0.017220496894409937
+# popt[5] = 0.005667701863354037
+
 
 # Print parameters of fit, and plot the result
 print("Optimized parameters:", popt)
