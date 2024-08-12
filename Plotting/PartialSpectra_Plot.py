@@ -11,20 +11,26 @@ TOP = "TOP" in sys.argv
 ALL = "ALL" in sys.argv
 
 if TOP: 
-    E = float(sys.argv[2])
-    top = int(sys.argv[3])
+    E = float(sys.argv[3])
+    top = int(sys.argv[2])
 if ALL: 
     MODE = sys.argv[2]
     max = int(sys.argv[3])
 
 if ALL:
+    total = 0
     for (l,m),y in partial_spectra.items():
         if l < max:
             if MODE == "log":
                 plt.semilogy(E_range,np.real(y),label = f"{l,m}")
             elif MODE == "real":
                 plt.plot(E_range,np.real(y),label = f"{l,m}")
+        if l == m:
+            total += np.real(y)
     plt.savefig("images/partial.png")
+    plt.clf()
+    plt.semilogy(E_range,total)
+    plt.savefig("images/total.png")
 if TOP:
     E_index = np.argmin(np.abs(E_range - E))
     contributions = []

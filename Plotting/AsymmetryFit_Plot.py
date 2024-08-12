@@ -5,8 +5,8 @@ from scipy.optimize import curve_fit
 from scipy.special import sph_harm
 from scipy.special import gamma
 
-l_values = np.array([25,24,23,22,21])
-m_values = np.array([25,24,23,22,21])
+l_values = np.array([25,24,23,22,21,26])
+m_values = np.array([25,24,23,22,21,26])
 
 E = float(sys.argv[1])
 
