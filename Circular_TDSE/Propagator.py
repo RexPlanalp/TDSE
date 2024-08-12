@@ -90,7 +90,11 @@ class propagator:
         if rank == 0:
             print(f"Norm of Initial State:{np.real(prod)}")
 
-
+        norm_indices = np.linspace(0, Nt-2, 100, dtype=int)
+        if rank == 0:
+            norm_file = open("TDSE_files/norms.txt","w")
+            norm_file.write(f"Norm of Inititial state: {np.real(prod)} \n")
+            norm_file.close()
 
 
         ksp = PETSc.KSP().create(comm = comm)
@@ -126,6 +130,11 @@ class propagator:
             ksp.setOperators(partial_L_copy)
             ksp.solve(known,solution)
             solution.copy(psi_initial)
+
+            if rank == 0 and i in norm_indices:
+                norm_file = open("TDSE_files/norms.txt","a")
+                norm_file.write(f"Norm of state at step {i}: {np.real(prod)} \n")
+                norm_file.close()
 
             partial_L_copy.destroy()
             partial_R_copy.destroy()
