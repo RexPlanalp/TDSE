@@ -46,5 +46,9 @@ x = np.linspace(0,10,1500)
 for i in range(simInstance.splines["n_basis"]):
     wavefunction += total[i] * basisInstance.B(i,simInstance.splines["order"],x,basisInstance.knots)
 
+plt.plot(x,np.real(wavefunction))
+plt.plot(x,np.imag(wavefunction))
+plt.savefig("images/component_wavefunction.png")
+
 plt.plot(x,np.abs(wavefunction)**2)
-plt.savefig("images/wavefunction.png")
+plt.savefig("images/PDF.png")
