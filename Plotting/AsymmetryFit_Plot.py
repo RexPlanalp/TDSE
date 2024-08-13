@@ -10,9 +10,6 @@ m_values = np.array([25,24,23,22,21,26])
 
 E = float(sys.argv[1])
 
-
-
-
 k = np.sqrt(2 * E)
 theta = np.pi / 2
 phi = np.arange(0, 2 * np.pi + 0.01, 0.01)
