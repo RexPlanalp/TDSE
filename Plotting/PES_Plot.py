@@ -10,7 +10,7 @@ plt.figure()
 plt.semilogy(E_range,np.real(PES),color = "k")
 plt.xlabel("Energy (au)")
 plt.ylabel("Yield (Log scale)")
-plt.savefig("images/PES.png")
+plt.savefig("images/log_PES.png")
 plt.clf()
 
 plt.figure()
