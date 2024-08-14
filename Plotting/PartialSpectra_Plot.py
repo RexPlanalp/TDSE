@@ -9,6 +9,7 @@ E_range = np.load("PES_files/E.npy")
 
 TOP = "TOP" in sys.argv
 ALL = "ALL" in sys.argv
+SINGLE = "SINGLE" in sys.argv
 
 if TOP: 
     E = float(sys.argv[3])
@@ -16,6 +17,10 @@ if TOP:
 if ALL: 
     MODE = sys.argv[2]
     max = int(sys.argv[3])
+
+if SINGLE:
+    lprime = int(sys.argv[2])
+    mprime = int(sys.argv[3])
 
 if ALL:
     total = 0
@@ -50,9 +55,9 @@ if TOP:
         plt.plot(E_range, np.abs(y), label=f"l={l}, m={m}")
 
         if i == 0:
-            set = round((np.abs(y[E_index])),8)
+            set = np.sqrt(np.real(y[E_index]))
 
-        ratio = round((np.abs(y[E_index])),8)/set
+        ratio = np.sqrt(np.real(y[E_index]))
         print(f"Top {i+1}, l,m: {l,m}, Value: {ratio}")
         ratios.append(ratio)
         
@@ -69,6 +74,15 @@ if TOP:
     plt.plot(x_values,y_values)
     plt.savefig("images/ratios.png")
     plt.clf()
-
-   
+if SINGLE:
+    plt.clf()
+    for (l,m),y in partial_spectra.items():
+        if l == lprime and m == mprime:
+            E = 0.48
+            E_index = np.argmin(np.abs(E_range - E))
+            plt.plot(E_range,np.real(y),label = f"{l,m}")
+            print((np.real(y[E_index])))
+            plt.axvline(E)
+    plt.savefig(f"images/{lprime}_{mprime}.png")
+    
 
