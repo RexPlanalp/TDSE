@@ -128,7 +128,7 @@ pyramid_array = np.array([[val if val is not None else 0 for val in row] for row
 # Plotting the pyramid as a heatmap
 fig, ax = plt.subplots(figsize=(10, 8))
 #cax = ax.imshow(pyramid_array[::-1], cmap='hot', interpolation='nearest')  # Reverse the array for upside-down pyramid
-cax = ax.imshow(pyramid_array[::-1], cmap='inferno', interpolation='nearest')  # Reverse the array for upside-down pyramid
+cax = ax.imshow(pyramid_array[::-1], cmap='inferno', interpolation='nearest',norm = LogNorm())  # Reverse the array for upside-down pyramid
 ax.set_xlabel('m')
 ax.set_ylabel('l')
 
