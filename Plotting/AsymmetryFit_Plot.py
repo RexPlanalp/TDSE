@@ -5,8 +5,8 @@
 # from scipy.special import sph_harm
 # from scipy.special import gamma
 
-# l_values = np.array([25,24,23,22,21,26,27,20])
-# m_values = np.array([25,24,23,22,21,26,27,20])
+# l_values = np.array([25,24,23,22,21,26,20,19,18,17])
+# m_values = np.array([25,24,23,22,21,26,20,19,18,17])
 
 # E = 0.48
 
@@ -53,19 +53,19 @@
 # sigma = 0.01 * np.ones_like(y_data)
 
 # # Run the fitting algorithm and normalize relative weights
-# popt, pcov = curve_fit(A, phi-0.01, y_data, p0=initial_guess, bounds=(lower_bounds, upper_bounds),sigma = sigma)
-# #popt[:len(l_values)] /= popt[0]
+# popt, pcov = curve_fit(A, phi-0.01, y_data, p0=initial_guess, bounds=(lower_bounds, upper_bounds),sigma = sigma,maxfev=20000)  # Increase the maximum number of function evaluations
+# popt[:len(l_values)] /= popt[0]
 
 # # Print parameters of fit, and plot the result
 # print("Optimized parameters:", popt)
 # plt.plot(phi, y_data, label="Simulation Result")
-# plt.plot(phi, A(phi, *popt)+0.1, label="Model Fit+0.1")
+# plt.plot(phi, A(phi, *popt), label="Model Fit+0.1")
 # plt.xlabel('Phi')
 # plt.ylabel('A')
 # plt.legend()
 # plt.savefig("images/A_fit.png")
 # plt.show()
-###############################################################
+##################################################################
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -74,9 +74,10 @@ from scipy.optimize import curve_fit
 from scipy.special import sph_harm
 from scipy.special import gamma
 
-l_values = np.array([25,24,23,22,21,26,20,19,27,18,8,7])
-m_values = np.array([25,24,23,22,21,26,20,19,27,18,8,7])
-fixed_amplitudes = np.array([0.025377139861139313, 0.02289811208166617, 0.011890305712894974, 0.0063552611322039545, 0.003329584625400153, 0.001911661464594239, 0.0009327722036463356, 0.00012405228144882712, 5.884203879569787e-05, 1.9276150831415788e-05, 7.083841710375572e-06, 3.8662290598901825e-06])
+l_values = np.array([26,25,24,23,22,21,20,19,18,17])
+m_values = np.array([26,25,24,23,22,21,20,19,18,17])
+fixed_amplitudes = np.array([0.001911661464594239,0.025377139861139313,0.02289811208166617,0.011890305712894974,0.0063552611322039545,0.003329584625400153,0.0009327722036463356,0.00012405228144882712,1.9276150831415788e-05,1.3411739941594665e-06])
+
 E = 0.48
 
 k = np.sqrt(2 * E)
@@ -108,8 +109,6 @@ def A(phi, *phases):
 # Load Simulation Result
 y_data = np.load("TDSE_files/A_slice.npy")
 
-
-
 # Sets up initial guesses for phases only
 initial_phases_guess = [0.0] * len(l_values)
 lower_bounds_phases = [-np.pi] * len(l_values)
@@ -117,7 +116,12 @@ upper_bounds_phases = [np.pi] * len(l_values)
 sigma = 0.01 * np.ones_like(y_data)
 
 # Run the fitting algorithm and normalize relative weights
-popt_phases, pcov_phases = curve_fit(A, phi, y_data, p0=initial_phases_guess, bounds=(lower_bounds_phases, upper_bounds_phases), sigma=sigma)
+popt_phases, pcov_phases = curve_fit(
+    A, phi+0.01, y_data, p0=initial_phases_guess, 
+    bounds=(lower_bounds_phases, upper_bounds_phases), 
+    sigma=sigma, 
+    maxfev=20000  # Increase the maximum number of function evaluations
+)
 
 # Combine fixed amplitudes with optimized phases for full parameter set
 popt = np.concatenate((fixed_amplitudes, popt_phases))

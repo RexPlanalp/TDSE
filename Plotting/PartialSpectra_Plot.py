@@ -67,7 +67,7 @@ if TOP:
             if i == 0:
                 set_value = np.sqrt(np.real(y[E_index]))
 
-            ratio = np.sqrt(np.real(y[E_index]))
+            ratio = np.sqrt(np.real(y[E_index]))/set_value
             print(f"Top {i+1}, l,m: {l,m}, Value: {ratio}")
             ratios.append(ratio)
         
