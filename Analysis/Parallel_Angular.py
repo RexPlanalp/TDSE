@@ -122,13 +122,19 @@ for E in local_E_range:
                 scaled_vector = spherical_vector * wavefunction
                 scaled_vector = scaled_vector.reshape(n_block,n_basis)
 
-                total_sum = scaled_vector.sum(axis = 0)
-                value = total_sum.conj().dot(S_R.dot(total_sum))
+                # total_sum = scaled_vector.sum(axis = 0)
+                # value = total_sum.conj().dot(S_R.dot(total_sum))
 
-                # top_lm = [(25,25),(24,24)]
-                # top_indices = [lm_dict[(l,m)] for l,m in top_lm]
-                # partial_sum = scaled_vector[top_indices, :].sum(axis=0)
-                # value = partial_sum.conj().dot(S_R.dot(partial_sum))
+                
+                #l_values = np.array([25,24,23,22,21,26,27,20])
+                #m_values = np.array([25,24,23,22,21,26,27,20])
+                l_values = np.array([26,25,24,23,22,21,20,19,18,17])
+                m_values = np.array([26,25,24,23,22,21,20,19,18,17])
+                top_lm = [(l,m) for l,m in zip(l_values,m_values)]
+                
+                top_indices = [lm_dict[(l,m)] for l,m in top_lm]
+                partial_sum = scaled_vector[top_indices, :].sum(axis=0)
+                value = partial_sum.conj().dot(S_R.dot(partial_sum))
                 
                 E_vals.append(E)
                 theta_vals.append(theta_val)

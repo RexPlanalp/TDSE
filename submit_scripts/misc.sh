@@ -8,12 +8,12 @@
 #SBATCH -t 0-00:30:00
 
 
-REPO_DIR="/users/becker/dopl4670/Research"
+REPO_DIR="/users/becker/dopl4670/Research/TDSE/Plotting"
                                                              
 
 hostname
 pwd
 
-mpiexec -n $SLURM_NTASKS python $REPO_DIR/Asymmetry.py >> results.log
+mpiexec -n $SLURM_NTASKS python $REPO_DIR/AsymmetryFit_Plot.py >> results.log
 
 

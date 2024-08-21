@@ -74,24 +74,14 @@ from scipy.optimize import curve_fit
 from scipy.special import sph_harm
 from scipy.special import gamma
 
-l_values = np.array([25,24,23,22,21,26,27,26,20,25])
-m_values = np.array([25,24,23,22,21,26,25,24,20,23])
-fixed_amplitudes = np.array([0.025377139861139313, 0.02289811208166617, 0.011890305712894974, 0.0063552611322039545, 0.003329584625400153, 0.001911661464594239, 0.0019063560149378018, 0.0015955431914372272, 0.0009327722036463356, 0.0008231126715025616])
-
-# mask = np.array([0,1,2,3,4,5,8])
-
-# l_values = l_values[mask]
-# m_values = m_values[mask]
-# fixed_amplitudes = fixed_amplitudes[mask]
-
-
-#E = float(sys.argv[1])
+l_values = np.array([25,24,23,22,21,26,20,19,27,18,8,7])
+m_values = np.array([25,24,23,22,21,26,20,19,27,18,8,7])
+fixed_amplitudes = np.array([0.025377139861139313, 0.02289811208166617, 0.011890305712894974, 0.0063552611322039545, 0.003329584625400153, 0.001911661464594239, 0.0009327722036463356, 0.00012405228144882712, 5.884203879569787e-05, 1.9276150831415788e-05, 7.083841710375572e-06, 3.8662290598901825e-06])
 E = 0.48
 
 k = np.sqrt(2 * E)
 theta = np.pi / 2
 phi = np.arange(0, 2 * np.pi + 0.01, 0.01)
-
 
 def PES(phi, theta, phases):
     PES_amplitude = sum(
@@ -117,6 +107,8 @@ def A(phi, *phases):
 
 # Load Simulation Result
 y_data = np.load("TDSE_files/A_slice.npy")
+
+
 
 # Sets up initial guesses for phases only
 initial_phases_guess = [0.0] * len(l_values)
