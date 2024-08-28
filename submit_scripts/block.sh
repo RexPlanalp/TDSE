@@ -8,12 +8,12 @@
 #SBATCH -t 0-00:30:00
 
 
-REPO_DIR="/users/becker/dopl4670/Research/TDSE/Analysis"
+REPO_DIR="/users/becker/dopl4670/Research/TDSE/Plotting"
                                                              
 
 hostname
 pwd
 
-mpiexec -n $SLURM_NTASKS python $REPO_DIR/Block.py >> results.log
+mpiexec -n $SLURM_NTASKS python $REPO_DIR/Block_Plot.py CONT >> results.log
 
 

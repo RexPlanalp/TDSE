@@ -29,11 +29,13 @@ if ALL:
             plt.semilogy(E_range,np.real(y),label = f"{l,m}")
         elif MODE == "real":
             plt.plot(E_range,np.real(y),label = f"{l,m}")
-        if l == m:
+        #if l == m:
+        if np.abs(l-m)==2: 
             total_restricted += np.real(y)
         total += np.real(y)
     plt.savefig("images/partial.png")
     plt.clf()
+    np.save("PES_files/total.npy",total)
     plt.semilogy(E_range,total_restricted,label = "Total Restricted")
     plt.semilogy(E_range,total,label = "Total")
     plt.savefig("images/total.png")

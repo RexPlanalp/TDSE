@@ -2,10 +2,10 @@ import numpy as np
 from scipy.signal import find_peaks
 import matplotlib.pyplot as plt
 
-root = "//data/becker/dopl4670/TDSE_Jobs/Project/10_800_2E14/"
+root = "//data/becker/dopl4670/TDSE_Jobs/Argon/Argon_10_800_2E14_1"
 
-total_PES = root + "PES_files/PES.npy"
-total_E = root + "PES_files/E.npy"
+total_PES = root + "/PES_files/PES.npy"
+total_E = root + "/PES_files/E.npy"
 
 PES = np.real(np.load(total_PES))
 E = np.load(total_E)
