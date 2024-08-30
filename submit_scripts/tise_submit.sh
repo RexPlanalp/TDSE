@@ -7,7 +7,7 @@
 #SBATCH -o run.log 
 #SBATCH -t 0-01:00:00
 
-
+#SBATCH --exclude=node78
 #SBATCH --exclude=node81
 #SBATCH --exclude=node82
 #SBATCH --exclude=node83

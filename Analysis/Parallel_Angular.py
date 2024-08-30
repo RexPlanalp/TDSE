@@ -46,13 +46,13 @@ if True:
     SLICE = simInstance.SLICE
     if SLICE == "XZ":
         phi_range = np.array([0,np.pi])
-        theta_range = np.arange(0,np.pi+0.01,0.01)
+        theta_range = np.arange(0,np.pi,0.01)
     elif SLICE == "XY":
-        phi_range = np.arange(0,2*np.pi+0.01,0.01)
+        phi_range = np.arange(0,2*np.pi,0.01)
         theta_range = np.array([np.pi/2])
     elif SLICE == "YZ":
         phi_range = np.array([np.pi/2,3*np.pi/2])
-        theta_range = np.arange(0,np.pi+0.01,0.01)
+        theta_range = np.arange(0,np.pi,0.01)
 
 if True:
         S = PETSc.Mat().createAIJ([total_size, total_size], nnz=(2 * (order - 1) + 1), comm=MPI.COMM_SELF)
@@ -128,8 +128,8 @@ for E in local_E_range:
                 
                 #l_values = np.array([25,24,23,22,21,26,27,20])
                 #m_values = np.array([25,24,23,22,21,26,27,20])
-                l_values = np.array([26,25,24,23,22,21,20,19,18,17])
-                m_values = np.array([26,25,24,23,22,21,20,19,18,17])
+                l_values = np.array([25,24,23,22,21])
+                m_values = np.array([25,24,23,22,21])
                 top_lm = [(l,m) for l,m in zip(l_values,m_values)]
                 
                 top_indices = [lm_dict[(l,m)] for l,m in top_lm]
