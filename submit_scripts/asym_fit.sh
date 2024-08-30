@@ -14,6 +14,6 @@ REPO_DIR="/users/becker/dopl4670/Research/TDSE/Plotting"
 hostname
 pwd
 
-mpiexec -n $SLURM_NTASKS python $REPO_DIR/AsymmetryFit_Plot.py >> results.log
+mpiexec -n $SLURM_NTASKS python $REPO_DIR/FitA_Plot.py >> results.log
 
 
