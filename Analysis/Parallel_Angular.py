@@ -128,8 +128,8 @@ for E in local_E_range:
                 
                 #l_values = np.array([25,24,23,22,21,26,27,20])
                 #m_values = np.array([25,24,23,22,21,26,27,20])
-                l_values = np.array([25,24,23,22,21])
-                m_values = np.array([25,24,23,22,21])
+                l_values = np.array([26,25,24,23,22,21])
+                m_values = np.array([26,25,24,23,22,21])
                 top_lm = [(l,m) for l,m in zip(l_values,m_values)]
                 
                 top_indices = [lm_dict[(l,m)] for l,m in top_lm]
