@@ -33,15 +33,16 @@ if "PARTIAL" in sys.argv:
 if "TOP" in sys.argv:
     top = int(sys.argv[2])
     E = float(sys.argv[3])
+    
    
     E_idx = np.argmin(np.abs(E_range - E))
 
     values = []
     lm_vals = []
     for (l, m), y in partial_spectra.items():
-        partial_spectrum = np.real(y)
-        values.append(partial_spectrum[E_idx])
-        lm_vals.append((l, m))
+            partial_spectrum = np.real(y)
+            values.append(partial_spectrum[E_idx])
+            lm_vals.append((l, m))
 
     values = np.array(values)
     lm_vals = np.array(lm_vals)
@@ -58,8 +59,33 @@ if "TOP" in sys.argv:
     
     plt.plot([l for l,_ in top_lm_vals], np.sqrt(top_values/np.max(top_values)), 'o')
     plt.savefig("images/top.png")
-       
 
+# Must specify energy via command line
+if "AMP" in sys.argv:
+    E = float(sys.argv[2])
+   
+    E_idx = np.argmin(np.abs(E_range - E))
+
+    values = []
+    lm_vals = []
+    for (l, m), y in partial_spectra.items():
+        if l == m:
+            partial_spectrum = np.real(y)
+            values.append(partial_spectrum[E_idx])
+            lm_vals.append((l, m))
+
+    values = np.array(values)
+    lm_vals = np.array(lm_vals)
+
+    l_vals = [l for l,_ in lm_vals]
+    sorted_indices = np.argsort(l_vals)
+
+    values = values[sorted_indices]
+    np.save("PES_files/amp.npy",values)
+
+    
+    
+    
 
 
    
