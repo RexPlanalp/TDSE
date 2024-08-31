@@ -101,9 +101,10 @@ with h5py.File('TDSE_files/TDSE.h5', 'r') as f:
     imaginary_part = file_data[:, 1]
     total = real_part + 1j * imaginary_part
 
-m = 0
+#m = 0
 partial_spectra = {}
 for l in range(data["lm"]["lmax"]+1):
+    for m in range(-l,l+1):
         print(l)
         vals = []
 
@@ -134,8 +135,11 @@ plt.clf()
 
 # Computing PAD
 k_interpolate = np.sqrt(2 * E_interpolate)
-theta = np.arange(0,np.pi+0.01,0.01)
-phi = np.array([0,np.pi])
+#theta = np.arange(0,np.pi+0.01,0.01)
+#phi = np.array([0,np.pi])
+
+theta = np.array([np.pi/2])
+phi = np.arange(0,2*np.pi,0.01)
 
 k_vals = []
 theta_vals = []
@@ -167,7 +171,7 @@ pz_vals = k_vals * np.cos(theta_vals)
 
 max_mom = np.max(np.real(pad_vals))
 min_mom = np.max(np.real(pad_vals))*10**-6
-plt.scatter(pz_vals, px_vals, c=pad_vals, cmap="hot_r",norm=mcolors.LogNorm(vmin=min_mom,vmax=max_mom))
+plt.scatter(px_vals, py_vals, c=pad_vals, cmap="hot_r",norm=mcolors.LogNorm(vmin=min_mom,vmax=max_mom))
 plt.savefig("Cont_PAD.png")
             
                     

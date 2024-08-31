@@ -14,10 +14,8 @@ from Atomic import *
 comm = PETSc.COMM_WORLD
 rank = comm.rank
 
-if not os.path.exists("TDSE_files"):
-    if rank == 0:
-        os.mkdir("TDSE_files")
-    comm.barrier()
+
+
 
 def EVSolver(H, S, num_of_energies):
     E = SLEPc.EPS().create()
@@ -107,12 +105,5 @@ atomicInstance = atomic(simInstance)
 atomicInstance.createS(simInstance,basisInstance)
 
 solveEigensystem(simInstance,basisInstance,atomicInstance)
-
-if rank == 0:
-    print("Cleaning up...")
-    os.system(f"mv {atomicInstance.pot_func.__name__}_Cont.h5 TISE_files")
-
-
-
 
 
