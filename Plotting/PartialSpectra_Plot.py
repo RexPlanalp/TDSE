@@ -2,6 +2,7 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import pickle
+import json
 
 with open("PES_files/partial_pes.json", "rb") as fp:
     partial_spectra = pickle.load(fp)
@@ -66,22 +67,16 @@ if "AMP" in sys.argv:
    
     E_idx = np.argmin(np.abs(E_range - E))
 
-    values = []
-    lm_vals = []
+    amplitude_dict = {}
+
     for (l, m), y in partial_spectra.items():
-        if l == m:
-            partial_spectrum = np.real(y)
-            values.append(partial_spectrum[E_idx])
-            lm_vals.append((l, m))
+        partial_spectrum = np.real(y).tolist()
+        key_str = f"({l},{m})"
 
-    values = np.array(values)
-    lm_vals = np.array(lm_vals)
-
-    l_vals = [l for l,_ in lm_vals]
-    sorted_indices = np.argsort(l_vals)
-
-    values = values[sorted_indices]
-    np.save("PES_files/amp.npy",values)
+        amplitude_dict[key_str] = np.sqrt(partial_spectrum[E_idx])
+        
+    with open('amplitudes.json', 'w') as json_file:
+        json.dump(amplitude_dict, json_file, indent=4)
 
     
     

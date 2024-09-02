@@ -7,7 +7,8 @@ from scipy.special import gamma
 P = False
 PandA = False
 Test1 = False
-Test2 = True
+Test2 = False
+Test3 = True
 
 
 if PandA:
@@ -232,6 +233,38 @@ if Test2:
 
     print("Fitted phase for l=25, m=25:", popt[0]%(2*np.pi))
     print("Analytic phase for l=25, m=25:", np.angle(gamma(25 + 1 - 1j / k))%(2*np.pi))
+
+if Test3:
+    import json
+
+    E = 0.48
+    k = np.sqrt(2 * E)
+    theta = np.pi/2
+    phi = np.arange(0, 2 * np.pi, 0.01)
+
+    E_interpolate = np.arange(0, 1 + 0.01, 0.01)
+    E_idx = np.argmin(np.abs(E_interpolate - E))
+
+    # Load the JSON data from the file
+    with open('amplitudes.json', 'r') as json_file:
+        amplitude_dict = json.load(json_file)
+    with open('phases.json', 'r') as json_file:
+        phase_dict = json.load(json_file)
+
+    PAD_amp = 0
+    for key in amplitude_dict.keys():
+        l, m = map(int, key.strip("()").split(','))
+        amplitude = amplitude_dict[key]
+        phase = phase_dict[key][E_idx]
+
+        print(phase,amplitude)
+        PAD_amp += (-1j)**l * np.exp(1j*np.angle(gamma(l + 1 -1j/k))) * sph_harm(m, l, phi, theta) * amplitude * np.exp(1j*phase)
+        
+    PAD = np.abs(PAD_amp)**2
+
+    plt.plot(phi, PAD)
+    plt.savefig("TESTPAD.png")
+        
 
 
 

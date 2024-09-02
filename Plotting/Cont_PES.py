@@ -20,6 +20,17 @@ sys.path.append('/users/becker/dopl4670/Research/TDSE/Common')
 from Sim import *
 from Basis import *
 
+
+E_max = 1
+E_res = 0.01
+
+
+
+
+
+
+
+
 simInstance = Sim("input.json")  
 simInstance.lm_block_maps() 
 simInstance.calc_n_block()   
@@ -53,7 +64,7 @@ with open("input.json", 'r') as file:
     data = json.load(file)
 
 # The specified energy range
-E_interpolate = np.arange(0, 1 + 0.01, 0.01)
+E_interpolate = np.arange(0, E_max + E_res, E_res)
 
 # Path for the new HDF5 file
 new_file_path = 'H_Cont_Cleaned.h5'
@@ -101,10 +112,10 @@ with h5py.File('TDSE_files/TDSE.h5', 'r') as f:
     imaginary_part = file_data[:, 1]
     total = real_part + 1j * imaginary_part
 
-m = 0
+#m = 0
 partial_spectra = {}
 for l in range(data["lm"]["lmax"]+1):
-    #for m in range(-l,l+1):
+    for m in range(-l,l+1):
         print(l)
         vals = []
 
@@ -123,10 +134,23 @@ for l in range(data["lm"]["lmax"]+1):
         partial_spectra[(l,m)] = vals
 
 
+phases_dict = {}
+
 # Computing Total photoelectron spectrum
 total = 0
 for key, value in partial_spectra.items():
     total += np.abs(value)**2
+    
+    phases = np.angle(value)
+    
+    # Convert the key to a string so it can be used as a JSON key
+    key_str = f"({key[0]},{key[1]})"
+    
+    # Save the phases to the dictionary
+    phases_dict[key_str] = phases.tolist()  # Convert numpy array to list for JSON serialization
+    
+with open('phases.json', 'w') as json_file:
+    json.dump(phases_dict, json_file, indent=4)
     
 
 plt.semilogy(E_interpolate, total)
@@ -136,21 +160,21 @@ plt.clf()
 
 # Computing PAD
 k_interpolate = np.sqrt(2 * E_interpolate)
-theta = np.arange(0,np.pi+0.01,0.01)
-phi = np.array([0,np.pi])
+#theta = np.arange(0,np.pi+0.01,0.01)
+#phi = np.array([0,np.pi])
 
-#theta = np.array([np.pi/2])
-#phi = np.arange(0,2*np.pi,0.01)
+theta = np.array([np.pi/2])
+phi = np.arange(0,2*np.pi,0.01)
 
 k_vals = []
 theta_vals = []
 phi_vals = []
 pad_vals = []
 
-for k in k_interpolate:
+for i,k in enumerate(k_interpolate):
+    print(i,len(k_interpolate))
     if k == 0:
         continue
-    print(k,np.max(k_interpolate))
     E_idx = np.argmin(np.abs(k_interpolate - k))
     for t in theta:
         for p in phi:
@@ -171,8 +195,8 @@ py_vals = k_vals * np.sin(theta_vals) * np.sin(phi_vals)
 pz_vals = k_vals * np.cos(theta_vals)
 
 max_mom = np.max(np.real(pad_vals))
-min_mom = np.max(np.real(pad_vals))*10**-6
-plt.scatter(pz_vals, px_vals, c=pad_vals, cmap="hot_r",norm=mcolors.LogNorm(vmin=min_mom,vmax=max_mom))
+min_mom = np.max(np.real(pad_vals))*10**-2
+plt.scatter(px_vals, py_vals, c=pad_vals, cmap="hot_r",norm=mcolors.LogNorm(vmin=min_mom,vmax=max_mom))
 plt.savefig("Cont_PAD.png")
             
                     
