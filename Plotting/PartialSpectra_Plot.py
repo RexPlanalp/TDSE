@@ -22,10 +22,10 @@ if "TOTAL" in sys.argv:
 if "PARTIAL" in sys.argv:
     partial = 0
     for (l,m),y in partial_spectra.items():
-        condition = l == m
+        condition = (l==25) and (m == 25)
         if condition:
             partial += np.real(y)
-    plt.semilogy(E_range,partial,label = "Partial: l = m")
+    plt.plot(E_range,partial,label = "Partial: l = m")
     plt.legend()
     plt.savefig("images/partial.png")
     plt.clf()
@@ -34,6 +34,9 @@ if "PARTIAL" in sys.argv:
 if "TOP" in sys.argv:
     top = int(sys.argv[2])
     E = float(sys.argv[3])
+
+    
+
     
    
     E_idx = np.argmin(np.abs(E_range - E))
@@ -55,8 +58,16 @@ if "TOP" in sys.argv:
     top_values = values[:top]
     top_lm_vals = lm_vals[:top]
 
+    top_dict = {}
+
     for idx,(l,m) in enumerate(top_lm_vals):
        print(f"{(l,m)}:{np.sqrt(top_values[idx]/np.max(top_values))}")
+
+       key_str = f"{(l,m)}"
+       top_dict[key_str] = np.sqrt(top_values[idx]/np.max(top_values))
+
+    with open('amplitudes.json', 'w') as json_file:
+        json.dump(top_dict, json_file, indent=4)
     
     plt.plot([l for l,_ in top_lm_vals], np.sqrt(top_values/np.max(top_values)), 'o')
     plt.savefig("images/top.png")
@@ -69,7 +80,13 @@ if "AMP" in sys.argv:
 
     amplitude_dict = {}
 
+    lm_values = [(26, 26), (25, 25), (24, 24), (23, 23), (22, 22), (21, 21)]
+
+
     for (l, m), y in partial_spectra.items():
+        if (l, m) not in lm_values:
+            continue
+        
         partial_spectrum = np.real(y).tolist()
         key_str = f"({l},{m})"
 

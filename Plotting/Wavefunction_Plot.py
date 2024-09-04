@@ -17,6 +17,9 @@ simInstance.spacialGrid()
 basisInstance = basis()
 basisInstance.createKnots(simInstance)
 
+order = simInstance.splines["order"]
+knots = basisInstance.knots
+
 
 if "BOUND" in sys.argv:
     potential = simInstance.box["pot"]
@@ -41,14 +44,21 @@ if "TDSE" in sys.argv:
         total = real_part + 1j * imaginary_part
     total = total[block*n_basis:(block+1)*n_basis]
 
-wavefunction = 0
-x = np.linspace(0,10,1500)
-for i in range(simInstance.splines["n_basis"]):
-    wavefunction += total[i] * basisInstance.B(i,simInstance.splines["order"],x,basisInstance.knots)
 
-plt.plot(x,np.real(wavefunction))
-plt.plot(x,np.imag(wavefunction))
-plt.savefig("images/component_wavefunction.png")
+x = np.linspace(0,simInstance.box["grid_size"],15000)
+wavefunction = np.zeros_like(x,dtype=complex)
+
+for i in range(simInstance.splines["n_basis"]):
+    start = knots[i]
+    end = knots[i + order]
+    
+    valid_indices = np.where((x >= start) & (x < end))[0]
+    
+    if valid_indices.size > 0:
+        wavefunction[valid_indices] += total[i] * basisInstance.B(i, order, x[valid_indices], knots)
+
+
 
 plt.plot(x,np.abs(wavefunction)**2)
+plt.xlim([0,30])
 plt.savefig("images/PDF.png")

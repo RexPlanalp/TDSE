@@ -3,17 +3,18 @@ import matplotlib.pyplot as plt
 from scipy.special import sph_harm
 from scipy.optimize import curve_fit
 from scipy.special import gamma
+import json
 
 P = False
-PandA = False
+PandA = True
 Test1 = False
 Test2 = False
-Test3 = True
+Test3 = False
 
 
 if PandA:
     # Given values
-    lm_values = [(26, 26), (25, 25), (24, 24), (23, 23), (22, 22), (21, 21)]
+    lm_values = [(25, 25), (24, 24), (23, 23), (22, 22), (21, 21)]
     E = 0.48
     k = np.sqrt(2 * E)
 
@@ -29,13 +30,13 @@ if PandA:
         phases = params[len(lm_values):]
 
         pes_amp = sum(
-            amplitude * (-1j)**l * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
+            amplitude * (1j)**l * np.exp(1j * phase) * np.exp(-1j*np.angle(gamma(l + 1 -1j/k)))* sph_harm(m, l, phi, theta) 
             for amplitude, phase, (m, l) in zip(amplitudes, phases, lm_values)
         )
         pes_vals = np.abs(pes_amp) ** 2
 
         pes_amp_opp = sum(
-            (-1) ** l * amplitude * (-1j)**l * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
+            amplitude * (1j)**l * np.exp(1j * phase) * np.exp(-1j*np.angle(gamma(l + 1 -1j/k)))* sph_harm(m, l, phi+np.pi, theta) 
             for amplitude, phase, (m, l) in zip(amplitudes, phases, lm_values)
         )
         pes_vals_opp = np.abs(pes_amp_opp) ** 2
@@ -56,21 +57,21 @@ if PandA:
 
     # Plotting the results
     plt.plot(phi, A_data, label='Data')
-    plt.plot(phi, A(phi, *popt)+0.01, label='Fitted')
+    plt.plot(phi, A(phi, *popt)+0.1, label='Fitted')
     plt.legend()
     plt.savefig("images/A_fit.png")
     plt.clf()
 
-    plt.scatter([l for l, _ in lm_values], fitted_amplitudes/np.max(fitted_amplitudes), label='Fit Amplitudes')
+    plt.scatter([l for l, _ in lm_values], fitted_amplitudes/fitted_amplitudes[0], label='Fit Amplitudes')
     plt.legend()
     plt.savefig("images/amplitudes.png")
 
     print("Fitted amplitudes:", fitted_amplitudes)
-    print("Fitted phases:", fitted_phases)
+    print("Fitted phases:", fitted_phases%(2*np.pi))
 
 if P:
     # Given values
-    lm_values = [(26, 26), (25, 25), (24, 24), (23, 23), (22, 22), (21, 21)]
+    lm_values = [(25, 25), (24, 24), (23, 23), (22, 22), (21, 21),(26, 26)]
     E = 0.48
     k = np.sqrt(2 * E)
 
@@ -78,21 +79,30 @@ if P:
     phi = np.arange(0, 2 * np.pi, 0.01)
 
     # Load the A_data
-    #A_data = np.load("TDSE_files/A_slice.npy")
-    A_data = np.load("TDSE_files/A_slice_unrestricted.npy")
+    A_data = np.load("TDSE_files/A_slice.npy")
 
-    amplitudes = np.array([0.07533005985129226,1.0,0.902312561894757,0.4685439642905903,0.25043252182788084,0.13120409327525653])
+    with open('amplitudes.json', 'r') as json_file:
+        amplitude_dict = json.load(json_file)
+    
+    amplitudes = amplitude_dict.values()
 
+    
+
+
+  
+
+
+    
     # Define the fitting function
     def A(phi, *phases):
         pes_amp = sum(
-            np.angle(gamma(l + 1 -1j/k)) * amplitude * (-1j)**l * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
+            np.exp(-1j*(np.angle(gamma(l + 1 -1j/k)))+1j*phase) * amplitude * (1j)**l * sph_harm(m, l, phi, theta)
             for amplitude, phase, (m, l) in zip(amplitudes, phases, lm_values)
         )
         pes_vals = np.abs(pes_amp) ** 2
 
         pes_amp_opp = sum(
-            (-1) ** l * np.angle(gamma(l + 1 -1j/k)) * amplitude * (-1j)**l * np.exp(1j * phase) * sph_harm(m, l, phi, theta)
+            np.exp(-1j*(np.angle(gamma(l + 1 -1j/k)))+1j*phase) * amplitude * (1j)**l * sph_harm(m, l, phi+np.pi, theta)
             for amplitude, phase, (m, l) in zip(amplitudes, phases, lm_values)
         )
         pes_vals_opp = np.abs(pes_amp_opp) ** 2
@@ -100,7 +110,7 @@ if P:
         asymmetry = (pes_vals - pes_vals_opp) / (pes_vals + pes_vals_opp)
         return asymmetry
 
-    # Initial guesses for the phases
+    # # Initial guesses for the phases
     initial_phases = np.zeros(len(lm_values))
 
     # Perform the curve fitting
@@ -116,15 +126,9 @@ if P:
     plt.savefig("images/A_fit.png")
     plt.show()
 
-    analytic_phases = []
-    for (l,m) in lm_values:
-        phase = np.angle(gamma(l + 1 -1j/k))
-        analytic_phases.append(phase)
-    analytic_phases = np.array(analytic_phases)
-
     print("Fixed amplitudes:", amplitudes)
     print("Fitted phases:", fitted_phases%(2*np.pi))
-    print("Analytic phases:", analytic_phases%(2*np.pi))
+    
 
 if Test1:
     # Given values
@@ -242,27 +246,29 @@ if Test3:
     theta = np.pi/2
     phi = np.arange(0, 2 * np.pi, 0.01)
 
-    E_interpolate = np.arange(0, 1 + 0.01, 0.01)
-    E_idx = np.argmin(np.abs(E_interpolate - E))
+    
 
     # Load the JSON data from the file
     with open('amplitudes.json', 'r') as json_file:
         amplitude_dict = json.load(json_file)
-    with open('phases.json', 'r') as json_file:
-        phase_dict = json.load(json_file)
 
     PAD_amp = 0
+    PAD_amp_opp = 0
     for key in amplitude_dict.keys():
         l, m = map(int, key.strip("()").split(','))
         amplitude = amplitude_dict[key]
-        phase = phase_dict[key][E_idx]
+       
 
-        print(phase,amplitude)
-        PAD_amp += (-1j)**l * np.exp(1j*np.angle(gamma(l + 1 -1j/k))) * sph_harm(m, l, phi, theta) * amplitude * np.exp(1j*phase)
+        
+        PAD_amp += (1j)**l * np.exp(-1j*np.angle(gamma(l + 1 -1j/k))) * sph_harm(m, l, phi, theta) * amplitude
+        PAD_amp_opp +=  (1j)**l * np.exp(-1j*np.angle(gamma(l + 1 -1j/k))) * sph_harm(m, l, phi+np.pi, theta) * amplitude 
         
     PAD = np.abs(PAD_amp)**2
+    PAD_opp = np.abs(PAD_amp_opp)**2
 
-    plt.plot(phi, PAD)
+    asymmetry = (PAD - PAD_opp) / (PAD + PAD_opp)
+
+    plt.plot(phi, asymmetry)
     plt.savefig("TESTPAD.png")
         
 

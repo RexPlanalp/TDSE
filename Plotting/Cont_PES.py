@@ -24,13 +24,6 @@ from Basis import *
 E_max = 1
 E_res = 0.01
 
-
-
-
-
-
-
-
 simInstance = Sim("input.json")  
 simInstance.lm_block_maps() 
 simInstance.calc_n_block()   
@@ -44,6 +37,18 @@ basisInstance = basis()
 basisInstance.createKnots(simInstance)
 B = basisInstance.B
 knots = basisInstance.knots
+
+if simInstance.laser["polarization"] == "linear":
+    theta_range = np.arange(0,np.pi,0.01)
+    phi_range = np.array([0,np.pi])
+
+  
+elif simInstance.laser["polarization"] == "elliptical":
+    theta_range = np.array([np.pi/2])
+    phi_range = np.arange(0,2*np.pi,0.01)
+
+    
+
 
 LOAD_S = True
 if LOAD_S:
@@ -59,6 +64,13 @@ if LOAD_S:
     S_R= S_array[:n_basis, :n_basis]
     S.destroy()
 
+with h5py.File('TDSE_files/TDSE.h5', 'r') as f:
+    file_data = f["psi_final"][:]
+    real_part = file_data[:, 0]
+    imaginary_part = file_data[:, 1]
+    total = real_part + 1j * imaginary_part
+
+
 # Load the input data
 with open("input.json", 'r') as file:
     data = json.load(file)
@@ -66,92 +78,75 @@ with open("input.json", 'r') as file:
 # The specified energy range
 E_interpolate = np.arange(0, E_max + E_res, E_res)
 
-# Path for the new HDF5 file
-new_file_path = 'H_Cont_Cleaned.h5'
+# Dictionary to store the cleaned states
+cleaned_states = {}
 
 # Process each l value
 for l in range(data["lm"]["lmax"]+1):
     print(l)
     with h5py.File("H_Cont.h5", 'r') as file:  # Open the original file in read-only mode
         
-        # Prepare to write to a new file
-        with h5py.File(new_file_path, 'a') as new_file:  # Open or create the new file in append mode
+        # Get a list of dataset names for the specific l
+        datasets = list(file.keys())
+        filtered_datasets = [name for name in datasets if name.startswith(f'Psi_{l}_')]
 
-            # Get a list of dataset names for the specific l
-            datasets = list(file.keys())  
-            filtered_datasets = [name for name in datasets if name.startswith(f'Psi_{l}_')]
+        # Extract energies and corresponding datasets
+        energies = []
+        dataset_names = []
+        for dataset_name in filtered_datasets:
+            parts = dataset_name.split('_')
+            energy = float(parts[2])
+            energies.append(energy)
+            dataset_names.append(dataset_name)
+        energies = np.array(energies)
 
-            # Extract energies and corresponding datasets
-            energies = []
-            dataset_names = []
-            for dataset_name in filtered_datasets:
-                parts = dataset_name.split('_')
-                energy = float(parts[2])
-                energies.append(energy)
-                dataset_names.append(dataset_name)
-            energies = np.array(energies)
-
-            # Loop through each specified energy in the range
-            for energy in E_interpolate:
-                index_closest = np.argmin(np.abs(energies - energy))
-                closest_energy = energies[index_closest]
-                closest_dataset = dataset_names[index_closest]
+        # Loop through each specified energy in the range
+        for energy in E_interpolate:
+            index_closest = np.argmin(np.abs(energies - energy))
+            closest_energy = energies[index_closest]
+            closest_dataset = dataset_names[index_closest]
+            
+            # Create new dataset name with interpolated energy
+            new_dataset_name = f'Psi_{l}_{energy:.2f}'  # Format to 2 decimal places
+            
+            # Store in the dictionary instead of writing to a new file
+            if new_dataset_name not in cleaned_states:
+                # Retrieve data and convert to complex array
+                data_array = file[closest_dataset][...]
+                if data_array.shape[1] == 2:
+                    # Convert two-column real/imag data to complex array
+                    psi_complex = data_array[:, 0] + 1j * data_array[:, 1]
+                else:
+                    # Assume data is already in complex format
+                    psi_complex = data_array
                 
-                # Create new dataset name with interpolated energy
-                new_dataset_name = f'Psi_{l}_{energy:.2f}'  # Format to 2 decimal places
-                
-                # Check if the new name already exists in the new file to avoid overwriting
-                if new_dataset_name not in new_file:
-                    # Copy data to new file under new name
-                    new_file[new_dataset_name] = file[closest_dataset][...]
+                # Copy data to the dictionary as complex numbers
+                cleaned_states[new_dataset_name] = psi_complex
 
-
-with h5py.File('TDSE_files/TDSE.h5', 'r') as f:
-    file_data = f["psi_final"][:]
-    real_part = file_data[:, 0]
-    imaginary_part = file_data[:, 1]
-    total = real_part + 1j * imaginary_part
-
-#m = 0
 partial_spectra = {}
-for l in range(data["lm"]["lmax"]+1):
-    for m in range(-l,l+1):
-        print(l)
-        vals = []
-
-        block_idx = simInstance.lm_dict[(l,m)]
-        block = total[block_idx*n_basis:(block_idx+1)*n_basis]
-
-        with h5py.File(new_file_path, 'r') as new_file:
-            for energy in E_interpolate:
-                dataset_name = f'Psi_{l}_{energy:.2f}'
-                if dataset_name in new_file:
-                    psi = new_file[dataset_name][:]
-                    psi_complex = psi[:, 0] + 1j * psi[:, 1]
-
-                    inner_product = psi_complex.conj().dot(S_R.dot(block))
-                    vals.append(inner_product)
-        partial_spectra[(l,m)] = vals
 
 
-phases_dict = {}
+for l,m in simInstance.lm_dict:
+    print(f'l: {l}, m: {m}')
+    vals = []
 
-# Computing Total photoelectron spectrum
+    block_idx = simInstance.lm_dict[(l, m)]
+    block = total[block_idx*n_basis:(block_idx+1)*n_basis]
+
+    for energy in E_interpolate:
+        dataset_name = f'Psi_{l}_{energy:.2f}'
+        if dataset_name in cleaned_states:
+            
+
+            psi_complex = cleaned_states[dataset_name]
+            inner_product = psi_complex.conj().dot(S_R.dot(block))
+            vals.append(inner_product)
+
+    partial_spectra[(l, m)] = vals
+
 total = 0
 for key, value in partial_spectra.items():
     total += np.abs(value)**2
-    
-    phases = np.angle(value)
-    
-    # Convert the key to a string so it can be used as a JSON key
-    key_str = f"({key[0]},{key[1]})"
-    
-    # Save the phases to the dictionary
-    phases_dict[key_str] = phases.tolist()  # Convert numpy array to list for JSON serialization
-    
-with open('phases.json', 'w') as json_file:
-    json.dump(phases_dict, json_file, indent=4)
-    
 
 plt.semilogy(E_interpolate, total)
 plt.savefig("Cont_PES.png")
@@ -160,11 +155,6 @@ plt.clf()
 
 # Computing PAD
 k_interpolate = np.sqrt(2 * E_interpolate)
-#theta = np.arange(0,np.pi+0.01,0.01)
-#phi = np.array([0,np.pi])
-
-theta = np.array([np.pi/2])
-phi = np.arange(0,2*np.pi,0.01)
 
 k_vals = []
 theta_vals = []
@@ -176,8 +166,8 @@ for i,k in enumerate(k_interpolate):
     if k == 0:
         continue
     E_idx = np.argmin(np.abs(k_interpolate - k))
-    for t in theta:
-        for p in phi:
+    for t in theta_range:
+        for p in phi_range:
 
             k_vals.append(k)
             theta_vals.append(t)
@@ -185,8 +175,10 @@ for i,k in enumerate(k_interpolate):
 
             pad_amp = 0
             for key, value in partial_spectra.items():
+                
                 l,m = key
-                pad_amp += (-1j)**l * np.exp(1j*np.angle(gamma(l + 1 -1j/k))) * sph_harm(m, l, p, t) * value[E_idx]
+                #pad_amp += (-1j)**l * np.exp(1j*np.angle(gamma(l + 1 -1j/k))) * sph_harm(m, l, p, t) * value[E_idx]
+                pad_amp += (1j)**l * np.exp(-1j*np.angle(gamma(l + 1 -1j/k))) * sph_harm(m, l, p, t) * value[E_idx]
             pad_vals.append(np.abs(pad_amp)**2)
 
 
@@ -197,7 +189,10 @@ pz_vals = k_vals * np.cos(theta_vals)
 max_mom = np.max(np.real(pad_vals))
 min_mom = np.max(np.real(pad_vals))*10**-2
 plt.scatter(px_vals, py_vals, c=pad_vals, cmap="hot_r",norm=mcolors.LogNorm(vmin=min_mom,vmax=max_mom))
+#plt.scatter(px_vals, py_vals, c=pad_vals, cmap="hot_r")
+plt.colorbar()
 plt.savefig("Cont_PAD.png")
+            
             
                     
                    
